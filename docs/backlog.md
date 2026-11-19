@@ -17,6 +17,8 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 8 | [Forks](#8-forks) | New skill | M | none | todo |
 | 9 | [Secrets scanner for publishing](#9-secrets-scanner-for-publishing) | Checklist tool | M | licence check | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
+| 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | none | todo |
+| 13 | [Contributions to other people's projects](#13-contributions-to-other-peoples-projects) | New skill | M | 6 helps | todo |
 | – | [Smaller items](#smaller) | Fixes | S each | none | todo |
 | 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
@@ -164,6 +166,39 @@ When the review says publish or feature, draft the announcement: where it fits, 
 
 **Done when**, for one repo recommended for featuring, it drafts posts for at least two places, each with the reason it fits (from the repo's referrers or where similar repos are discussed).
 
+## 12. Other people in the review
+
+The review counts other people only as a reason for care: stars, forks and issues from others make it prefer archive to make-private, a licence fix names anyone else with commits, and the fix prompt opens a pull request when others commit. It never shows who else built the repo, or whether the people who came to it got an answer, though both say as much about the repo as its stars do. A collaborator reading the page notices an issue from a stranger left unanswered for two years, or a README in the first person singular over someone else's commits.
+
+Add to the Outcomes panel, as context with no pass or fail:
+- **Contributors**: everyone else with commits, from `git shortlog -sne` on the clone (which works on claude.ai), by login where GitHub links one and by name otherwise, never by email address, with their number of commits and their last.
+- **Waiting on you**: open issues and pull requests opened by other people, each with its age and whether the owner has replied.
+
+And use them:
+- **Tone** flags a README that presents shared work as the user's alone, such as a first-person history over commits that are mostly someone else's. The fix credits them by name.
+- **Before archiving** and **keep** gain a draft reply for each open issue or pull request from someone else, in the fix prompt, for the user to post. The review never posts it.
+
+Its rules match the `stargazers` skill's: public data only, no email addresses, never contact anyone.
+
+**Done when** a review of a repo with commits from someone else and an unanswered issue from a stranger lists both in Outcomes, flags Tone if the README doesn't credit the other contributor, and puts a draft reply in the fix prompt.
+
+## 13. Contributions to other people's projects
+
+A merged pull request to someone else's project is some of the best evidence of how the user works with others: someone else's maintainers reviewed it and took it. Nothing shows it today. Triage reads the user's pull requests to a fork's parent, but only to decide about the fork, and an upstream contribution made without a fork on the account is never seen.
+
+A new skill, `contributions`, would list the user's merged pull requests to repos they don't own, from issue search (`search/issues?q=author:LOGIN+type:pr+is:merged+-user:LOGIN`, which answers on claude.ai too), and sort them into three groups:
+- **the user's own organisations' repos**, which `-user:` doesn't leave out. They're the user's own work, so they're left out of this list and counted instead;
+- **employers' repos**, work done for a job. The user says which owners were employers, kept outside the plugin, as in the "Author identities" smaller item: the same employer often shows up both as an organisation here and as an email domain on old commits. They're listed apart, since whether to show them is the user's call;
+- **other people's projects**, the open-source contributions: one entry per repo, with its stars, the number merged, the dates and a line on what each did, from its title, most-starred repo first.
+
+Search gives at most 100 results a page and 1,000 in all, so paginate and say when the total runs past that. Like `stargazers`, it uses public data only and contacts no one. Profile review (item 6) would use the third group to say which contributions to mention in the profile README, and triage would use it to tell a fork whose work went upstream from one whose work didn't.
+
+A search by hand on 2026-11-19 shows the shape on this account: 288 merged pull requests to repos not under `tcrossland`, 152 of them to the user's own `mailcellar` organisation, most of the remaining 136 to an employer's organisation, and the rest to open-source projects, among them `erlang/otp`, `elixir-lang/elixir`, `elixir-lsp/elixir-ls`, `beancount/fava` and `explosion/spacy-dev-resources`.
+
+**Unverified**: how the skill finds the user's own organisations on claude.ai, where `user/orgs` is refused (`list_repos` lists repos of other owners the user can push to, which may be enough), and whether search reaches every old pull request.
+
+**Done when** it lists the user's merged pull requests to other people's projects with the three groups apart, the counts add up to the search's total, and "Don't deselect date unless datepicker is multidate" to `uxsolutions/bootstrap-datepicker`, merged 2014-12-10, is among them.
+
 ## Smaller
 
 Each is done when the change is made and the tests pass, unless it says otherwise.
@@ -174,6 +209,7 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 - **Recheck the traffic claim**: `docs/github-facts.md` marks "14 days, needs push access" as not rechecked. Done when it has a source and a date.
 - **Rate limits in triage**: the pull-request search goes through GitHub's search API, whose rate limit is far lower than the rest of the API's, so an account with many forks that have commits could hit it. Say in Step 8 to pace the searches and to note any that were refused. Done when triage on an account with more than 30 such forks completes.
 - **Stargazers when profiles can't be read**: neither skill says what to do when Step 2 of `stargazers` can't read the profiles, so the scorecard falls back to "None in the same field", which reads as a judgement that was never made (seen in the 0.2.4 test runs, where every profile call was refused). Say "Not available" with the reason instead, in the `stargazers` reply and in the review's Stargazers lists. Done when both skills say so, and a template test checks the scorecard's wording.
+- **Says whether it takes contributions**: Way in checks that a visitor can run or reuse a repo, but not that the repo says whether it wants contributions, or that its settings agree with what it says: a README that asks for issues when issues are turned off, "pull requests welcome" on an archived repo, or no word either way on a repo with outside pull requests waiting. Add it to Way in, as a flag rather than a fail. A repo that doesn't want contributions passes once it says so. Item 5's Practice panel would check the CONTRIBUTING file and issue templates that a repo inviting contributions needs. Done when a review flags each of the three cases above, and passes a repo that says it doesn't take contributions.
 - **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
 - **README links that don't ship**: the README is in the zip, but its "Working on it" section links to `docs/`, which isn't. Move that section to `docs/README.md`, or have `scripts/package.sh` leave it out.
 
