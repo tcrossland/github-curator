@@ -2,3 +2,4 @@
 *.zip
 dist/
 docs/local
+.claude/agent-memory/
