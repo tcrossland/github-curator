@@ -43,11 +43,11 @@ CASES = [
 
 
 def extract_checker(skill_text):
-    """Return the first python code block in the skill."""
-    match = re.search(r"```python\n(.*?)\n```", skill_text, re.S)
-    if not match:
-        raise ValueError("no python block in SKILL.md")
-    return match.group(1)
+    """Return the python code block in the skill that prints the problem count."""
+    blocks = [b for b in re.findall(r"```python\n(.*?)\n```", skill_text, re.S) if "'problems:'" in b]
+    if len(blocks) != 1:
+        raise ValueError(f"expected one quote checker block in SKILL.md, found {len(blocks)}")
+    return blocks[0]
 
 
 def build_run(cases):

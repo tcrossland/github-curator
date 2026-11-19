@@ -107,6 +107,47 @@ Before featuring:
 
 Leave the recommendation and the feature call out for pasted text, a file, or a local clone with no GitHub remote.
 
+## Timing
+
+Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `overview-timings.log` or `triage-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`:
+
+```sh
+printf '%s\t%s\t%s\n' 'NAME' "$(date -u +%s)" "$(r=$(gh api rate_limit --jq '"\(.resources.core.used)\t\(.resources.core.reset)"' 2>/dev/null) && printf %s "$r")" >> "LOG"
+```
+
+Reading `rate_limit` costs no request, and `core.used` counts every REST request, each page of a paginated call included. It leaves out two kinds, so say so rather than guess:
+- **Search requests** have their own count, which resets every minute, so it can't be read across a step. Count the `search/` requests each step makes yourself, as `searches`.
+- **GraphQL requests** have their own limit and aren't counted.
+
+The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
+
+Log a line only for a step that ran. The steps, in order:
+- **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4) and `Build` (writing the page's JSON in Step 5).
+- **Overview**: each repo's review keeps its own log and shows it on its scorecard. The overview's log has one line per repo, named `OWNER/NAME`, written as its scorecard is published (or saved, with `no-publish`), then `Build`.
+- **Triage**: `List repos`, `Forks`, `Own repos`, `Sort` and `Build`.
+
+The page needs its timings before the template is filled, so for every page, in this order: write the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
+
+```python
+import json, sys
+rows, prev = [], None
+for line in open(sys.argv[1], encoding='utf-8'):
+    f = line.rstrip('\n').split('\t')
+    try:
+        t = int(f[1])
+    except (IndexError, ValueError):
+        continue
+    used = int(f[2]) if len(f) == 4 and f[2].isdigit() else None
+    cur = {'t': t, 'used': used, 'reset': f[3] if used is not None else None}
+    if prev:
+        same = used is not None and prev['used'] is not None and cur['reset'] == prev['reset']
+        rows.append({'step': f[0], 'seconds': t - prev['t'], 'calls': used - prev['used'] if same else None})
+    prev = cur
+print(json.dumps(rows))
+```
+
+A step's `calls` is null when the rate limit couldn't be read at its start or its end (so one failed read blanks two rows), or when GitHub's hourly window reset during it. A line that can't be read at all is skipped, and its time goes to the next row. If `gh` isn't available, still log the times.
+
 ## Step 1: get the draft
 
 Accept any of these:
@@ -239,9 +280,10 @@ The verdict names the single most important fix. Take the earliest failing quest
    - `questions`: seven objects, in order, each with `short` (the bold label above), `status` (`pass`, `fail` or `flagged`), `question` (the full question text), `finding`, `quotes` (a list of `{text, source}`), and `fix`
    - `outcomes` (repos only): `asOf` (ISO 8601 date), `source` (one line, such as "GitHub API"), `items` (a list of `{label, value, note}`, with `note` optional, such as "Not available: no push access"), in this order: Stars, Forks, Watchers, Open issues, Open pull requests, Views (14 days), Unique visitors, Clones (14 days), Unique cloners; and `lists` (a list of `{label, entries, empty}` for "Top referrers", "Most-viewed pages", "Stargazers worth a look" and "Stargazers", each entry a string such as "news.ycombinator.com · 40 views, 31 unique", with an empty list when there are none; `empty` is the line shown in place of an empty list: "None in the last 14 days" for the two traffic lists, "None in the same field" for "Stargazers worth a look", and "None" for "Stargazers"). A "Stargazers worth a look" entry is "`LOGIN` · the one line from the `stargazers` skill"; a "Stargazers" entry is "DATE STARRED · `LOGIN` · name, company, location (whichever the profile has) · N followers · active DATE (or no recent activity)", oldest first, opening with "N earlier stargazers not listed" when only the 30 most recent were read
    - `fixPrompt` (when anything fails or is flagged): a prompt for Claude Code, in the repo's house style, as `header`, `items` and `footer`. The `header` says where the edits go. When the repo's own rules (CLAUDE.md, CONTRIBUTING.md or a working agreement) say how changes land, it follows them. Otherwise, for a public repo or one with commits from anyone besides the user, it names a new branch and says to open a pull request and not merge it; for a private repo only the user commits to, it says to commit on the current branch and not push, so the user reviews the commits before they leave the machine. Either way, the user's own instructions on branching take precedence. The `header` also restates the repo's own rules that matter for the edits, and says to check every statement against the repo and never invent a figure. `items` has one entry per failed or flagged question, `{question, status, text}`, where `text` is a short section: the question's name and location, the finding, the quoted line, the fix, what to verify first, and a Conventional Commits message if the repo uses them. Leave out a private repo's Findable flag when visibility is its only gap. For archive and publish, and for a recommended feature, add one item per `todo` work-before item that a commit can do, with `question` set to the list's title ("Before archiving", "Before featuring") and `status` `before`; the `header` then also says not to do the action itself, since the user does that once the changes have landed. Steps only the user can take (pinning, releases, unpinning) stay on the scorecard and out of the prompt. For make-private and delete, leave the fix prompt out. Leave `fixPrompt` out too if no items remain. Settings changes go through `gh repo edit`; the prompt never archives, deletes or changes a repo's visibility, and never closes an issue or pull request: each is the user's call, so an item about open issues says what to write in reply and leaves the closing to the user. The `footer` lists the repo's own checks from its CI workflow, link checking, and what the pull request description (or, with no pull request, the closing reply) must report.
+   - `timings`: the rows from the log, as set out under Timing, each `{step, seconds, calls, searches}`, with `searches` only when the step made any
    - `footer`: the status definitions in one or two sentences
    Text fields may use `backticks` for code.
-3. Fill the template: replace `__TITLE__` with the title, and `__DATA__` with the JSON, escaping every `</` as `<\/`. Save the result as `REPO-NAME-scorecard.html`.
+3. Append the `Build` line to the log and add `timings` to the JSON, as set out under Timing. Then fill the template: replace `__TITLE__` with the title, and `__DATA__` with the JSON, escaping every `</` as `<\/`. Save the result as `REPO-NAME-scorecard.html`.
 4. With `no-publish`, stop here: the saved file is the result. Otherwise, publish it with `publish_files`, titled "Repo review: REPO-NAME", with the icon `checklist`. If Step 1 found an existing scorecard, under either title, republish to it (`get_artifact` gives the `base_version`) instead of creating a new one, so a re-run updates the same page.
 
 ## Step 6: reply
@@ -265,6 +307,7 @@ After each repo's scorecard is published (or saved, with `no-publish`), publish 
 - `verdict`: `fix` (the repo that needs attention first, and its most important fix) and `why` (one or two sentences). Pick the repo whose earliest failing question comes first; break ties by the most fails.
 - `pins`: `current` (the pinned repos and gists now, as `owner/name` strings), `recommended` (up to six, in the order to pin them, chosen across every repo reviewed and the current pins that weren't), `source` (where the current pins came from) and `why` (one or two sentences on what changes and why). Rank the repos whose feature call is yes, and keep a current pin that wasn't reviewed unless something reviewed is clearly stronger.
 - `repos`: one object per repo with `name` (owner/name), `link`, `action` (its recommended action), `feature` (`true` or `false`), `todo` (the number of `todo` items before the action and featuring, or 0), `statuses` (the seven statuses in order), `fix` (that repo's verdict fix), `stars`, `views` (14-day views, or "Not available") and `scorecard` (the scorecard's claude.ai URL, or its file path with `no-publish`)
+- `timings`: the rows from the overview's log, one per repo, then `Build`, as set out under Timing
 - `footer`: which repos were included and how they were chosen
 
 Reply in three lines: the repo that needs attention first with its fix; the recommended pins, in order; then one `name: ACTION (featured), N pass · N fail · N flagged` entry per repo, with "(featured)" only when its feature call is yes, separated by semicolons.
@@ -309,6 +352,7 @@ Write the run as JSON and publish it from the same template as Step 5 (or save i
 - `repos`: one object per repo with `name` (owner/name), `link`, `visibility` (`public` or `private`), `kind` (`own` or `fork`), `pinned` (`true` or `false`), `pushed` (date only), `stars`, `signals` (the short facts), `action` (the provisional action), `sure` (`clear` or `review`), `reason` (one sentence) and, for `review`, `question` (what the full review has to answer). List the repos to review in the order above, then the clear ones.
 - `commands`: for the clear deletes, one `gh repo delete OWNER/REPO` per repo, without `--yes`, so that each asks the user to confirm; leave it out when there are none. Introduce them in `commandsNote`: deleting needs the `delete_repo` scope (`gh auth refresh -s delete_repo`), a deleted repo can be restored within 90 days unless it's part of a fork network with other repos in it, and the user runs them only if they agree.
 - `next`: the command that reviews the first ten repos marked `review`, `/github-curator:repo-review overview` followed by their URLs in the order above, and `nextNote` saying how many are left for later runs
+- `timings`: the rows from the triage log, as set out under Timing, with `searches` on `Forks` when it searched for pull requests
 - `footer`: which repos were included and how they were chosen, the pins' source, and that triage reads only the API, so every `review` action is provisional
 
 Never run the commands, and never archive, delete or change the visibility of anything during triage.

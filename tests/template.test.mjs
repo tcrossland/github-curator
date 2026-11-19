@@ -66,12 +66,40 @@ test('text from the run is escaped, and </script> in the data does not end the b
   assert.match(html, /&lt;b&gt;bold&lt;\/b&gt; &lt;\/script&gt;&lt;i&gt;/);
 });
 
+test('timings show in a closed section at the foot, with totals', () => {
+  const timings = [{ step: 'Get the draft', seconds: 42, calls: 12 }, { step: 'Similar repos', seconds: 125, calls: 3, searches: 4 }, { step: 'Build', seconds: 8, calls: 0 }];
+  const { html } = render({ ...review, timings });
+  assert.match(html, /<details class="timings"><summary>Timings · 2 min 55 s in all<\/summary>/);
+  assert.match(html, /<tr><td>Similar repos<\/td><td class="num">2 min 05 s<\/td><td class="num">3<\/td><td class="num">4<\/td><\/tr>/);
+  assert.match(html, /<tr><td>Get the draft<\/td><td class="num">42 s<\/td><td class="num">12<\/td><td class="num">0<\/td><\/tr>/);
+  assert.match(html, /<tfoot><tr><td>Total<\/td><td class="num">2 min 55 s<\/td><td class="num">15<\/td><td class="num">4<\/td><\/tr><\/tfoot>/);
+  assert.ok(html.indexOf('class="timings"') < html.indexOf('<footer>'));
+});
+
+test('timings without searches have no searches column, unknown calls show a dash, and the total is a lower bound', () => {
+  const { html } = render({ ...review, timings: [{ step: 'Forks', seconds: 300, calls: null }, { step: 'Build', seconds: 5, calls: 1 }] });
+  assert.doesNotMatch(html, /Searches/);
+  assert.match(html, /<tr><td>Forks<\/td><td class="num">5 min 00 s<\/td><td class="num">–<\/td><\/tr>/);
+  assert.match(html, /<td>Total<\/td><td class="num">5 min 05 s<\/td><td class="num">at least 1<\/td>/);
+});
+
+test('with no call counts at all, the total is a dash too', () => {
+  const { html } = render({ ...review, timings: [{ step: 'Forks', seconds: 30, calls: null }] });
+  assert.match(html, /<td>Total<\/td><td class="num">30 s<\/td><td class="num">–<\/td>/);
+});
+
+test('no timings, no section', () => {
+  assert.doesNotMatch(render(review).html, /timings/);
+});
+
 test('overview shows pins and the recommendation column', () => {
   const { html } = render({
     overview: true, title: 'Portfolio overview', subject: '1 repo', date: '2026-11-19', verdict: { fix: 'x', why: 'y' },
     pins: { current: ['owner/a'], recommended: ['owner/a', 'owner/b'], source: 'GraphQL', why: 'Add b.' },
     repos: [{ name: 'owner/b', link: '#', action: 'keep', feature: true, todo: 2, statuses: Array(7).fill('pass'), fix: 'f', stars: 1, views: 0, scorecard: '#' }],
+    timings: [{ step: 'owner/b', seconds: 600, calls: 80 }, { step: 'Build', seconds: 20, calls: 0 }],
   });
+  assert.match(html, /Timings · 10 min 20 s in all/);
   assert.match(html, /<h3>Recommended<\/h3><ol><li>owner\/a<\/li><li>owner\/b<\/li><\/ol>/);
   assert.match(html, /<td class="act">Keep · featured · 2 to do<\/td>/);
 });
@@ -83,7 +111,10 @@ test('triage splits clear deletes from repos to review and lists the commands', 
     repos: [repo('t/a', 'review', 'archive'), repo('t/b', 'clear', 'delete'), repo('t/c', 'clear', 'delete')],
     commands: ['gh repo delete t/b', 'gh repo delete t/c'], commandsNote: 'Needs delete_repo.',
     next: '/github-curator:repo-review overview #', nextNote: 'None left.', footer: 'API only.',
+    timings: [{ step: 'List repos', seconds: 3, calls: 1 }, { step: 'Forks', seconds: 61, calls: 120, searches: 17 }],
   });
+  assert.match(html, /Timings · 1 min 04 s in all/);
+  assert.match(html, /<td>Total<\/td><td class="num">1 min 04 s<\/td><td class="num">121<\/td><td class="num">17<\/td>/);
   assert.match(html, /2 clear deletes · 1 to review/);
   assert.match(html, /1 likely archive/);
   assert.match(html, /To review, most at stake first <span>\(1\)<\/span>/);

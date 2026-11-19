@@ -160,6 +160,12 @@ footer { color: var(--muted); font-size: 12.5px; }
 .pins .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .pins h3 { font: 600 13px/1.2 var(--body); margin: 0 0 4px; }
 .pins ol { margin: 0; padding-left: 20px; font: 400 13px/1.5 var(--mono); }
+.timings { font-size: 13px; color: var(--muted); }
+.timings summary { cursor: pointer; color: var(--accent); }
+.timings .ov { margin-top: 8px; font-size: 13px; }
+.timings .ov td.num, .timings .ov th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.timings .ov tfoot td { font-weight: 600; color: var(--ink); border-bottom: 0; }
+.timings p { margin: 6px 0 0; }
 @media (max-width: 640px) {
   .strip { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
   .row { grid-template-columns: 1fr; }
@@ -179,6 +185,23 @@ footer { color: var(--muted); font-size: 12.5px; }
   var label = { pass: 'Pass', fail: 'Fail', flagged: 'Flagged' };
   var actions = { keep: 'Keep', publish: 'Publish', archive: 'Archive', 'make-private': 'Make private', delete: 'Delete' };
   var actionName = function (a) { return actions[a] || a; };
+  var dur = function (s) { return s == null ? '–' : s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + (s % 60 < 10 ? '0' : '') + (s % 60) + ' s'; };
+  var timings = function (rows) {
+    if (!rows || !rows.length) return '';
+    var sum = function (k) { return rows.reduce(function (a, r) { return a == null || r[k] == null ? null : a + r[k]; }, 0); };
+    var cell = function (v) { return '<td class="num">' + (v == null ? '–' : esc(v)) + '</td>'; };
+    var known = rows.filter(function (r) { return r.calls != null; });
+    var calls = known.reduce(function (a, r) { return a + r.calls; }, 0);
+    var callsTotal = '<td class="num">' + (!known.length ? '–' : known.length < rows.length ? 'at least ' + calls : calls) + '</td>';
+    var searches = rows.some(function (r) { return r.searches; });
+    var total = sum('seconds');
+    return '<details class="timings"><summary>Timings · ' + dur(total) + ' in all</summary><div class="ovwrap"><table class="ov"><thead><tr><th>Step</th><th class="num">Time</th><th class="num">API calls</th>' +
+           (searches ? '<th class="num">Searches</th>' : '') + '</tr></thead><tbody>' +
+           rows.map(function (r) { return '<tr><td>' + esc(r.step) + '</td><td class="num">' + dur(r.seconds) + '</td>' + cell(r.calls) + (searches ? cell(r.searches || 0) : '') + '</tr>'; }).join('') +
+           '</tbody><tfoot><tr><td>Total</td><td class="num">' + dur(total) + '</td>' + callsTotal +
+           (searches ? cell(rows.reduce(function (a, r) { return a + (r.searches || 0); }, 0)) : '') + '</tr></tfoot></table></div>' +
+           '<p>Wall-clock time from the end of one step to the end of the next, Claude\'s own work included. API calls are GitHub REST requests, read from the rate limit; searches and GraphQL aren\'t in them, and anything else using the GitHub account at the same time is. – means the count couldn\'t be read: the rate limit was unreadable at the step\'s start or end, or GitHub\'s hourly window reset during it.</p></details>';
+  };
   if (d.triage) {
     var rs = d.repos || [], rev = rs.filter(function (r) { return r.sure !== 'clear'; }), clr = rs.filter(function (r) { return r.sure === 'clear'; });
     var tally = {}; rev.forEach(function (r) { tally[r.action] = (tally[r.action] || 0) + 1; });
@@ -206,6 +229,7 @@ footer { color: var(--muted); font-size: 12.5px; }
       t += '<section class="fixp" aria-label="Delete commands"><span class="label">Delete commands, to run yourself</span>' + (d.commandsNote ? '<p class="note">' + fmt(d.commandsNote) + '</p>' : '') +
            '<div class="bar"><button type="button" class="copy" data-copy="cmd-text">Copy commands</button></div><textarea id="cmd-text" readonly aria-label="Delete commands">' + esc(d.commands.join('\n')) + '</textarea></section>';
     }
+    t += timings(d.timings);
     if (d.footer) t += '<footer>' + fmt(d.footer) + '</footer>';
     document.getElementById('app').innerHTML = t;
     document.querySelectorAll('[data-copy]').forEach(function (b) {
@@ -233,6 +257,7 @@ footer { color: var(--muted); font-size: 12.5px; }
       h += '</div></td><td>' + fmt(r.fix) + '</td><td class="num">' + esc(r.stars) + '</td><td class="num">' + esc(r.views) + '</td><td><a href="' + esc(r.scorecard) + '">Open</a></td></tr>';
     });
     h += '</tbody></table></div>';
+    h += timings(d.timings);
     if (d.footer) h += '<footer>' + fmt(d.footer) + '</footer>';
     document.getElementById('app').innerHTML = h;
     return;
@@ -338,6 +363,7 @@ footer { color: var(--muted); font-size: 12.5px; }
     html += '</div><div class="fixline"><b>Fix</b><p>' + fmt(q.fix) + '</p></div></div></article>';
   });
   html += '</section>';
+  html += timings(d.timings);
   if (d.footer) html += '<footer>' + fmt(d.footer) + '</footer>';
   document.getElementById('app').innerHTML = html;
   var btn = document.getElementById('rerun-btn');

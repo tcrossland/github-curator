@@ -38,6 +38,12 @@ They show what a repo adds, which topics it lacks, and where to point readers of
 
 The page is one template, `skills/repo-review/scorecard-template.html`, filled with the run's JSON. It renders all three modes: a single review, the overview and triage. It's a separate file so it isn't retyped on every run. A re-run republishes to the same artifact, so the page keeps one URL and can show what changed since the last check. Scorecards published before the skill was renamed have the title "Portfolio repo check: …", and re-runs still find them.
 
+## Timing
+
+Every page carries the time and the GitHub requests each step took, so a change made to speed a mode up can be measured. The times are wall-clock from the end of one step to the end of the next, so they include Claude's own work between tool calls. That's what the user waits for, but it can't be told apart from time spent waiting on GitHub, and a skill can't read its own token use.
+
+The request count comes from the rate limit's `core.used`, read at each step's end, rather than from Claude counting its own calls: reading the rate limit costs no request, and it counts every page of a paginated call, which a count of commands would miss. Search requests have their own count in the rate limit, but it resets every minute, so it can't be read across a step; those are counted by hand. GraphQL has its own limit, so it isn't counted. Every timing line runs in one shell, so the log has one file and one clock. A step that spans GitHub's hourly reset has no count, and anything else using the same GitHub account at the same time inflates it: a claude.ai session and the user's own `gh` were seen sharing one count. The logging line keeps `gh`'s output only when the call succeeds, because on an HTTP error `gh` prints the error body to stdout, and the conversion skips any line it can't read.
+
 ## Where the fix prompt's edits land
 
 The fix prompt follows the repo's own rules on branches first, and the user's instructions over both. Without either, a public repo, or one others commit to, gets a branch and a pull request, because its main branch is what visitors and contributors see. A private repo only the user commits to gets commits on the current branch, left unpushed: a pull request there is a review step for an audience of one, and the unpushed commits give the user the same chance to review.
