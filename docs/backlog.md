@@ -29,10 +29,23 @@ The 0.2.4 test runs on claude.ai (see Done, below) showed that the session's `gh
 - **Stargazers** listed the stargazers but couldn't read a single profile, so it couldn't pick the ones worth a look, in the skill or in the review's Outcomes panel.
 - **Similar repos** described each repo from its search result, because other owners' READMEs were refused.
 
-Work out, for each, a route that works in both places, and have the skills switch to it on the 403 rather than fail:
-- Attach each repo with `add_repo` before reading it. **Unverified**: whether there's a limit on how many repos a session can attach, and whether attaching another owner's public repo is allowed.
-- Read public pages with WebFetch: the README through `raw.githubusercontent.com`, a profile from `github.com/LOGIN`. A WebFetch result is a summary, so label what it gives as the skill already does for pins.
-- Keep the search API for listings, as the test run did.
+Three more probes tested the routes around this (facts in `docs/github-facts.md`). What they settled:
+- **Attaching works only with push access, and only with the user's permission.** Read access gives an anonymous git clone and nothing more. With the user's permission one session attached 12 repos with push access, and an attached fork's `.parent` can be read. In auto mode, push access is refused unless the user asked for it.
+- **Cross-fork compare is out**, even for an attached fork: the proxy refuses it with HTTP 400.
+- **Git works** for any public repo without attaching it, through the session's proxy as in Claude Code: a sparse clone of just the README, and a fork's count beyond its parent from treeless clones.
+- **WebFetch isn't a source of exact text**: it reworded and cut a README, and was rate-limited on repo pages. A profile through it gives the name, followers and pinned repos only.
+- **Issue search answers**, so the user's merged pull requests to a parent can still be read.
+
+The route, the same in both places where it can be:
+- **READMEs** (triage's own repos, similar repos): a sparse clone that checks out only the README.
+- **A fork against its parent**: the count and the authors from treeless clones, `git rev-list --count` and `git log`. This also lifts the compare API's limit of 250 commits. A parent as large as elixir's still costs its whole commit history.
+- **A fork's parent**: only `gh api repos/OWNER/FORK` gives it, which on claude.ai needs the fork attached with push access; `list_repos`, search and GraphQL don't (a third probe checked all three). A parent doesn't change, so the triage page records each fork's parent and its default branch, and a later triage reads them from the previous page, as it already reads that page to compare. Only forks new since then need the API. The first triage on claude.ai either attaches every fork, with the user's permission, or is run from Claude Code instead, where the user's own `gh` reads every parent; the page says which.
+- **Pull requests to the parent**: issue search, as now.
+- **Stargazers' profiles**: WebFetch of `github.com/LOGIN`, one at a time, judging the field from the pinned repos' descriptions, labelled "profile page summary". Say in the reply that bio, company and location weren't available.
+- **Private repos** need attaching too.
+- **On claude.ai, triage asks once for permission to attach** the forks whose parent it doesn't know yet and the private repos, and leaves any it can't attach as `review`, saying which and why.
+
+Still **unverified**: whether a session can attach more than 12 repos. It matters only for a first triage on claude.ai with no previous page to read parents from (62 forks and 10 private repos on this account).
 
 **Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, and stargazers there reads profiles or says plainly that it can't.
 
