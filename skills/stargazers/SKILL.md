@@ -17,9 +17,9 @@ The argument is a repo URL or `OWNER/REPO`. With several, take each in turn.
 
 ## Step 1: list the stargazers
 
-First check the repo is public with `gh api repos/OWNER/REPO --jq .private`. If it's private, or the call returns 404, stop and say so in one line: only people with access can star a private repo, so there are no stargazers to list yet.
+First read the repo with `gh api repos/OWNER/REPO --jq '{full_name, private, stargazers_count}'`, and use its `full_name` from here on, since the name given may differ in case or be an old one. If the call returns 404, stop and say in one line that the repo doesn't exist or isn't visible to the user. If it's private, stop and say so in one line: only people with access can star a private repo, so there are no stargazers to list yet.
 
-Then run `gh api -H "Accept: application/vnd.github.star+json" --paginate 'repos/OWNER/REPO/stargazers?per_page=100'` and keep `starred_at` and `user.login` for each. Leave out the user's own star (`gh api user` gives the user's login). A public repo's stargazers are public, so this needs no push access.
+Then run `gh api -H "Accept: application/vnd.github.star+json" --paginate 'repos/OWNER/REPO/stargazers?per_page=100'` and keep `starred_at` and `user.login` for each. Leave out the user's own star (`gh api user` gives the user's login). GitHub lists a repo's stargazers only to its owner: for anyone else's public repo this call returns 404 (and GraphQL's `stargazers` comes back empty), however many stars the repo has. When that happens, stop and say so in one line, with the repo's `stargazers_count`: the count is public, the list isn't. Don't look for the list anywhere else.
 
 ## Step 2: read each profile
 
