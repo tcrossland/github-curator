@@ -6,9 +6,9 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 0 | [Prove the current version on claude.ai](#0-prove-the-current-version-on-claudeai) | Check | S | none | todo |
+| 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | todo |
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | 0 | todo |
-| 2 | [Timing](#2-timing) | Measurement | S | 0 | todo |
+| 2 | [Timing](#2-timing) | Measurement | S | 0 | in progress |
 | 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | 0 | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | 2, 3 | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | 3 | todo |
@@ -18,24 +18,23 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 9 | [Secrets scanner for publishing](#9-secrets-scanner-for-publishing) | Checklist tool | M | licence check | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
 | – | [Smaller items](#smaller) | Fixes | S each | none | todo |
+| 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` or `done` as work moves, and move a done item's section to the end, or delete it once the summary row says enough.
 
-## 0. Prove the current version on claude.ai
+## 11. GitHub access from a claude.ai session
 
-Build the zip with `scripts/package.sh`, upload it, and run every mode once before building more:
-- `repo-review` on a repo whose expected result is already known, such as one already brought up to the checklist and archived;
-- `repo-review overview` on two or three repos;
-- `repo-review triage`, which also checks that `gh api user/repos` lists private repos in that environment, or that the `list_repos` fallback works;
-- `stargazers` on a repo with stars.
+The 0.2.4 test runs on claude.ai (see Done, below) showed that the session's `gh` is bound to the repos attached to it. GraphQL, `user/repos`, every `users/…` and `orgs/…` path, and `repos/OWNER/REPO` for any repo not attached are all refused with HTTP 403. The facts are in `docs/github-facts.md`. What each mode lost:
+- **Triage** listed its repos through `list_repos` and took their fields from the search API, but couldn't read a README or compare a fork with its parent, so it marked no repo clear. On claude.ai it's a list, not a triage.
+- **Stargazers** listed the stargazers but couldn't read a single profile, so it couldn't pick the ones worth a look, in the skill or in the review's Outcomes panel.
+- **Similar repos** described each repo from its search result, because other owners' READMEs were refused.
 
-Also check along the way:
-- The scorecard template loads through the relative link in Step 5. The docs say supporting files ship with the skill. **Unverified** on claude.ai.
-- Pins are read from the profile page through WebFetch. This worked from Claude Code. **Unverified** on claude.ai.
-- `argument-hint` in each skill's frontmatter is Claude Code's field. Check that an upload with it syncs without error and that the skills still take their keywords. **Unverified** on claude.ai.
-- The skill says GraphQL (`gh api graphql`, `gh repo view --json`) isn't available on claude.ai. **Unverified.** If it is available, read pins directly instead of from a summary of the profile page.
+Work out, for each, a route that works in both places, and have the skills switch to it on the 403 rather than fail:
+- Attach each repo with `add_repo` before reading it. **Unverified**: whether there's a limit on how many repos a session can attach, and whether attaching another owner's public repo is allowed.
+- Read public pages with WebFetch: the README through `raw.githubusercontent.com`, a profile from `github.com/LOGIN`. A WebFetch result is a summary, so label what it gives as the skill already does for pins.
+- Keep the search API for listings, as the test run did.
 
-**Done when** each mode has run once on claude.ai, and anything that failed is fixed or written up here as its own item.
+**Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, and stargazers there reads profiles or says plainly that it can't.
 
 ## 1. Traffic history
 
@@ -53,7 +52,15 @@ Nothing records how long a run takes or where the time goes. A full review clone
 
 Have each mode record, at the start and end of every step, the time from the shell (`date -u +%s`) and the number of `gh api` calls made, and put them in the page's JSON as `timings`: a list of `{step, seconds, calls}`. The template shows them in a closed section at the foot of the page; overview and triage also give the totals. The times include Claude's own work between tool calls, which is what the user waits for, but can't separate it from time spent waiting on GitHub. A skill can't read its own token use.
 
-**Unverified**: that the shell's clock on claude.ai runs on between tool calls, so the times are wall-clock.
+The shell's clock on claude.ai is wall-clock (`docs/github-facts.md`).
+
+**First figures**, timed by hand in the 0.2.4 test runs, before the skill logged anything (runs 1 and 2 rebuilt from file and publish times, to about ±10 seconds): about 682 s across the four runs. In every run the time went to Claude's own work between calls, not to waiting on GitHub:
+- review of spacy-annotator: about 310 s, slowest building the run and checking its quotes and numbers (Steps 3 and 4, about 95 s);
+- overview of two repos: about 236 s, slowest Step 1 and Steps 2 to 4, about 70 s each;
+- triage: 105 s, slowest the signals (37 s), though most of its reads were refused (item 11);
+- stargazers: 31 s, slowest reading profiles (12 s), all refused.
+
+**Status**: the skill and template side is in. `SKILL.md` has a Timing section: each step appends its name, `date -u +%s` and the rate limit's `core.used` to a log, and a script turns the log into `timings`, with `calls` read from the rate limit (which costs no request) rather than counted by hand. Search requests aren't in `core.used`, so they're counted by hand as `searches`. The template shows the rows and a total in a closed section above the footer, in all three modes. What's left is a release with it and the runs below. `gh api rate_limit` answers on claude.ai and counts calls there; its count is shared with anything else using the account at the same time (`docs/github-facts.md`).
 
 **Done when** a review, an overview and a triage each show per-step times on their pages, and the slowest step of each is written up here, as a candidate to speed up.
 
@@ -116,6 +123,7 @@ The tests cover code (the quote checker and the template), not the skill's judge
 - a fork with commits beyond its parent is never clear;
 - a private repo never fails Findable on visibility alone;
 - an archived repo with every item done is recommended archive, with nothing to do.
+- the same commit gets the same statuses twice. In the 0.2.4 test runs, claude-code-methodology's Way in was flagged in one review and passed in the next, on the same commit, so a case that runs one repo twice would catch a rule that leaves too much to judgement.
 
 Claude Code has a `claude plugin eval` command that reads cases from `evals/` by default. **Unverified**: how its cases and checks are written.
 
@@ -152,4 +160,18 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 - **Author identities**: let the user list their past commit email domains, kept outside the plugin (in a gitignored file or an environment variable), so triage can tell their unlinked commits from other people's without asking. Done when triage reads the list and marks matching commits as the user's.
 - **Recheck the traffic claim**: `docs/github-facts.md` marks "14 days, needs push access" as not rechecked. Done when it has a source and a date.
 - **Rate limits in triage**: the pull-request search goes through GitHub's search API, whose rate limit is far lower than the rest of the API's, so an account with many forks that have commits could hit it. Say in Step 8 to pace the searches and to note any that were refused. Done when triage on an account with more than 30 such forks completes.
+- **Stargazers when profiles can't be read**: neither skill says what to do when Step 2 of `stargazers` can't read the profiles, so the scorecard falls back to "None in the same field", which reads as a judgement that was never made (seen in the 0.2.4 test runs, where every profile call was refused). Say "Not available" with the reason instead, in the `stargazers` reply and in the review's Stargazers lists. Done when both skills say so, and a template test checks the scorecard's wording.
+- **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
 - **README links that don't ship**: the README is in the zip, but its "Working on it" section links to `docs/`, which isn't. Move that section to `docs/README.md`, or have `scripts/package.sh` leave it out.
+
+## Done
+
+### 0. Prove the current version on claude.ai
+
+0.2.4 was uploaded and every mode run once on 2026-11-19, recorded in the doc "github-curator 0.2.4: test report". Each run finished and published:
+- the review of spacy-annotator recommended archive and keeping it pinned, with all seven questions passing, and one item before archiving still to do, where none was expected: third-party text in the repo with no source named. That's a finding about the repo, not a fault in the plugin;
+- the overview of stat-arb-from-scratch and claude-code-methodology passed;
+- triage listed 82 repos through the `list_repos` fallback, but marked none clear (item 11);
+- stargazers listed 13 stargazers but read no profiles (item 11, and the smaller item on what to show then).
+
+The scorecard template loaded through its relative link, pins came through WebFetch, GraphQL is refused, and `argument-hint` caused no trouble. Each is now in `docs/github-facts.md`.

@@ -21,7 +21,7 @@ The behaviours of GitHub and of Claude's plugin system that the skills state or 
 |---|---|---|
 | A profile shows up to six pinned repositories and gists, combined. | [Pinning items to your profile](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile) | 2026-11-19 |
 | GraphQL lists pins (`user.pinnedItems`). No REST endpoint for them was found. | Seen with `gh api graphql` | 2026-11-19 |
-| WebFetch of the profile page returns the pins, but names the owner only for repos owned by someone else. The owner of the rest is in each link's path. | Seen | 2026-11-19 |
+| WebFetch of the profile page returns the pins, but names the owner only for repos owned by someone else. The owner of the rest is in each link's path. | Seen, in Claude Code and on claude.ai | 2026-11-19 |
 
 ## API behaviour
 
@@ -37,6 +37,21 @@ The behaviours of GitHub and of Claude's plugin system that the skills state or 
 | Topic search (`topic:A+topic:B`) can rank only loosely related repos first; keyword search returns many results, also loosely ranked. | Seen | 2026-11-19 |
 | Traffic covers the last 14 days and needs push access. | Stated in the skill before this file existed; not rechecked | — |
 
+## GitHub from a claude.ai session
+
+Seen in the 0.2.4 test runs on claude.ai, recorded in the doc "github-curator 0.2.4: test report". The session's `gh` goes through a proxy bound to the repos attached to the session, so much of what works in Claude Code's own shell doesn't work there.
+
+| Fact | Source | Checked |
+|---|---|---|
+| GraphQL is refused, both `gh api graphql` and `gh repo view --json`, with HTTP 403: `GitHub GraphQL is not available from Claude Code sessions; use the REST API`. | Seen | 2026-11-19 |
+| Paths that aren't scoped to an attached repo are refused with HTTP 403 (`sessions are bound to their configured repositories. Use repository-scoped endpoints`): `user/repos`, `users/LOGIN`, `users/LOGIN/events`, `users/LOGIN/repos` and `orgs/NAME/repos`. | Seen | 2026-11-19 |
+| `repos/OWNER/REPO` and the paths under it are refused the same way for any repo not attached to the session, the user's own included, so READMEs, fork comparisons and other owners' repos can't be read without attaching each one. | Seen | 2026-11-19 |
+| The search API still works: `search/repositories?q=user:LOGIN`, with `fork:only` for forks, gives the listing fields for the user's public repos. | Seen | 2026-11-19 |
+| `list_repos` lists the user's repos, private ones included (85 owned, 10 private), plus repos of other owners the user can push to. | Seen | 2026-11-19 |
+| The shell's clock is wall-clock: two `date -u +%s` readings in separate tool calls were 34 seconds apart, and agreed with the artifact server's timestamp to within 3 seconds. | Seen | 2026-11-19 |
+| `gh api rate_limit` answers, unlike the other unscoped paths, and `core.used` rose by exactly 1 across one repo call, with `reset` unchanged. The Timing section of `repo-review` reads API calls from it. | Seen | 2026-11-19 |
+| The session's rate limit is shared with the user's own `gh` on their computer: minutes apart, both showed the same `reset` and consecutive `used` counts (278 → 279 locally, then 279 → 280 on claude.ai). So it's most likely per account, and a run's call counts include anything else using the account at the same time. | Seen | 2026-11-19 |
+
 ## Claude plugins and skills
 
 | Fact | Source | Checked |
@@ -45,7 +60,8 @@ The behaviours of GitHub and of Claude's plugin system that the skills state or 
 | `claude plugin validate` warns when `version` or `author` is missing. | Seen | 2026-11-19 |
 | A top-level `bin/` directory stops claude.ai and Cowork from installing a plugin. | Manifest reference | 2026-11-19 |
 | Everyone who installs a plugin receives all its files. | [Build a plugin](https://claude.com/docs/plugins/build.md) | 2026-11-19 |
-| Supporting files in a skill folder ship with the skill. `${CLAUDE_SKILL_DIR}` is filled in by Claude Code and Cowork; in chat on claude.ai, refer to a file by its path relative to `SKILL.md`. | [Skills how-to](https://claude.com/docs/skills/how-to.md), [Skills](https://code.claude.com/docs/en/skills) | 2026-11-19 |
+| Supporting files in a skill folder ship with the skill. `${CLAUDE_SKILL_DIR}` is filled in by Claude Code and Cowork; in chat on claude.ai, refer to a file by its path relative to `SKILL.md`. | [Skills how-to](https://claude.com/docs/skills/how-to.md), [Skills](https://code.claude.com/docs/en/skills); seen on claude.ai (`scorecard-template.html` loaded through the relative link in every run of 0.2.4) | 2026-11-19 |
+| A plugin whose skills carry `argument-hint` in their frontmatter uploads and runs on claude.ai, and the skills still read their keyword arguments. | Seen, 0.2.4 | 2026-11-19 |
 | The docs disagree on the description limit: 200 characters in a help article, 1,024 in the skills how-to. A 263-character description uploaded and synced without error. | [Help article](https://support.claude.com/en/articles/12512198), how-to; seen | 2026-11-19 |
 | Uploads are a zip, holding either the plugin's contents or a single top-level folder. | Build a plugin | 2026-11-19 |
 | A running session doesn't take up a plugin change. A plugin installed, updated, enabled, disabled or edited on disk since the session started is pending until `/reload-plugins` or the next session. Live change detection covers only `~/.claude/skills/`, the project's `.claude/skills/` and a `.claude/skills/` inside an `--add-dir` directory. | [Plugin commands reference](https://code.claude.com/docs/en/plugins/cli-reference.md#reload-plugins), [Skills](https://code.claude.com/docs/en/skills.md#edit-a-skill-during-a-session) | 2026-11-19 |
