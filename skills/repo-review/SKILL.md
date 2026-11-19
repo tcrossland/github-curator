@@ -1,6 +1,7 @@
 ---
 name: "repo-review"
 description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: overview, triage."
+argument-hint: "[repo-url | folder | file] · overview [repo-urls…] · triage [public|private|own|forks|archived|org:NAME] · no-publish"
 ---
 
 # Repo review
@@ -12,7 +13,9 @@ For a repo, the review also recommends what to do with it, whether to feature it
 There are three ways to run it:
 - **One draft**: the arguments are a repo URL, a local clone's folder, a file, a doc link or pasted text. Run Steps 1 to 6.
 - **Overview**: the arguments start with `overview`, optionally followed by repo URLs. Run Steps 1 to 4 for each repo (publishing each repo's scorecard as usual), then Step 7.
-- **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`). Run Step 8 only: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
+- **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
+
+In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
 
 ## The questions
 
@@ -239,7 +242,7 @@ The verdict names the single most important fix. Take the earliest failing quest
    - `footer`: the status definitions in one or two sentences
    Text fields may use `backticks` for code.
 3. Fill the template: replace `__TITLE__` with the title, and `__DATA__` with the JSON, escaping every `</` as `<\/`. Save the result as `REPO-NAME-scorecard.html`.
-4. Publish it with `publish_files`, titled "Repo review: REPO-NAME", with the icon `checklist`. If Step 1 found an existing scorecard, under either title, republish to it (`get_artifact` gives the `base_version`) instead of creating a new one, so a re-run updates the same page.
+4. With `no-publish`, stop here: the saved file is the result. Otherwise, publish it with `publish_files`, titled "Repo review: REPO-NAME", with the icon `checklist`. If Step 1 found an existing scorecard, under either title, republish to it (`get_artifact` gives the `base_version`) instead of creating a new one, so a re-run updates the same page.
 
 ## Step 6: reply
 
@@ -248,7 +251,7 @@ Reply in exactly three lines (two when there is no recommendation), and nothing 
 2. The verdict: the most important fix, in one sentence.
 3. The counts, in the form `N pass · N fail · N flagged`.
 
-The artifact card carries the link, so don't repeat it.
+The artifact card carries the link, so don't repeat it. With `no-publish` there is no card: add a last line with the saved file's full path.
 
 ## Step 7: overview
 
@@ -256,12 +259,12 @@ An overview runs the full review on every repo, so with more than a handful, run
 
 For `overview`, use the repo URLs given. If none are given, list the user's repos with `list_repos`, keep the ones the user owns, public and private, forks included, leaving out those already archived, and say in the overview's footer which repos were included and how they were chosen.
 
-After each repo's scorecard is published, publish one more page from the same template, titled "Portfolio overview", with the icon `checklist`. Republish to an existing "Portfolio overview" artifact if `list_artifacts` finds one. Its JSON:
+After each repo's scorecard is published (or saved, with `no-publish`), publish or save one more page from the same template, titled "Portfolio overview", with the icon `checklist`. Republish to an existing "Portfolio overview" artifact if `list_artifacts` finds one. Its JSON:
 - `overview`: `true`
 - `title`: "Portfolio overview"; `subject`: how many repos and which commits; `date`
 - `verdict`: `fix` (the repo that needs attention first, and its most important fix) and `why` (one or two sentences). Pick the repo whose earliest failing question comes first; break ties by the most fails.
 - `pins`: `current` (the pinned repos and gists now, as `owner/name` strings), `recommended` (up to six, in the order to pin them, chosen across every repo reviewed and the current pins that weren't), `source` (where the current pins came from) and `why` (one or two sentences on what changes and why). Rank the repos whose feature call is yes, and keep a current pin that wasn't reviewed unless something reviewed is clearly stronger.
-- `repos`: one object per repo with `name` (owner/name), `link`, `action` (its recommended action), `feature` (`true` or `false`), `todo` (the number of `todo` items before the action and featuring, or 0), `statuses` (the seven statuses in order), `fix` (that repo's verdict fix), `stars`, `views` (14-day views, or "Not available") and `scorecard` (the scorecard's claude.ai URL)
+- `repos`: one object per repo with `name` (owner/name), `link`, `action` (its recommended action), `feature` (`true` or `false`), `todo` (the number of `todo` items before the action and featuring, or 0), `statuses` (the seven statuses in order), `fix` (that repo's verdict fix), `stars`, `views` (14-day views, or "Not available") and `scorecard` (the scorecard's claude.ai URL, or its file path with `no-publish`)
 - `footer`: which repos were included and how they were chosen
 
 Reply in three lines: the repo that needs attention first with its fix; the recommended pins, in order; then one `name: ACTION (featured), N pass · N fail · N flagged` entry per repo, with "(featured)" only when its feature call is yes, separated by semicolons.
@@ -273,6 +276,12 @@ Triage is a first pass over many repos, from GitHub's API alone. It settles the 
 ### Which repos
 
 List the repos the user owns with `gh api --paginate 'user/repos?affiliation=owner&per_page=100'`. If that fails or plainly misses repos, use `list_repos`, and say in the footer which source was used. Then apply the filters given: `public` or `private` (visibility), `own` or `forks`, and `archived` (archived repos are left out unless it's given). With no filters, take every repo that isn't archived. Read the pinned repos as in Step 1.
+
+With `org:NAME`, list that organisation's repos instead, with `gh api --paginate 'orgs/NAME/repos?per_page=100'`, and apply the other filters to them; take one organisation per run. Other people in an organisation may rely on its repos, and only its admins can archive, delete or change the visibility of one:
+- The listing's `permissions.admin` says whether the user is an admin of each repo. When it's false, add the signal "needs an org admin": every action on that repo is an admin's call, not the user's.
+- A repo is `clear` only when it's empty and the user is its admin. A fork with no commits beyond its parent goes to review, with the question of whether anyone in the organisation uses it.
+- The signals for "each repo of the user's own" apply to every repo that isn't a fork.
+- Title the page "Repo triage: NAME", so it stays apart from the triage of the user's own repos.
 
 ### Signals
 
@@ -293,7 +302,7 @@ Among the repos to review, put first the ones where the most is at stake: those 
 
 ### The triage page
 
-Write the run as JSON and publish it from the same template as Step 5, titled "Repo triage", with the icon `checklist`. Republish to an existing "Repo triage" artifact if `list_artifacts` finds one, and compare with it: name the repos that have gone since (the user acted on them) and any whose provisional action changed. Its JSON:
+Write the run as JSON and publish it from the same template as Step 5 (or save it, with `no-publish`), titled "Repo triage" (or "Repo triage: NAME" for an organisation), with the icon `checklist`. Republish to an existing artifact of the same title if `list_artifacts` finds one, and compare with it: name the repos that have gone since (the user acted on them) and any whose provisional action changed. Its JSON:
 - `triage`: `true`
 - `title`: "Repo triage"; `subject`: how many repos, which filters and the listing's source; `date`
 - `changes` (only when there was a previous triage): `since` (its date) and `items`

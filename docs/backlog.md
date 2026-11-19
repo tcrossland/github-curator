@@ -32,6 +32,7 @@ Build the zip with `scripts/package.sh`, upload it, and run every mode once befo
 Also check along the way:
 - The scorecard template loads through the relative link in Step 5. The docs say supporting files ship with the skill. **Unverified** on claude.ai.
 - Pins are read from the profile page through WebFetch. This worked from Claude Code. **Unverified** on claude.ai.
+- `argument-hint` in each skill's frontmatter is Claude Code's field. Check that an upload with it syncs without error and that the skills still take their keywords. **Unverified** on claude.ai.
 - The skill says GraphQL (`gh api graphql`, `gh repo view --json`) isn't available on claude.ai. **Unverified.** If it is available, read pins directly instead of from a summary of the profile page.
 
 **Done when** each mode has run once on claude.ai, and anything that failed is fixed or written up here as its own item.

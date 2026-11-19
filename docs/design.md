@@ -42,6 +42,14 @@ The page is one template, `skills/repo-review/scorecard-template.html`, filled w
 
 The fix prompt follows the repo's own rules on branches first, and the user's instructions over both. Without either, a public repo, or one others commit to, gets a branch and a pull request, because its main branch is what visitors and contributors see. A private repo only the user commits to gets commits on the current branch, left unpushed: a pull request there is a review step for an audience of one, and the unpushed commits give the user the same chance to review.
 
+## Arguments are keywords, not placeholders
+
+Each skill reads its arguments as words (`overview`, `triage forks`, `org:NAME`, `since:2026-01-01`, `no-publish`) rather than through Claude Code's positional placeholders (`$0`, `$name`). The modes take lists of any length, and a draft can be pasted text with spaces, so a fixed position for each argument would misread most calls. The `argument-hint` in each skill's frontmatter shows the words in Claude Code's autocomplete.
+
+An organisation's triage is stricter than the user's own. Other people may rely on an organisation's repos, and only its admins can archive or delete them, so an unchanged fork there goes to review instead of being a clear delete, and a repo the user isn't an admin of is marked as an admin's call. Its page has its own title, so it doesn't replace the triage of the user's own repos.
+
+`no-publish` exists for working on the skill: a test run of a changed rule or template would otherwise republish the live scorecard.
+
 ## What ships
 
 Everyone a plugin is shared with receives every file in the upload. `scripts/package.sh` zips only the manifest, the skills, the README and the licence (`LICENSE` and `NOTICE`), leaving out `docs/`, `tests/` and `scripts/`, which are for working on the plugin, not using it.
