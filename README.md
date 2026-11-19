@@ -17,6 +17,8 @@ scripts/package.sh
 
 It validates the manifest and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README and the licence.
 
+A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version. Typing `/reload-plugins` in the session applies plugin updates, but whether it picks up an upload to claude.ai isn't tested yet (see [`docs/github-facts.md`](docs/github-facts.md#claude-plugins-and-skills)).
+
 The skills run as `/github-curator:repo-review` and `/github-curator:stargazers`.
 
 ## Working on it
