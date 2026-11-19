@@ -68,15 +68,17 @@ Before archiving:
 4. **Still runs, or says it doesn't**: it builds and its tests pass on a current runtime, with the commands and results recorded in a pull request the README links to, or the README says plainly that it no longer runs.
 5. **Old dependencies**: if its dependencies are old enough to have known vulnerabilities, the README says so and says to run it locally only.
 6. **Licence and notices**: a licence file, and a notice for every file copied from another project.
-7. **Picture**: a screenshot or sample output, when there is a UI or a result to show.
-8. **Description and topics**: set, since archived repos still appear in search.
-9. **Issues and pull requests**: each open one answered, merged or closed, since archiving makes them read-only.
+7. **Third-party data and models**: every dataset, model weight or other file from an outside source names that source, and its terms allow redistribution; anything whose terms don't, or whose source is unknown, is removed from the history, not only the working tree. An archived repo keeps serving them.
+8. **Picture**: a screenshot or sample output, when there is a UI or a result to show.
+9. **Description and topics**: set, since archived repos still appear in search.
+10. **Issues and pull requests**: each open one answered, merged or closed, since archiving makes them read-only.
 
 Before publishing:
 1. **Secrets and private data**: search the full history, not only the working tree, for keys, tokens, passwords, internal hostnames and personal data (a full clone, not `--depth 1`). Anything ever committed becomes public with the repo.
 2. **Licence**: a licence file, and notices for copied files.
-3. **The seven questions**: every fail fixed; publishing is the moment it gets the most attention.
-4. **Description and topics**: set before it goes public.
+3. **Third-party data and models**: every dataset, model weight or other file from an outside source names that source, and its terms allow redistribution; anything whose terms don't, or whose source is unknown, is removed from the history, not only the working tree.
+4. **The seven questions**: every fail fixed; publishing is the moment it gets the most attention.
+5. **Description and topics**: set before it goes public.
 
 Before deleting:
 1. **Nothing of the user's own**: no commits, notes or results that exist only here.
@@ -95,9 +97,10 @@ A profile holds up to six pinned repositories and gists combined, so featuring i
 
 Before featuring:
 1. **The seven questions**: all pass. A featured repo gets the most visitors, so a fail costs most here.
-2. **Description, topics and a link**: description and topics set, and the homepage field pointing to a demo, report or write-up when there is one.
-3. **A release**: a tagged release, when it's software people would install or run.
-4. **Pinned**: pinned on the user's profile. Pinning is the user's call; the review only recommends.
+2. **Licence**: a licence file, so the visitors it draws may reuse what they find, and a notice for every file copied from another project.
+3. **Description, topics and a link**: description and topics set, and the homepage field pointing to a demo, report or write-up when there is one.
+4. **A release**: a tagged release, when it's software people would install or run.
+5. **Pinned**: pinned on the user's profile. Pinning is the user's call; the review only recommends.
 
 Leave the recommendation and the feature call out for pasted text, a file, or a local clone with no GitHub remote.
 
@@ -107,7 +110,7 @@ Accept any of these:
 - **Pasted text**: use it as given. Questions 2 and 3 can only be partly checked without the repo, so flag what can't be seen.
 - **A file** (attached, or in a connected folder on the user's computer): read it. If it's a README inside a repo folder, also read the files it links to.
 - **A GitHub repo or file link**: attach the repo with `add_repo` and `access: "push"` before anything else, so the GitHub API (settings, outcomes, traffic) works. Then clone it with `--depth 1` into a new, empty directory, or fetch and check out the latest default branch if a clone already exists. If push access is refused, fall back to a read-only clone, and take settings from the repo page with WebFetch. A WebFetch result is a summary, not the page, so label any quote taken from it "repo page summary, may not be verbatim".
-  Read `README.md`, every file it links to that bears on a claim, the manifest (`pyproject.toml` or equivalent), the CI workflow and the license. Read settings with `gh api repos/OWNER/REPO` (description, topics, visibility, homepage, has_issues, and for the recommendation `fork`, `archived` and `pushed_at`) and tags with `gh api repos/OWNER/REPO/tags`. For a fork, count the commits it has that its parent doesn't with `gh api 'repos/PARENT-OWNER/PARENT-REPO/compare/PARENT-BRANCH...OWNER:BRANCH' --jq .ahead_by`, taking the parent's name and default branch from `.parent` in the settings and the fork's branch from `default_branch`. For a private repo, clone the full history instead of `--depth 1`, so the secrets check before publishing can read it. GraphQL (`gh repo view --json`) is not available; use REST.
+  Read `README.md`, every file it links to that bears on a claim, the manifest (`pyproject.toml` or equivalent), the CI workflow and the license. Read settings with `gh api repos/OWNER/REPO` (description, topics, visibility, homepage, has_issues, `license`, and for the recommendation `fork`, `archived` and `pushed_at`) and tags with `gh api repos/OWNER/REPO/tags`. For a fork, count the commits it has that its parent doesn't with `gh api 'repos/PARENT-OWNER/PARENT-REPO/compare/PARENT-BRANCH...OWNER:BRANCH' --jq .ahead_by`, taking the parent's name and default branch from `.parent` in the settings and the fork's branch from `default_branch`. For a private repo, clone the full history instead of `--depth 1`, so the secrets check before publishing can read it. GraphQL (`gh repo view --json`) is not available; use REST.
   Read the repos pinned on the user's profile. REST doesn't list them, so take them from the profile page (`https://github.com/OWNER`) with WebFetch, asking for the pinned repositories as `owner/name` (the page shows the owner only for repos owned by someone else, so ask for it from each link's path), and label them "profile page summary, may not be complete". Where `gh api graphql` does work (in the shell on the user's computer), use `gh api graphql -f query='{user(login:"OWNER"){pinnedItems(first:6){nodes{... on Repository{nameWithOwner}}}}}'` instead. If neither works, say the pins couldn't be read and make the feature call without them.
   If `private` is true in that response, check it as set out under Private repos above, and add "private" to the scorecard's `subject`. If `gh api repos/OWNER/REPO` returns 404, the repo either doesn't exist or is private and not shared with this account, and the WebFetch fallback can't see a private repo either. Say so in one line and ask the user for access, a local clone or the pasted README.
 - **A local clone** (a folder on the user's computer that holds a `.git` directory): this is the pre-push check, so review the working copy exactly as it is.
@@ -172,7 +175,7 @@ For each question, in order:
 3. Write a one- or two-sentence finding in plain words.
 4. Write one concrete fix: an edit the user could make today, ideally the actual replacement line or sentence, in the repo's house style. For a pass, say "No change" and, only if there's one, the event that should prompt a re-check.
 
-Checking facts (question 3) means comparing claims against their sources: every relative link and anchor resolves, versions match the manifest, statuses match tags, releases and each other wherever the page states them twice, and numbers match the report they come from. Checking claims (question 4) means finding the test, report or file that backs each strong claim ("reproducible", "no look-ahead", "every trial counted", "works with no keys") and noting any claim the repo's own docs hedge or contradict.
+Checking facts (question 3) means comparing claims against their sources: every relative link and anchor resolves, versions match the manifest, statuses match tags, releases and each other wherever the page states them twice, and numbers match the report they come from. Checking claims (question 4) means finding the test, report or file that backs each strong claim ("reproducible", "no look-ahead", "every trial counted", "works with no keys") and noting any claim the repo's own docs hedge or contradict. Checking the way in (question 6) includes the licence, since without one nobody else has permission to reuse the code: a repo with no licence file (`license` is null in the API, or no `LICENSE`, `COPYING` or similar in the working copy) fails Way in, as does one whose README or manifest names a licence that no file holds, or whose licence file still has a template's placeholders in its copyright line (such as `[year] [fullname]`; the appendix at the end of the Apache-2.0 text keeps its placeholders on purpose, so they don't count). The fix says to add or complete one and leaves the choice of licence to the user; when the repo is mostly writing rather than code, it says a Creative Commons licence fits that better than a software one. Before suggesting a licence be added, check who else has commits (`gh api --paginate 'repos/OWNER/REPO/contributors?anon=1&per_page=100'`; entries without a login are commits under an unlinked email, so say which names they carry, not the addresses): code that others contributed with no licence can be licensed only with their agreement, so when anyone besides the user has commits, the fix names them and says so. For a fork, its code is under its parent's licence: when the parent has none, the fix says only the parent's owner can license it. Judge a private repo as it would read once public. For pasted text or a file with no repo to read, flag Way in when the licence can't be seen.
 
 ## Step 3: compare with the previous run
 
@@ -273,9 +276,9 @@ List the repos the user owns with `gh api --paginate 'user/repos?affiliation=own
 
 ### Signals
 
-From the listing, for each repo: `private`, `fork`, `archived`, `pushed_at`, `stargazers_count`, `forks_count`, `open_issues_count`, `description`, `topics`, `size` and `default_branch`. Then:
+From the listing, for each repo: `private`, `fork`, `archived`, `pushed_at`, `stargazers_count`, `forks_count`, `open_issues_count`, `description`, `topics`, `size`, `default_branch` and `license`. Then:
 - **Each fork**: read its parent from `gh api repos/OWNER/REPO` (`.parent`), and count the commits the fork has that its parent doesn't, as in Step 1. Note when the parent is archived, and when there is no parent (it was deleted or the fork was detached: treat the repo as the user's own). When the fork has commits beyond its parent, read who made them from the same compare call (`.commits[] | .author.login, (.commit.author.email | split("@")[1]), .commit.message`; it lists at most 250). Count a commit as possibly the user's when its login is the user's, or when it has no login at all: commits made under an email that isn't linked to the user's account have none, so GitHub's `author=` filter misses them. Record the email domains of those, not the addresses, so the user can recognise a former employer's. When `ahead_by` runs into the thousands, or none of the listed commits look like the user's, the fork's default branch has most likely drifted from the parent's (an old `master` against a newer `main`): say so, and count the user's commits with `gh api --paginate 'repos/OWNER/REPO/commits?author=OWNER&per_page=100' --jq '.[].sha' | wc -l`. Then list the user's pull requests to the parent and whether each was merged: `gh api 'search/issues?q=repo:PARENT-OWNER/PARENT-REPO+author:OWNER+type:pr'` (`.items[] | .title, .state, .pull_request.merged_at`).
-- **Each repo of the user's own**: the first lines of its README, from `gh api repos/OWNER/REPO/readme --jq .content | base64 -d | head -20`, and whether it says the project is unmaintained or archived. A 404 means there is no README.
+- **Each repo of the user's own**: the first lines of its README, from `gh api repos/OWNER/REPO/readme --jq .content | base64 -d | head -20`, and whether it says the project is unmaintained or archived. A 404 means there is no README. When `license` is null, add the signal "no licence"; when its `spdx_id` is `NOASSERTION`, add "licence not recognised by GitHub". A fork's licence is its parent's, so leave it out for forks.
 
 Write each repo's signals as short facts, as in The recommendation.
 
@@ -284,7 +287,7 @@ Write each repo's signals as short facts, as in The recommendation.
 Give each repo a provisional action from The recommendation, and mark it `clear` or `review`:
 - **clear delete**: an empty repo (`size` 0); or a fork with no commits beyond its parent, that nobody else has starred, forked or opened an issue on, and that isn't pinned. Nothing of the user's is lost.
 - **likely delete, to review**: a fork whose commits beyond its parent look like the ones the user's merged pull requests already brought upstream. The work survives in the parent, but the full review should confirm nothing else is in the fork.
-- **review**: everything else, with the likeliest action and the question the full review has to answer ("does the README say what the changes were for?", "worth publishing?"). Triage never settles keep, publish, archive, make-private or feature: each depends on the page and the work, which only the full review reads.
+- **review**: everything else, with the likeliest action and the question the full review has to answer ("does the README say what the changes were for?", "worth publishing?"). When the repo has no licence and the likeliest action is keep, publish or archive, say in the question that one is needed: the full review fails Way in without it, and every checklist before archiving, publishing or featuring asks for one. Triage never settles keep, publish, archive, make-private or feature: each depends on the page and the work, which only the full review reads.
 
 Among the repos to review, put first the ones where the most is at stake: those pinned on the user's profile, private repos that may be worth publishing, and public repos others have starred, forked or opened issues on.
 

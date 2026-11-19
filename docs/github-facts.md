@@ -31,6 +31,7 @@ The behaviours of GitHub and of Claude's plugin system that the skills state or 
 | A fork's `ahead_by` from the compare endpoint can run into the thousands when its default branch has drifted from the parent's (seen: 9,897 ahead, an old `master` against the parent's `main`, none of the commits the fork owner's). | Seen | 2026-11-19 |
 | The `author=` filter on the commits endpoint misses commits made under an email that isn't linked to the account; those commits have no `author.login` (seen: 6 of the fork owner's commits, none found by the filter). | Seen | 2026-11-19 |
 | Issue search results for pull requests include `pull_request.merged_at`. | Seen | 2026-11-19 |
+| The repo listing (`user/repos`) includes `license`, with an `spdx_id`, or null when GitHub finds no licence file (seen: 10 of 23 of the user's own repos on the first page). GitHub reports a licence file it can't identify as `NOASSERTION`. | Seen, except `NOASSERTION`: not seen, and not yet checked against GitHub's docs (**unverified**) | 2026-11-19 |
 | `repos/OWNER/REPO/community/profile` gives a `health_percentage` and which community files exist. | Seen | 2026-11-19 |
 | Topic search (`topic:A+topic:B`) can rank only loosely related repos first; keyword search returns many results, also loosely ranked. | Seen | 2026-11-19 |
 | Traffic covers the last 14 days and needs push access. | Stated in the skill before this file existed; not rechecked | — |
