@@ -9,13 +9,13 @@ Both read GitHub through `gh api`. Neither follows, stars or messages anyone, an
 
 ## Install and update
 
-The plugin is installed by uploading a zip of it to claude.ai (Customize > Plugins > Upload plugin). Edits here don't reach Claude until the plugin is uploaded again, so after every change, raise `version` in `.claude-plugin/plugin.json`, build the zip and upload it:
+The plugin is installed by uploading a zip of it to claude.ai (Customize > Plugins > Upload plugin). Edits here don't reach Claude until the plugin is uploaded again, so after every change, raise `version` in `.claude-plugin/plugin.json`, add an entry for it to [CHANGELOG.md](CHANGELOG.md), build the zip and upload it:
 
 ```sh
 scripts/package.sh
 ```
 
-It validates the manifest and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README and the licence.
+It validates the manifest and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README, the changelog and the licence.
 
 A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version. Typing `/reload-plugins` in the session applies plugin updates, but whether it picks up an upload to claude.ai isn't tested yet (see [`docs/github-facts.md`](docs/github-facts.md#claude-plugins-and-skills)).
 

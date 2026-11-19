@@ -58,4 +58,6 @@ An organisation's triage is stricter than the user's own. Other people may rely 
 
 ## What ships
 
-Everyone a plugin is shared with receives every file in the upload. `scripts/package.sh` zips only the manifest, the skills, the README and the licence (`LICENSE` and `NOTICE`), leaving out `docs/`, `tests/` and `scripts/`, which are for working on the plugin, not using it.
+Everyone a plugin is shared with receives every file in the upload. `scripts/package.sh` zips only the manifest, the skills, the README, the changelog and the licence (`LICENSE` and `NOTICE`), leaving out `docs/`, `tests/` and `scripts/`, which are for working on the plugin, not using it.
+
+The changelog ships because the zip is all a user gets: the repo is private, and the commit history, written for working on the plugin, doesn't go in it. Each entry says what changed from the user's side, and is written in the same commit as the version it describes.

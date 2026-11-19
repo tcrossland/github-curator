@@ -1,7 +1,7 @@
 #!/bin/sh
 # Build the zip to upload to claude.ai (Customize > Plugins > Upload plugin).
-# It holds only what the plugin needs: the manifest, the skills, the README and
-# the licence (LICENSE and NOTICE).
+# It holds only what the plugin needs: the manifest, the skills, the README, the
+# changelog and the licence (LICENSE and NOTICE).
 # docs/, tests/ and scripts/ stay out, since everyone the plugin is shared with
 # receives every file in the upload.
 set -eu
@@ -18,6 +18,6 @@ fi
 
 mkdir -p dist
 rm -f "$out"
-zip -r -X -q "$out" .claude-plugin skills README.md LICENSE NOTICE -x '*.DS_Store'
+zip -r -X -q "$out" .claude-plugin skills README.md CHANGELOG.md LICENSE NOTICE -x '*.DS_Store'
 echo "Built $out"
 unzip -l "$out"
