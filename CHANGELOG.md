@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## 0.2.7 (2026-11-20)
+
+- An overview reviews its repos one at a time, so each scorecard's Timings and the overview's time per repo are that repo's own. Before, reviews could run side by side, and their times and API calls ran together.
+
 ## 0.2.6 (2026-11-20)
 
 - The reply to a review or an overview takes its pass, fail and flagged counts from the page's own data, so the reply and the page always agree. Before, they were counted by hand and could differ.

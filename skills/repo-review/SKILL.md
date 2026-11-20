@@ -12,7 +12,7 @@ For a repo, the review also recommends what to do with it, whether to feature it
 
 There are three ways to run it:
 - **One draft**: the arguments are a repo URL, a local clone's folder, a file, a doc link or pasted text. Run Steps 1 to 6.
-- **Overview**: the arguments start with `overview`, optionally followed by repo URLs. Run Steps 1 to 4 for each repo (publishing each repo's scorecard as usual), then Step 7.
+- **Overview**: the arguments start with `overview`, optionally followed by repo URLs. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7.
 - **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
 
 In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
@@ -123,7 +123,7 @@ The count is the GitHub account's, not the run's: requests made at the same time
 
 Log a line only for a step that ran. The steps, in order:
 - **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4) and `Build` (writing the page's JSON in Step 5).
-- **Overview**: each repo's review keeps its own log and shows it on its scorecard. The overview's log has one line per repo, named `OWNER/NAME`, written as its scorecard is published (or saved, with `no-publish`), then `Build`.
+- **Overview**: review the repos one at a time. Finish each repo's review, through publishing (or saving) its scorecard, before making any call for the next, and don't run two repos' steps side by side or in one command. Each repo's review keeps its own log and shows it on its scorecard, and the next repo's log starts after the last one's `Build` line. The overview's log has one line per repo, named `OWNER/NAME`, written as its scorecard is published (or saved, with `no-publish`), then `Build`.
 - **Triage**: `List repos`, `Forks`, `Own repos`, `Sort` and `Build`.
 
 The page needs its timings before the template is filled, so for every page, in this order: write the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
