@@ -107,6 +107,10 @@ footer { color: var(--muted); font-size: 12.5px; }
 .ov .minis { display: flex; gap: 3px; }
 .ov .mini { width: 22px; height: 22px; border-radius: 4px; display: grid; place-items: center; font: 500 10px/1 var(--mono); background: var(--cb); color: var(--c); }
 .ov a { color: var(--accent); }
+.ov .fpcopy { font: 500 12px/1 var(--mono); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; white-space: nowrap; }
+.ov .fpcopy:hover, .ov .fpcopy:focus-visible { background: var(--accent); color: var(--surface); outline: none; }
+.ov .fpfall textarea { width: 100%; min-height: 140px; font: 400 12px/1.5 var(--mono); color: var(--ink); background: var(--quote-bg); border: 1px solid var(--rule); border-radius: 4px; padding: 10px; resize: vertical; }
+.ovnote { margin: -10px 0 0; font-size: 12.5px; color: var(--muted); }
 .outcomes { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 18px; display: grid; gap: 12px; }
 .ohead { display: flex; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; align-items: baseline; }
 .ohead .label { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
@@ -185,6 +189,9 @@ footer { color: var(--muted); font-size: 12.5px; }
   var label = { pass: 'Pass', fail: 'Fail', flagged: 'Flagged' };
   var actions = { keep: 'Keep', publish: 'Publish', archive: 'Archive', 'make-private': 'Make private', delete: 'Delete' };
   var actionName = function (a) { return actions[a] || a; };
+  // One builder for the fix prompt, so the overview's per-repo copy gives the same text as that repo's scorecard.
+  var fpItems = function (fp, mode) { return fp.items.filter(function (x) { return mode === 'all' || x.status === mode; }); };
+  var fpText = function (fp, its) { return [fp.header].concat(its.map(function (x) { return x.text; })).concat([fp.footer]).join('\n\n'); };
   var dur = function (s) { return s == null ? '–' : s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + (s % 60 < 10 ? '0' : '') + (s % 60) + ' s'; };
   var timings = function (rows) {
     if (!rows || !rows.length) return '';
@@ -250,16 +257,32 @@ footer { color: var(--muted); font-size: 12.5px; }
            '<div class="cols"><div><h3>Pinned now</h3>' + pl(d.pins.current) + '</div><div><h3>Recommended</h3>' + pl(d.pins.recommended) + '</div></div>' +
            (d.pins.source ? '<p class="note">' + fmt(d.pins.source) + '</p>' : '') + '</section>';
     }
-    h += '<div class="ovwrap"><table class="ov"><thead><tr><th>Repo</th><th>Recommendation</th><th>Q1 to Q7</th><th>Most important fix</th><th>Stars</th><th>Views (14 days)</th><th>Scorecard</th></tr></thead><tbody>';
-    d.repos.forEach(function (r) {
+    var hasFp = function (r) { return r.fixPrompt && r.fixPrompt.items && r.fixPrompt.items.length; };
+    h += '<div class="ovwrap"><table class="ov"><thead><tr><th>Repo</th><th>Recommendation</th><th>Q1 to Q7</th><th>Most important fix</th><th>Stars</th><th>Views (14 days)</th><th>Scorecard</th><th>Fix prompt</th></tr></thead><tbody>';
+    d.repos.forEach(function (r, ri) {
       h += '<tr><td><a href="' + esc(r.link) + '">' + esc(r.name) + '</a></td><td class="act">' + (r.action ? esc(actionName(r.action)) + (r.feature ? ' · featured' : '') + (r.todo ? ' · ' + esc(r.todo) + ' to do' : '') : '') + '</td><td><div class="minis">';
       r.statuses.forEach(function (s, i) { h += '<span class="mini ' + s + '" title="Q' + (i + 1) + ': ' + label[s] + '">' + (i + 1) + '</span>'; });
-      h += '</div></td><td>' + fmt(r.fix) + '</td><td class="num">' + esc(r.stars) + '</td><td class="num">' + esc(r.views) + '</td><td><a href="' + esc(r.scorecard) + '">Open</a></td></tr>';
+      h += '</div></td><td>' + fmt(r.fix) + '</td><td class="num">' + esc(r.stars) + '</td><td class="num">' + esc(r.views) + '</td><td><a href="' + esc(r.scorecard) + '">Open</a></td><td>' +
+           (hasFp(r) ? '<button type="button" class="fpcopy" id="ovfp-' + ri + '" aria-label="Copy the fix prompt for ' + esc(r.name) + '">Copy</button>' : '') + '</td></tr>';
+      if (hasFp(r)) h += '<tr class="fpfall" id="ovfpr-' + ri + '" hidden><td colspan="8"><textarea id="ovfpt-' + ri + '" readonly aria-label="Fix prompt for ' + esc(r.name) + '"></textarea></td></tr>';
     });
     h += '</tbody></table></div>';
+    if (d.repos.some(hasFp)) h += '<p class="ovnote">Each fix prompt is the one on that repo\'s scorecard, with every finding. Paste it into a Claude Code session in that repo.</p>';
     h += timings(d.timings);
     if (d.footer) h += '<footer>' + fmt(d.footer) + '</footer>';
     document.getElementById('app').innerHTML = h;
+    d.repos.forEach(function (r, ri) {
+      if (!hasFp(r)) return;
+      var b = document.getElementById('ovfp-' + ri), text = fpText(r.fixPrompt, fpItems(r.fixPrompt, 'all'));
+      b.addEventListener('click', function () {
+        var done = function (m) { b.textContent = m; setTimeout(function () { b.textContent = 'Copy'; }, 2500); };
+        var fail = function () {
+          var ta = document.getElementById('ovfpt-' + ri);
+          document.getElementById('ovfpr-' + ri).hidden = false; ta.value = text; ta.select(); done('Blocked: see below');
+        };
+        try { navigator.clipboard.writeText(text).then(function () { done('Copied'); }, fail); } catch (e) { fail(); }
+      });
+    });
     return;
   }
   var n = { pass: 0, fail: 0, flagged: 0 };
@@ -376,10 +399,10 @@ footer { color: var(--muted); font-size: 12.5px; }
   if (fp && fp.items && fp.items.length) {
     var mode = 'all', ta = document.getElementById('fp-text'), note = document.getElementById('fp-note'), cp = document.getElementById('fp-copy');
     var build = function () {
-      var its = fp.items.filter(function (x) { return mode === 'all' || x.status === mode; });
+      var its = fpItems(fp, mode);
       note.textContent = its.length ? its.length + (its.length === 1 ? ' finding' : ' findings') : 'No findings of this kind';
       cp.disabled = !its.length;
-      return [fp.header].concat(its.map(function (x) { return x.text; })).concat([fp.footer]).join('\n\n');
+      return fpText(fp, its);
     };
     ta.value = build();
     document.querySelectorAll('.fixp .seg button').forEach(function (b) {
