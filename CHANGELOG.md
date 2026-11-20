@@ -4,6 +4,9 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- The review's Outcomes panel shows the other people in a repo: everyone else with commits, by login or by the name on their commits (never an email address), and the open issues and pull requests other people opened, each with its age and whether you've replied.
+- Tone is flagged when the README presents shared work as yours alone, and the fix credits the others by name. Way in is flagged when the README doesn't say whether the repo wants contributions while someone's issue waits, or asks for issues that are turned off, or invites pull requests on an archived repo.
+- For keep and archive, the fix prompt drafts a reply to each issue or pull request waiting on you, for you to post. The review never posts it.
 - A new skill, `contributions`, lists your merged pull requests to repos you don't own: those to your own organisations counted, those to employers you name with `employers:` listed apart, and those to other people's projects one row per repo with its stars, dates and what you did. Pull requests to private repos are counted, never named.
 
 ## 0.2.14 (2026-11-20)

@@ -350,6 +350,7 @@ footer { color: var(--muted); font-size: 12.5px; }
     html += '<section class="fixp" aria-label="Fix prompt"><span class="label">Fix prompt for Claude Code</span><div class="bar"><span class="seg" role="group" aria-label="Which findings">' +
             '<button type="button" data-f="fail" aria-pressed="false">Fails</button><button type="button" data-f="flagged" aria-pressed="false">Flags</button>' +
             (fp.items.some(function (x) { return x.status === 'before'; }) ? '<button type="button" data-f="before" aria-pressed="false">Before</button>' : '') +
+            (fp.items.some(function (x) { return x.status === 'reply'; }) ? '<button type="button" data-f="reply" aria-pressed="false">Replies</button>' : '') +
             '<button type="button" data-f="all" aria-pressed="true">All</button></span>' +
             '<button type="button" class="copy" id="fp-copy">Copy fix prompt</button><span class="note" id="fp-note"></span></div>' +
             '<details><summary>Show the prompt</summary><textarea id="fp-text" readonly aria-label="Fix prompt"></textarea></details></section>';

@@ -46,6 +46,16 @@ An employer's repos can't be told apart from the API: on that account the employ
 
 The groups are counted by a script from the search's own results, and its total is checked against the search's `total_count`, for the same reason the review's reply counts come from the page's data: counts made by hand drift. Stars come from one repository search with up to 40 `repo:` qualifiers rather than one call per repo, because `repos/OWNER/REPO` is refused on claude.ai for any repo not attached to the session, while search answers there.
 
+## Other people in the review
+
+Who else built a repo, and whether the people who came to it got an answer, say as much about it as its stars, so the Outcomes panel lists them: Contributors and Waiting on you. Like the rest of the panel they get no pass or fail; they feed Tone, Way in and the fix prompt instead.
+
+Contributors come from the commits API rather than `git shortlog` on the clone: a public repo is cloned with `--depth 1`, which holds one commit, and the API gives each commit's login where GitHub links one, so a person is named by login and otherwise by the name on their commits, never by email address. A commit with no login counts as the user's when its name appears on any commit carrying the user's login: on the account it was built on, one repo had 8 of its 17 commits under the user's name with no linked login, and a rule that counted only logins would have listed the user as a contributor to their own repo. A script groups them, as the reply counts are, so the numbers on the page aren't counted by hand.
+
+Tone is flagged, not failed, for shared work presented as the user's alone, because how much credit a contribution needs is a judgement the user makes; the fix names the others so the change is easy. Whether a repo takes contributions is a flag on Way in for the same reason, and it's met by saying either way: a repo that doesn't want them is fine once it says so.
+
+The fix prompt drafts a reply to each issue or pull request waiting on the user, under its own status (`reply`), so the page's filter can show the replies apart from the edits. The review never posts one, and the prompt tells Claude Code not to either: a reply speaks for the user, so it's theirs to post, edit or drop.
+
 ## Steps for one mode live in their own file
 
 `SKILL.md` loads in full on every run, so a single review used to carry the overview and triage steps it never runs. Those steps are in `overview.md` and `triage.md` beside it, read only in their mode, so a single review loads the shared rules and Steps 1 to 6, and changes to triage (item 11 rewrites it) don't grow every review. An overview reads its file before starting, since it holds how an overview logs its time, not only Step 7. Each mode file names the sections of `SKILL.md` it relies on.

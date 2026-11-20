@@ -55,6 +55,14 @@ test('single review shows the recommendation, feature, similar repos and every q
   assert.equal(els['fp-text'].value, 'HEADER\n\nFAIL\n\nBEFORE\n\nFOOTER');
 });
 
+test('draft replies get their own filter, and only when there are any', () => {
+  assert.doesNotMatch(render(review).html, /data-f="reply"/);
+  const items = [...review.fixPrompt.items, { question: 'Waiting on you', status: 'reply', text: 'REPLY' }];
+  const { html, els } = render({ ...review, fixPrompt: { ...review.fixPrompt, items } });
+  assert.match(html, /data-f="before"[^>]*>Before<\/button><button type="button" data-f="reply" aria-pressed="false">Replies<\/button>/);
+  assert.equal(els['fp-text'].value, 'HEADER\n\nFAIL\n\nBEFORE\n\nREPLY\n\nFOOTER');
+});
+
 test('empty outcome lists use their own message, or None', () => {
   const { html } = render(review);
   assert.match(html, /<h3>Stargazers<\/h3><ul><li class="none">None<\/li>/);

@@ -9,7 +9,6 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | todo |
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
-| 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | none | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
@@ -72,25 +71,6 @@ Uses:
 - **Overview of many repos**, when a full review of each would take too long.
 
 **Done when** a quick review of ten repos takes a small part of the time an overview of the same ten takes (from item 2's timings), and its Hook, Findable and Way in statuses agree with the full reviews' on those repos, with each disagreement explained.
-
-## 12. Other people in the review
-
-The review counts other people only as a reason for care: stars, forks and issues from others make it prefer archive to make-private, a licence fix names anyone else with commits, and the fix prompt opens a pull request when others commit. It never shows who else built the repo, or whether the people who came to it got an answer, though both say as much about the repo as its stars do. A collaborator reading the page notices an issue from a stranger left unanswered for two years, or a README in the first person singular over someone else's commits.
-
-Add to the Outcomes panel, as context with no pass or fail:
-- **Contributors**: everyone else with commits, from `git shortlog -sne` on the clone (which works on claude.ai), by login where GitHub links one and by name otherwise, never by email address, with their number of commits and their last.
-- **Waiting on you**: open issues and pull requests opened by other people, each with its age and whether the owner has replied.
-
-And use them:
-- **Tone** flags a README that presents shared work as the user's alone, such as a first-person history over commits that are mostly someone else's. The fix credits them by name.
-- **Before archiving** and **keep** gain a draft reply for each open issue or pull request from someone else, in the fix prompt, for the user to post. The review never posts it.
-
-The smaller item on contributions is part of this one, since it reads the same outside pull requests:
-- **Says whether it takes contributions**: Way in checks that a visitor can run or reuse a repo, but not that the repo says whether it wants contributions, or that its settings agree with what it says: a README that asks for issues when issues are turned off, "pull requests welcome" on an archived repo, or no word either way on a repo with outside pull requests waiting. Add it to Way in, as a flag rather than a fail. A repo that doesn't want contributions passes once it says so. Item 5's Practice panel would check the CONTRIBUTING file and issue templates that a repo inviting contributions needs. Done when a review flags each of the three cases above, and passes a repo that says it doesn't take contributions.
-
-Its rules match the `stargazers` skill's: public data only, no email addresses, never contact anyone.
-
-**Done when** a review of a repo with commits from someone else and an unanswered issue from a stranger lists both in Outcomes, flags Tone if the README doesn't credit the other contributor, and puts a draft reply in the fix prompt.
 
 ## 5. Benchmark against good practice
 
