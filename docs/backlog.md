@@ -22,6 +22,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | – | [Other smaller items](#smaller) | Fixes | S each | none | any time |
 | 2 | [Timing](#2-timing) | Measurement | S | 0 | done |
 | – | [Timing rows that misread the rate limit](#timing-rows-that-misread-the-rate-limit) | Fix | S | none | done |
+| – | [Log each step in a command of its own](#log-each-step-in-a-command-of-its-own) | Fix | S | none | done |
 | – | [Reply counts from the JSON](#reply-counts-from-the-json) | Fix | S | none | done |
 | 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
@@ -217,9 +218,12 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 - **Three most-starred repos in `stargazers`**: it reads the first 100 repos only, and the API can't sort them by stars, so for someone with more than 100 repos the three can be wrong. Paginate, then sort by stars.
 - **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
 - **README links that don't ship**: the README is in the zip, but its "Working on it" section links to `docs/`, which isn't. Move that section to `docs/README.md`, or have `scripts/package.sh` leave it out.
-- **Log each step in a command of its own**: a step's line is stamped when its command runs, so work written in the same command as a step's line is timed to that step (item 2). Have the Timing section say to write a step's line in a command of its own, before any of the next step's work.
 
 ## Done
+
+### Log each step in a command of its own
+
+A step's timing line is stamped when its command runs, so in the cold overview of 2026-11-20 (item 2) work written into the same command as a step's line was timed to that step. Since 0.2.10 the Timing section says to append each step's line in a command of its own, before any of the next step's work.
 
 ### Timing rows that misread the rate limit
 

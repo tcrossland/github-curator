@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## 0.2.10 (2026-11-20)
+
+- Timings split a run's time between its steps more truly: each step's time is logged on its own as soon as the step ends. Before, the work of the next step could be counted to the one before it.
+
 ## 0.2.9 (2026-11-20)
 
 - Timings give an API call count on more rows. GitHub's rate limit can give slightly different reset times, or now and then a stray count, within one hour, and each blanked the count on rows where GitHub's hourly window hadn't reset. Now only a stray count's two rows go without.

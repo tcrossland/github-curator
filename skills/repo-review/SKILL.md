@@ -109,7 +109,7 @@ Leave the recommendation and the feature call out for pasted text, a file, or a 
 
 ## Timing
 
-Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `overview-timings.log` or `triage-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`:
+Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `overview-timings.log` or `triage-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`, in a command of its own: send it as soon as the step's work is done, and write none of the next step's work into the same command.
 
 ```sh
 printf '%s\t%s\t%s\n' 'NAME' "$(date -u +%s)" "$(r=$(gh api rate_limit --jq '"\(.resources.core.used)\t\(.resources.core.reset)"' 2>/dev/null) && printf %s "$r")" >> "LOG"
