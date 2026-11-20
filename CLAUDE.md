@@ -4,7 +4,7 @@ A Claude plugin with two skills, `repo-review` and `stargazers`, that review a G
 
 ## Where things are
 
-- `skills/`: what ships. `repo-review/SKILL.md` and its `scorecard-template.html`, which renders all three modes, and `stargazers/SKILL.md`.
+- `skills/`: what ships. `repo-review/SKILL.md`, with the overview and triage steps in `overview.md` and `triage.md` beside it, the quote checker `verify_run.py` and `scorecard-template.html`, which renders all three modes; and `stargazers/SKILL.md`.
 - `docs/README.md`: notes for working on the plugin. The README at the root ships in the zip, so it links nothing outside it.
 - `docs/design.md`: why the skills work the way they do. Read it before changing a rule.
 - `docs/github-facts.md`: every behaviour of GitHub or Claude the skills rely on, with its source and the date it was checked.
@@ -13,7 +13,7 @@ A Claude plugin with two skills, `repo-review` and `stargazers`, that review a G
 
 ## Changing a skill
 
-- `SKILL.md` loads in full on every run, so it holds instructions only. Put the reasons in `docs/design.md`.
+- `SKILL.md` loads in full on every run, so it holds instructions only. Put the reasons in `docs/design.md`. Steps used in only one mode go in that mode's file beside it.
 - The skills only recommend. Never add a step that archives, deletes, pins, changes a repo's visibility, closes an issue or pull request, or contacts anyone.
 - Before relying on a behaviour of GitHub or Claude, check `docs/github-facts.md`. A new fact goes there with its source ("Seen", or a link) and the date; anything not checked is marked **unverified**.
 - The skills run on claude.ai as well as in Claude Code, and a claude.ai session can't reach much of what works in a local shell: GraphQL, unscoped paths, unattached repos and cross-fork compare are all refused. The facts table's claude.ai section lists what works there. Don't assume a route that works here works there.
@@ -27,7 +27,7 @@ python3 -m unittest discover tests
 node --test tests/*.test.mjs
 ```
 
-The Python tests run the code blocks in `SKILL.md` as they stand, finding each block by its content: the quote checker by `'problems:'`, the timing script by `'reset'`, the logging line by `rate_limit`, the reply counts by `'flagged'`. Keep those markers. A new snippet that calls `gh` needs a stand-in `gh` in its test that checks its arguments and runs the snippet's own `--jq`, as `tests/test_timings.py` does.
+The Python tests run the code in the skills as it stands: the quote checker from `skills/repo-review/verify_run.py`, and the code blocks in each `SKILL.md`, found by their content: in `repo-review`, the timing script by `'reset'`, the logging line by `rate_limit` and the reply counts by `'flagged'`; in `stargazers`, the repo listings by `users/LOGIN/repos` and `orgs/ORG/repos`. Keep those markers. A new snippet that calls `gh` needs a stand-in `gh` in its test that checks its arguments and runs the snippet's own `--jq`, as `tests/test_timings.py` does.
 
 ## Releasing
 

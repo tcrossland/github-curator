@@ -12,8 +12,8 @@ For a repo, the review also recommends what to do with it, whether to feature it
 
 There are three ways to run it:
 - **One draft**: the arguments are a repo URL, a local clone's folder, a file, a doc link or pasted text. Run Steps 1 to 6.
-- **Overview**: the arguments start with `overview`, optionally followed by repo URLs. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7.
-- **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
+- **Overview**: the arguments start with `overview`, optionally followed by repo URLs. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7. Step 7 and how an overview logs its time are in [overview.md](overview.md) beside this file: read it before starting, and only in this mode.
+- **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only, from [triage.md](triage.md) beside this file, read only in this mode: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
 
 In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
 
@@ -122,10 +122,8 @@ Reading `rate_limit` costs no request, and `core.used` counts nearly every REST 
 
 The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
 
-Log a line only for a step that ran. The steps, in order:
+Log a line only for a step that ran. The steps, in order (overview and triage name theirs in their own files):
 - **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4) and `Build` (writing the page's JSON in Step 5).
-- **Overview**: review the repos one at a time. Finish each repo's review, through publishing (or saving) its scorecard, before making any call for the next, and don't run two repos' steps side by side or in one command. Each repo's review keeps its own log and shows it on its scorecard, and the next repo's log starts after the last one's `Build` line. The overview's log has one line per repo, named `OWNER/NAME`, written as its scorecard is published (or saved, with `no-publish`), then `Build`.
-- **Triage**: `List repos`, `Forks`, `Own repos`, `Sort` and `Build`.
 
 The page needs its timings before the template is filled, so for every page, in this order: write the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
 
@@ -161,7 +159,7 @@ Accept any of these:
 - **A local clone** (a folder on the user's computer that holds a `.git` directory): this is the pre-push check, so review the working copy exactly as it is.
   - Work through the device bridge, read only: never check out, fetch, pull, stash, commit or write anything inside the folder. If the folder isn't connected yet, ask for it with `device_request_folder_access`.
   - With `device_bash` in the folder, read the branch (`git rev-parse --abbrev-ref HEAD`), the commit (`git rev-parse --short HEAD`), uncommitted changes (`git status --porcelain`) and the remote (`git remote get-url origin`). Read `README.md`, every file it links to that bears on a claim, the manifest, the CI workflow and the license from the working copy, and check links and anchors on disk.
-  - Run the verify script from Step 4 in that shell, from a scratch file outside the connected folders, with the folder as `REPO-ROOT`. If `device_bash` isn't available, stage the README and the files it quotes or links to with `device_stage_files` and run everything in the workspace.
+  - Run Step 4's `verify_run.py` in that shell, from a copy written to a scratch file outside the connected folders, with the folder as `REPO-ROOT`. If `device_bash` isn't available, stage the README and the files it quotes or links to with `device_stage_files` and run everything in the workspace.
   - Settings and outcomes come from GitHub: if `origin` points to a GitHub repo, attach it with `add_repo` as in the bullet above and read them through the API, including whether the repo is private. They describe what's live, not the working copy, so say so in the Findable finding when the branch isn't the default branch. With no GitHub remote, flag Findable as not checkable and leave the outcomes panel out.
   - In the scorecard's `subject`, say "working copy at PATH, branch BRANCH at commit COMMIT", adding "with uncommitted changes in N files" when `git status` lists any. A quote from a file with uncommitted changes gets "(working copy)" after its line number.
   - Find the previous run by the repo name from `origin` (or the folder name with no remote), so a local check and a GitHub check of the same repo share one scorecard and the Since last check panel compares them.
@@ -229,37 +227,10 @@ If Step 1 found a previous run, write a short list of what changed since it: the
 ## Step 4: verify, then recommend and pick the verdict
 
 Verify before building the page:
-- **Quotes**: run the script below on the run's JSON. Every file quote must appear verbatim, on the line its source names. Fix or replace any that fails.
+- **Quotes**: run [verify_run.py](verify_run.py), which sits beside this file, on the run's JSON. Every file quote must appear verbatim, on the line its source names. Fix or replace any that fails.
 - **Numbers in your own prose**: list every number or count you wrote in the verdict, findings, fixes, signals and work-before notes ("seven phase notes", "30 links", "three commands"), and recount each one from the source with code, not from memory or the previous run. Rewrite any that don't match, or drop the number if a recount isn't possible.
 
-```python
-import json, re, sys, os
-run, root = sys.argv[1], sys.argv[2]
-d = json.load(open(run)); bad = 0
-for q in d['questions']:
-    for x in q['quotes']:
-        src = x['source']
-        m = re.match(r'([\w./-]+)(?::(\d+)|,?\s+lines?\s+(\d+))?', src)
-        name = m.group(1) if m else ''
-        path = os.path.join(root, name)
-        if not name or not os.path.isfile(path):
-            if '.' in name or '/' in name: print(f"{q['short']}: MISSING FILE {name}"); bad += 1
-            else: print(f"{q['short']}: not a file quote, skipped ({src[:40]})")
-            continue
-        ln = m.group(2) or m.group(3)
-        if not ln and re.search(r'\blines?\b', src, re.I):
-            print(f"{q['short']}: line number in an unreadable form ({src[:40]})"); bad += 1; continue
-        text = open(path, encoding='utf-8').read()
-        if x['text'] not in text: print(f"{q['short']}: NOT VERBATIM in {name}"); bad += 1; continue
-        if ln:
-            ln = int(ln); lines = text.splitlines()
-            if ln > len(lines) or (x['text'] not in lines[ln-1] and x['text'].splitlines()[0] not in lines[ln-1]):
-                print(f"{q['short']}: not on line {ln} of {name}"); bad += 1; continue
-        print(f"{q['short']}: ok ({name}{', line '+str(ln) if ln else ''})")
-print('problems:', bad)
-```
-
-Run it as `python3 verify_run.py RUN.json REPO-ROOT`, where `REPO-ROOT` is the clone in the workspace, or the local clone's folder when it runs in the shell on the user's computer.
+Copy it into the working folder, as Step 5 does the template, and run it as `python3 verify_run.py RUN.json REPO-ROOT`, where `REPO-ROOT` is the clone in the workspace, or the local clone's folder when it runs in the shell on the user's computer.
 
 With the questions settled, decide the recommendation, the feature call and their work-before lists, as set out in The recommendation above.
 
@@ -314,67 +285,3 @@ else:
 ```
 
 The artifact card carries the link, so don't repeat it. With `no-publish` there is no card: add a last line with the saved file's full path.
-
-## Step 7: overview
-
-An overview runs the full review on every repo, so with more than a handful, run `triage` first and pass the repos it names to `overview`.
-
-For `overview`, use the repo URLs given. If none are given, list the user's repos with `list_repos`, keep the ones the user owns, public and private, forks included, leaving out those already archived, and say in the overview's footer which repos were included and how they were chosen.
-
-After each repo's scorecard is published (or saved, with `no-publish`), publish or save one more page from the same template, titled "Portfolio overview", with the icon `checklist`. Republish to an existing "Portfolio overview" artifact if `list_artifacts` finds one. Its JSON:
-- `overview`: `true`
-- `title`: "Portfolio overview"; `subject`: how many repos and which commits; `date`
-- `verdict`: `fix` (the repo that needs attention first, and its most important fix) and `why` (one or two sentences). Pick the repo whose earliest failing question comes first; break ties by the most fails.
-- `pins`: `current` (the pinned repos and gists now, as `owner/name` strings), `recommended` (up to six, in the order to pin them, chosen across every repo reviewed and the current pins that weren't), `source` (where the current pins came from) and `why` (one or two sentences on what changes and why). Rank the repos whose feature call is yes, and keep a current pin that wasn't reviewed unless something reviewed is clearly stronger.
-- `repos`: one object per repo with `name` (owner/name), `link`, `action` (its recommended action), `feature` (`true` or `false`), `todo` (the number of `todo` items before the action and featuring, or 0), `statuses` (the seven statuses in order), `fix` (that repo's verdict fix), `stars`, `views` (14-day views, or "Not available") and `scorecard` (the scorecard's claude.ai URL, or its file path with `no-publish`)
-- `timings`: the rows from the overview's log, one per repo, then `Build`, as set out under Timing
-- `footer`: which repos were included and how they were chosen
-
-Reply in three lines: the repo that needs attention first with its fix; the recommended pins, in order; then one `name: ACTION (featured), N pass · N fail · N flagged` entry per repo, with "(featured)" only when its feature call is yes, separated by semicolons. Take that third line exactly as the counts script in Step 6 prints it from the overview's JSON (`python3 counts.py OVERVIEW.json`), not counted by hand; if it prints `cannot count`, fix that repo's `statuses` and rebuild the page first.
-
-## Step 8: triage
-
-Triage is a first pass over many repos, from GitHub's API alone. It settles the cases the API makes plain, gives every other repo a provisional action, and names the ones worth a full review. It never clones, runs the seven questions, lists stargazers or searches for similar repos, and, like the rest of this skill, it only recommends.
-
-### Which repos
-
-List the repos the user owns with `gh api --paginate 'user/repos?affiliation=owner&per_page=100'`. If that fails or plainly misses repos, use `list_repos`, and say in the footer which source was used. Then apply the filters given: `public` or `private` (visibility), `own` or `forks`, and `archived` (archived repos are left out unless it's given). With no filters, take every repo that isn't archived. Read the pinned repos as in Step 1.
-
-With `org:NAME`, list that organisation's repos instead, with `gh api --paginate 'orgs/NAME/repos?per_page=100'`, and apply the other filters to them; take one organisation per run. Other people in an organisation may rely on its repos, and only its admins can archive, delete or change the visibility of one:
-- The listing's `permissions.admin` says whether the user is an admin of each repo. When it's false, add the signal "needs an org admin": every action on that repo is an admin's call, not the user's.
-- A repo is `clear` only when it's empty and the user is its admin. A fork with no commits beyond its parent goes to review, with the question of whether anyone in the organisation uses it.
-- The signals for "each repo of the user's own" apply to every repo that isn't a fork.
-- Title the page "Repo triage: NAME", so it stays apart from the triage of the user's own repos.
-
-### Signals
-
-From the listing, for each repo: `private`, `fork`, `archived`, `pushed_at`, `stargazers_count`, `forks_count`, `open_issues_count`, `description`, `topics`, `size`, `default_branch` and `license`. Then:
-- **Each fork**: read its parent from `gh api repos/OWNER/REPO` (`.parent`), and count the commits the fork has that its parent doesn't, as in Step 1. Note when the parent is archived, and when there is no parent (it was deleted or the fork was detached: treat the repo as the user's own). When the fork has commits beyond its parent, read who made them from the same compare call (`.commits[] | .author.login, (.commit.author.email | split("@")[1]), .commit.message`; it lists at most 250). Count a commit as possibly the user's when its login is the user's, or when it has no login at all: commits made under an email that isn't linked to the user's account have none, so GitHub's `author=` filter misses them. Record the email domains of those, not the addresses, so the user can recognise a former employer's. When `ahead_by` runs into the thousands, or none of the listed commits look like the user's, the fork's default branch has most likely drifted from the parent's (an old `master` against a newer `main`): say so, and count the user's commits with `gh api --paginate 'repos/OWNER/REPO/commits?author=OWNER&per_page=100' --jq '.[].sha' | wc -l`. Then list the user's pull requests to the parent and whether each was merged: `gh api 'search/issues?q=repo:PARENT-OWNER/PARENT-REPO+author:OWNER+type:pr'` (`.items[] | .title, .state, .pull_request.merged_at`).
-- **Each repo of the user's own**: the first lines of its README, from `gh api repos/OWNER/REPO/readme --jq .content | base64 -d | head -20`, and whether it says the project is unmaintained or archived. A 404 means there is no README. When `license` is null, add the signal "no licence"; when its `spdx_id` is `NOASSERTION`, add "licence not recognised by GitHub". A fork's licence is its parent's, so leave it out for forks.
-
-Write each repo's signals as short facts, as in The recommendation.
-
-### Sorting
-
-Give each repo a provisional action from The recommendation, and mark it `clear` or `review`:
-- **clear delete**: an empty repo (`size` 0); or a fork with no commits beyond its parent, that nobody else has starred, forked or opened an issue on, and that isn't pinned. Nothing of the user's is lost.
-- **likely delete, to review**: a fork whose commits beyond its parent look like the ones the user's merged pull requests already brought upstream. The work survives in the parent, but the full review should confirm nothing else is in the fork.
-- **review**: everything else, with the likeliest action and the question the full review has to answer ("does the README say what the changes were for?", "worth publishing?"). When the repo has no licence and the likeliest action is keep, publish or archive, say in the question that one is needed: the full review fails Way in without it, and every checklist before archiving, publishing or featuring asks for one. Triage never settles keep, publish, archive, make-private or feature: each depends on the page and the work, which only the full review reads.
-
-Among the repos to review, put first the ones where the most is at stake: those pinned on the user's profile, private repos that may be worth publishing, and public repos others have starred, forked or opened issues on.
-
-### The triage page
-
-Write the run as JSON and publish it from the same template as Step 5 (or save it, with `no-publish`), titled "Repo triage" (or "Repo triage: NAME" for an organisation), with the icon `checklist`. Republish to an existing artifact of the same title if `list_artifacts` finds one, and compare with it: name the repos that have gone since (the user acted on them) and any whose provisional action changed. Its JSON:
-- `triage`: `true`
-- `title`: "Repo triage"; `subject`: how many repos, which filters and the listing's source; `date`
-- `changes` (only when there was a previous triage): `since` (its date) and `items`
-- `repos`: one object per repo with `name` (owner/name), `link`, `visibility` (`public` or `private`), `kind` (`own` or `fork`), `pinned` (`true` or `false`), `pushed` (date only), `stars`, `signals` (the short facts), `action` (the provisional action), `sure` (`clear` or `review`), `reason` (one sentence) and, for `review`, `question` (what the full review has to answer). List the repos to review in the order above, then the clear ones.
-- `commands`: for the clear deletes, one `gh repo delete OWNER/REPO` per repo, without `--yes`, so that each asks the user to confirm; leave it out when there are none. Introduce them in `commandsNote`: deleting needs the `delete_repo` scope (`gh auth refresh -s delete_repo`), a deleted repo can be restored within 90 days unless it's part of a fork network with other repos in it, and the user runs them only if they agree.
-- `next`: the command that reviews the first ten repos marked `review`, `/github-curator:repo-review overview` followed by their URLs in the order above, and `nextNote` saying how many are left for later runs
-- `timings`: the rows from the triage log, as set out under Timing, with `searches` on `Forks` when it searched for pull requests
-- `footer`: which repos were included and how they were chosen, the pins' source, and that triage reads only the API, so every `review` action is provisional
-
-Never run the commands, and never archive, delete or change the visibility of anything during triage.
-
-Reply in two lines: the counts (`N clear deletes · N to review`, with the provisional actions among those to review, such as `4 likely archive`), then the first three repos to review, with the question for each.

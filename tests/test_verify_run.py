@@ -1,17 +1,16 @@
-"""Tests for the quote checker embedded in skills/repo-review/SKILL.md (Step 4).
+"""Tests for the quote checker, skills/repo-review/verify_run.py (Step 4).
 
-The checker is extracted from the skill as it stands, so these tests check the
-code the skill actually tells Claude to run. Run: python3 -m unittest discover tests
+These run the file the skill tells Claude to copy and run, as it stands.
+Run: python3 -m unittest discover tests
 """
 import json
-import re
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-SKILL = Path(__file__).resolve().parent.parent / "skills" / "repo-review" / "SKILL.md"
+CHECKER = Path(__file__).resolve().parent.parent / "skills" / "repo-review" / "verify_run.py"
 
 FILES = {
     "README.md": "# Title\nA hook line.\nSecond line here.\nThird.\n",
@@ -40,14 +39,6 @@ CASES = [
     ("x", "CONTRIBUTING.md, line 1", "problem"),
     ("A hook line.", "README.md, line two", "problem"),
 ]
-
-
-def extract_checker(skill_text):
-    """Return the python code block in the skill that prints the problem count."""
-    blocks = [b for b in re.findall(r"```python\n(.*?)\n```", skill_text, re.S) if "'problems:'" in b]
-    if len(blocks) != 1:
-        raise ValueError(f"expected one quote checker block in SKILL.md, found {len(blocks)}")
-    return blocks[0]
 
 
 def build_run(cases):
@@ -81,7 +72,7 @@ def run_checker(checker, files, run):
 class VerifyRunTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.lines = run_checker(extract_checker(SKILL.read_text(encoding="utf-8")), FILES, build_run(CASES))
+        cls.lines = run_checker(CHECKER.read_text(encoding="utf-8"), FILES, build_run(CASES))
 
     def test_each_case(self):
         by_case = {line.split(":", 1)[0]: line for line in self.lines if line.startswith("case")}

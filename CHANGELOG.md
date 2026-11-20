@@ -2,6 +2,11 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## 0.2.13 (2026-11-20)
+
+- A single review loads less: the overview and triage steps are in files of their own, read only in those modes, so the review's instructions are about a fifth shorter.
+- The quote checker ships as a file, `verify_run.py`, and is run as written rather than retyped from the instructions.
+
 ## 0.2.12 (2026-11-20)
 
 - `stargazers` finds a stargazer's three most-starred repos, and their organisation's, among all of them. Before, it looked only at the first 100, so for someone with more it could miss their best-known work.

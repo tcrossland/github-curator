@@ -6,7 +6,7 @@ These notes are for changing the plugin. They stay out of the zip that `scripts/
 - [`github-facts.md`](github-facts.md): the GitHub and Claude behaviours the skills rely on, each with its source and the date it was checked.
 - [`backlog.md`](backlog.md): what to build next.
 
-The tests run the code blocks in `skills/repo-review/SKILL.md` as they stand (the quote checker, the timing script and the reply counts), check that every relative link in a shipped file points to a file the zip holds, and render the scorecard template's three modes:
+The tests run the skills' code as it stands (the quote checker, the timing script, the reply counts and `stargazers`' repo listings), check that every relative link in a shipped file points to a file the zip holds, and render the scorecard template's three modes:
 
 ```sh
 python3 -m unittest discover tests

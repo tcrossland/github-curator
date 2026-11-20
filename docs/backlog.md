@@ -7,13 +7,12 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
 | 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | in progress |
-| 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | none | todo |
-| 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | 3 | todo |
-| 7 | [Behaviour evals](#7-behaviour-evals) | Tests | M | 3 | todo |
+| 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | todo |
+| 7 | [Behaviour evals](#7-behaviour-evals) | Tests | M | none | todo |
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | 14 | todo |
-| 4 | [Quick review](#4-quick-review) | New mode | M | 3 | todo |
+| 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
 | 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | 7 helps | todo |
-| 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | 3, 7 helps | todo |
+| 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | 7 helps | todo |
 | 13 | [Contributions to other people's projects](#13-contributions-to-other-peoples-projects) | New skill | M | none | todo |
 | 6 | [Profile review](#6-profile-review) | New skill | M | 13 helps | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
@@ -35,15 +34,6 @@ The smaller item on the traffic claim goes with it:
 **Done when** the first snapshot is saved, and item 1's three unverified points and the traffic claim each have a source and a date in `docs/github-facts.md`.
 
 **Status**: the first snapshot was saved on 2026-11-20, for all 74 public repos, forks included, to a gitignored file, with the script that takes it beside it (about 100 s). Each repo's entry keeps its stars and forks, the daily views and clones GitHub still holds, and its top referrers, so later snapshots can be merged by repo and day. It also settled the 14 days, but not push access (`docs/github-facts.md`). Still to do: the weekly snapshots, the checks on claude.ai, and a source for push access.
-
-## 3. Split `SKILL.md` by mode
-
-`skills/repo-review/SKILL.md` is 360 lines (49 KB), and every run loads all of it, including the overview and triage steps that a single review never uses. Move Step 7 (overview) and Step 8 (triage) into supporting files beside it, linked from the modes list and read only in those modes. They're only the last 60 or so lines, so a single review saves about a sixth of the file today. The larger gain is keeping item 11's changes to triage, and whatever later items add, out of every review. Item 11 rewrites Step 8 and item 5 would add more to the file, so do this before both.
-
-The smaller item on the quote checker goes with it, since both move code out of `SKILL.md` and both change what the tests read:
-- **Quote checker as a file**: move the quote checker from `SKILL.md` into `skills/repo-review/verify_run.py`, so it's run rather than retyped, and point `tests/test_verify_run.py` at the new file.
-
-**Done when** a single review loads only the shared rules and Steps 1 to 6, the overview and triage files are linked by relative path, the quote checker runs from `verify_run.py`, and the tests still pass.
 
 ## 11. GitHub access from a claude.ai session
 
