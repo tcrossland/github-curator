@@ -1,4 +1,4 @@
-"""Tests for the reply counts in skills/repo-review/SKILL.md (Step 6).
+"""Tests for the reply counts in skills/repo-review/SKILL.md (Step 6, also run by Step 7).
 
 The script is extracted from the skill as it stands, so these tests check what the
 skill tells Claude to run. Run: python3 -m unittest discover tests
@@ -21,14 +21,18 @@ def script():
     return found[0]
 
 
-def run(questions):
-    """Run the counts script on a run JSON holding these questions; return (exit code, stdout, stderr)."""
+def run_json(doc):
+    """Run the counts script on this JSON; return (exit code, stdout, stderr)."""
     with tempfile.TemporaryDirectory() as tmp:
         path, data = Path(tmp) / "counts.py", Path(tmp) / "run.json"
         path.write_text(script(), encoding="utf-8")
-        data.write_text(json.dumps({"title": "Repo review: x", "questions": questions}), encoding="utf-8")
+        data.write_text(json.dumps(doc), encoding="utf-8")
         out = subprocess.run([sys.executable, "-I", str(path), str(data)], capture_output=True, text=True)
         return out.returncode, out.stdout, out.stderr
+
+
+def run(questions):
+    return run_json({"title": "Repo review: x", "questions": questions})
 
 
 SHORTS = ["Hook", "Proof", "Way in", "Signal", "Findable", "Current", "Tone"]
@@ -52,13 +56,36 @@ class CountsTest(unittest.TestCase):
         code, out, err = run(questions(*["pass"] * 6))
         self.assertNotEqual(code, 0)
         self.assertEqual(out, "")
-        self.assertIn("cannot count: 6 questions, expected 7", err)
+        self.assertIn("cannot count the run: 6 questions, expected 7", err)
 
     def test_an_unknown_status_names_its_question(self):
         code, out, err = run(questions("pass", "pass", "Flagged", "pass", "pass", "pass", "pass"))
         self.assertNotEqual(code, 0)
         self.assertEqual(out, "")
         self.assertIn("unknown status in: Way in", err)
+
+
+def repo(name, action, feature, *statuses):
+    return {"name": name, "action": action, "feature": feature, "statuses": list(statuses)}
+
+
+class OverviewCountsTest(unittest.TestCase):
+    def test_one_entry_per_repo_with_its_action_and_feature(self):
+        code, out, _ = run_json({"overview": True, "repos": [
+            repo("o/a", "archive", True, *["pass"] * 7),
+            repo("o/b", "keep", False, "fail", "flagged", "pass", "pass", "fail", "pass", "flagged"),
+        ]})
+        self.assertEqual((code, out), (0, "o/a: archive (featured), 7 pass · 0 fail · 0 flagged; "
+                                          "o/b: keep, 3 pass · 2 fail · 2 flagged\n"))
+
+    def test_a_repo_with_a_bad_status_is_named(self):
+        code, out, err = run_json({"overview": True, "repos": [
+            repo("o/a", "keep", False, *["pass"] * 7),
+            repo("o/b", "keep", False, "pass", "pass", "pass", "ok", "pass", "pass", "pass"),
+        ]})
+        self.assertNotEqual(code, 0)
+        self.assertEqual(out, "")
+        self.assertIn("cannot count o/b: 7 questions, expected 7; unknown status in: 4", err)
 
 
 if __name__ == "__main__":

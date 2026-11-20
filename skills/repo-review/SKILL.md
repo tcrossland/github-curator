@@ -291,17 +291,25 @@ The verdict names the single most important fix. Take the earliest failing quest
 Reply in exactly three lines (two when there is no recommendation), and nothing else:
 1. The recommendation: the action and whether to feature it, with the reason, in one sentence, and the number of `todo` items before them when there are any.
 2. The verdict: the most important fix, in one sentence.
-3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying.
+3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the overview's JSON.
 
 ```python
 import json, sys
-qs = json.load(open(sys.argv[1], encoding='utf-8'))['questions']
+d = json.load(open(sys.argv[1], encoding='utf-8'))
 statuses = ('pass', 'fail', 'flagged')
-odd = [str(q.get('short')) for q in qs if q.get('status') not in statuses]
-if len(qs) != 7 or odd:
-    sys.exit(f"cannot count: {len(qs)} questions, expected 7; unknown status in: {', '.join(odd) or 'none'}")
-n = {s: sum(q['status'] == s for q in qs) for s in statuses}
-print(f"{n['pass']} pass · {n['fail']} fail · {n['flagged']} flagged")
+
+def counts(name, items):
+    got = [s for _, s in items]
+    odd = [str(label) for label, s in items if s not in statuses]
+    if len(items) != 7 or odd:
+        sys.exit(f"cannot count {name}: {len(items)} questions, expected 7; unknown status in: {', '.join(odd) or 'none'}")
+    return f"{got.count('pass')} pass · {got.count('fail')} fail · {got.count('flagged')} flagged"
+
+if d.get('overview'):
+    print('; '.join(f"{r['name']}: {r['action']}{' (featured)' if r.get('feature') else ''}, "
+                    + counts(r['name'], list(enumerate(r['statuses'], 1))) for r in d['repos']))
+else:
+    print(counts('the run', [(q.get('short'), q.get('status')) for q in d['questions']]))
 ```
 
 The artifact card carries the link, so don't repeat it. With `no-publish` there is no card: add a last line with the saved file's full path.
@@ -321,7 +329,7 @@ After each repo's scorecard is published (or saved, with `no-publish`), publish 
 - `timings`: the rows from the overview's log, one per repo, then `Build`, as set out under Timing
 - `footer`: which repos were included and how they were chosen
 
-Reply in three lines: the repo that needs attention first with its fix; the recommended pins, in order; then one `name: ACTION (featured), N pass · N fail · N flagged` entry per repo, with "(featured)" only when its feature call is yes, separated by semicolons.
+Reply in three lines: the repo that needs attention first with its fix; the recommended pins, in order; then one `name: ACTION (featured), N pass · N fail · N flagged` entry per repo, with "(featured)" only when its feature call is yes, separated by semicolons. Take that third line exactly as the counts script in Step 6 prints it from the overview's JSON (`python3 counts.py OVERVIEW.json`), not counted by hand; if it prints `cannot count`, fix that repo's `statuses` and rebuild the page first.
 
 ## Step 8: triage
 

@@ -239,7 +239,7 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 
 ### Reply counts from the JSON
 
-Step 6's reply counted its pass, fail and flagged statuses by hand, and in a review on 2026-11-19 got 2 · 0 · 5 where the scorecard had 0 · 5 · 2. Since 0.2.6 a script in Step 6 prints the counts from the run's JSON, and refuses to count when there aren't seven questions or a status is unknown; `tests/test_reply_counts.py` runs it on sample runs. The overview's reply (Step 7) still counts each repo's statuses by hand.
+Step 6's reply counted its pass, fail and flagged statuses by hand, and in a review on 2026-11-19 got 2 · 0 · 5 where the scorecard had 0 · 5 · 2. Since 0.2.6 a script in Step 6 prints the counts from the run's JSON, and refuses to count when there aren't seven questions or a status is unknown. Step 7 runs the same script on the overview's JSON for its per-repo entries. `tests/test_reply_counts.py` runs it on sample runs of both.
 
 ### 0. Prove the current version on claude.ai
 
