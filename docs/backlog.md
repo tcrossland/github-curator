@@ -13,7 +13,6 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
 | 8 | [Forks](#8-forks) | New skill | M | none | todo |
-| 9 | [Secrets scanner for publishing](#9-secrets-scanner-for-publishing) | Checklist tool | M | none | todo |
 | – | [Other smaller items](#smaller) | Fixes | S each | none | any time |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row, and take it out of other items' Depends on: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. A smaller item is simply deleted.
@@ -113,21 +112,12 @@ A fork with commits says more than a star: someone used the code. This would be 
 
 **Done when** it runs on a repo with forks, lists each fork's commits beyond the original with their authors, and is called from the repo review's outcomes panel.
 
-## 9. Secrets scanner for publishing
-
-The secrets check before publishing relies on the model reading `git log`, which is weak over a long history. Use a dedicated scanner instead. Candidates, each licence read from the project's own LICENSE file on 2026-11-20:
-- gitleaks, MIT;
-- trufflehog, AGPL-3.0.
-
-AGPL is copyleft, so gitleaks is the one to use. Calling a tool installed on the machine is different from bundling it.
-
-**Done when** the before-publishing check runs a scanner over the full history and reports each finding with its commit and file, and a test repo with a planted fake key is caught.
-
 ## Smaller
 
 Each is done when the change is made and the tests pass, unless it says otherwise. They can be done at any time.
 
 - **Check `contributions` on claude.ai**: it was run only in Claude Code. In a claude.ai session, `gh api user` and `user/memberships/orgs` may be refused as unscoped paths, and the skill then takes the user's organisations from `list_repos`. Done when a claude.ai run gives the same three groups and counts as Claude Code on the same account, or says plainly which part it couldn't read, and the result is in `docs/github-facts.md`.
+- **Check the secrets scan on claude.ai**: a claude.ai session's clone is in its own VM, where betterleaks is probably not installed, so the scan likely doesn't run there and the review says so. Whether it is there, or may be installed, is **unverified**. Done when a claude.ai chat has tried `betterleaks version` and, if that fails, whether it may download a release archive, and the result is in `docs/github-facts.md`. If it can run there, the skill says how.
 - **Author identities**: let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. It changes triage's fork step, which item 11 is rewriting, so it waits for that. Done when triage reads the list and marks matching commits as the user's.
 - **Test uploads between releases**: changes now collect under Unreleased, and `version` changes only when a release is cut, but trying a change on claude.ai still needs an upload. Both claude.ai's replace prompt and the install skill's sync check go by version, so a test zip with the last release's version can't be told apart once synced. A `--dev` flag on `scripts/package.sh` could stamp a pre-release version such as `0.2.15-dev.1` into the zip's manifest, leaving the committed one alone. Whether claude.ai accepts a pre-release version in `plugin.json` is **unverified**. Done when one test upload with a pre-release version is seen to install and sync, the result is in `docs/github-facts.md`, and the flag is added (or, if it's refused, the README says how to test a change instead).
 - **Check the Claude Code tool list**: 0.2.14 added a list near the top of `repo-review`'s `SKILL.md` saying what Claude Code uses in place of each claude.ai tool, and what a run does with no artifact tool. Whether Claude Code outside the desktop app has an artifact tool is **unverified**. Done when a review run in a Claude Code session started on 0.2.14 or later finds the previous scorecard by following the list, and the result is in `docs/github-facts.md`.

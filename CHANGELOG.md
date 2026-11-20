@@ -8,6 +8,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - Tone is flagged when the README presents shared work as yours alone, and the fix credits the others by name. Way in is flagged when the README doesn't say whether the repo wants contributions while someone's issue waits, or asks for issues that are turned off, or invites pull requests on an archived repo.
 - For keep and archive, the fix prompt drafts a reply to each issue or pull request waiting on you, for you to post. The review never posts it.
 - The overview has a copy button on each repo that has something to fix, copying the fix prompt from that repo's scorecard, so you can act on the overview without opening each scorecard. Each prompt is for a Claude Code session in its own repo.
+- Before publishing, the review scans the repo's full history for keys, tokens and passwords with betterleaks (version 1 or 2), on every branch, and lists each finding with its commit, file and line, never the secret itself. betterleaks isn't installed for you (`brew install betterleaks`); without it, the review says the scan didn't run and leaves the item to do.
 - A new skill, `contributions`, lists your merged pull requests to repos you don't own: those to your own organisations counted, those to employers you name with `employers:` listed apart, and those to other people's projects one row per repo with its stars, dates and what you did. Pull requests to private repos are counted, never named.
 
 ## 0.2.14 (2026-11-20)

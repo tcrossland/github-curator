@@ -84,11 +84,24 @@ Before archiving:
 10. **Issues and pull requests**: each open one answered, merged or closed, since archiving makes them read-only.
 
 Before publishing:
-1. **Secrets and private data**: search the full history, not only the working tree, for keys, tokens, passwords, internal hostnames and personal data (a full clone, not `--depth 1`). Anything ever committed becomes public with the repo.
+1. **Secrets and private data**: no keys, tokens or passwords anywhere in the full history, every branch included, by the secrets scan below; and no internal hostnames or personal data, which the scan doesn't look for, so search the history for those yourself. Anything ever committed becomes public with the repo.
 2. **Licence**: a licence file, and notices for copied files.
 3. **Third-party data and models**: every dataset, model weight or other file from an outside source names that source, and its terms allow redistribution; anything whose terms don't, or whose source is unknown, is removed from the history, not only the working tree.
 4. **The seven questions**: every fail fixed; publishing is the moment it gets the most attention.
 5. **Description and topics**: set before it goes public.
+
+**The secrets scan.** Run betterleaks over the full clone from Step 1 (never a `--depth 1` one), in the shell that holds the clone (`device_bash` for a local clone), with `CLONE` as its path, from a folder outside it so the report isn't written inside it. Both of its major versions are in use and take different flags, so the script picks by version. It scans locally: never add `--validate`, `--analyze` or `--validation`, which send each secret found to its provider to test it.
+```sh
+bl=$(command -v betterleaks || command -v betterleaks-v1 || echo betterleaks)
+v=$("$bl" version 2>/dev/null)
+case $v in
+  1.*) "$bl" git CLONE --no-banner --redact --exit-code 0 --report-format json --report-path secrets.json ;;
+  2.*) "$bl" git CLONE --no-banner --silent --redact --exit-code 0 --validate=false --analyze=false --output secrets.json ;;
+  *) echo "betterleaks not found or not version 1 or 2: $v" >&2; false ;;
+esac &&
+jq -r '(if type == "array" then . else .findings end)[] | (.attributes // .Attributes) as $a | [$a["git.sha"][:7], (.location.path // .File), (.location.start_line // .StartLine), (.rule_id // .RuleID), $a["git.date"][:10]] | @tsv' secrets.json
+```
+Each line is a finding: commit, file, line, rule and date. With `--exit-code 0` a clean scan and one with findings both exit 0, so any other exit means the scan failed. Mark item 1 `done` only when the scan ran and found nothing, and the search for hostnames and personal data found nothing either. Otherwise mark it `todo`, with the note listing each finding as `COMMIT FILE:LINE (RULE, DATE)`. You may read a finding's line to judge it (a test fixture's fake key is still a finding, since the scan can't tell), but never copy a secret's value into the scorecard, the fix prompt or the reply. A finding is the user's to act on, so keep it out of the fix prompt: revoke the key at its provider first, since removing it from the history doesn't make it safe once it has been seen. If betterleaks isn't installed, or the scan fails, never install it: search the history yourself as well as you can, mark item 1 `todo` whatever that finds, and say in the note that the scan didn't run and why, with `brew install betterleaks` as the way to run it.
 
 Before deleting:
 1. **Nothing of the user's own**: no commits, notes or results that exist only here.
