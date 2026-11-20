@@ -70,6 +70,10 @@ An organisation's triage is stricter than the user's own. Other people may rely 
 
 `no-publish` exists for working on the skill: a test run of a changed rule or template would otherwise republish the live scorecard.
 
+## Reply counts come from the page's data
+
+The reply's pass, fail and flagged counts are printed by a script from the page's JSON, not counted by Claude. Counted by hand they drifted: one review's reply said 2 pass, 0 fail, 5 flagged where its scorecard had 0, 5 and 2. The script reads the same data the scorecard renders, so the two can't disagree, and it refuses to count when there aren't seven questions or a status is unknown, since a wrong count is worse than none.
+
 ## What ships
 
 Everyone a plugin is shared with receives every file in the upload. `scripts/package.sh` zips only the manifest, the skills, the README, the changelog and the licence (`LICENSE` and `NOTICE`), leaving out `docs/`, `tests/` and `scripts/`, which are for working on the plugin, not using it. The README ships, so it links only to files the zip holds, and the notes for working on the plugin are in `docs/README.md` instead; `tests/test_shipped_links.py` checks every relative link in a shipped file.
