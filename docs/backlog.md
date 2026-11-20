@@ -7,11 +7,10 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
 | 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | todo |
-| 7 | [Behaviour evals](#7-behaviour-evals) | Tests | M | none | todo |
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
-| 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | 7 helps | todo |
-| 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | 7 helps | todo |
+| 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | none | todo |
+| 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
 | 13 | [Contributions to other people's projects](#13-contributions-to-other-peoples-projects) | New skill | M | none | todo |
 | 6 | [Profile review](#6-profile-review) | New skill | M | 13 helps | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
@@ -51,21 +50,6 @@ Two smaller items are part of this one, since they change the same steps:
 - **Rate limits in triage**: the pull-request search goes through GitHub's search API, whose rate limit is far lower than the rest of the API's, so an account with many forks that have commits could hit it. Say in Step 8 to pace the searches and to note any that were refused. Done when triage on an account with more than 30 such forks completes.
 
 **Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, stargazers there reads profiles or says plainly that it can't, and a triage with the timing log (item 2) shows per-step times on its page, with its slowest step written up here. The new route's clones are the cost to watch: a parent as large as elixir's costs its whole commit history.
-
-## 7. Behaviour evals
-
-The tests cover code (the quote checker and the template), not the skill's judgement. A change to a rule could flip a recommendation without anything noticing. Keep a few known cases, each with the input and the expected call:
-- an unchanged fork nobody uses is a clear delete in triage;
-- a fork with commits beyond its parent is never clear;
-- a private repo never fails Findable on visibility alone;
-- an archived repo with every item done is recommended archive, with nothing to do.
-- the same commit gets the same statuses twice. In the 0.2.4 test runs, claude-code-methodology's Way in was flagged in one review and passed in the next, on the same commit, so a case that runs one repo twice would catch a rule that leaves too much to judgement.
-
-Do this before items 12 and 5, which change rules.
-
-Claude Code has a `claude plugin eval` command that reads cases from `evals/` by default. **Unverified**: how its cases and checks are written.
-
-**Done when** the cases above run with one command, and each fails if its rule is removed from `SKILL.md`.
 
 ## 1. Traffic history
 

@@ -12,3 +12,11 @@ The tests run the skills' code as it stands (the quote checker, the timing scrip
 python3 -m unittest discover tests
 node --test tests/*.test.mjs
 ```
+
+The behaviour evals in `evals/` check the skills' calls rather than their code: each case gives one repo, offline, and the call the skill should make (`design.md` says why). Each run is a child Claude session on the CLI's own sign-in, so run `claude auth login` first if `claude auth status` says you aren't signed in. They cost real tokens (the full suite, 30 runs with and without the plugin, came to about $8 and six minutes on 2026-11-20), so run them when a change touches a rule:
+
+```sh
+scripts/evals.sh
+```
+
+Extra arguments go to `claude plugin eval`: `--case triage-*` for some cases, `--runs 1` for a quick pass, `--ablation none` to skip the runs without the plugin. Results go to `evals/results/`, which git ignores.

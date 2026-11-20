@@ -30,6 +30,8 @@ node --test tests/*.test.mjs
 
 The Python tests run the code in the skills as it stands: the quote checker from `skills/repo-review/verify_run.py`, and the code blocks in each `SKILL.md`, found by their content: in `repo-review`, the timing script by `'reset'`, the logging line by `rate_limit` and the reply counts by `'flagged'`; in `stargazers`, the repo listings by `users/LOGIN/repos` and `orgs/ORG/repos`. Keep those markers. A new snippet that calls `gh` needs a stand-in `gh` in its test that checks its arguments and runs the snippet's own `--jq`, as `tests/test_timings.py` does.
 
+The behaviour evals in `evals/` check the skills' calls on known cases, offline, with `scripts/evals.sh` (`claude plugin eval` underneath; it needs the CLI signed in, and costs real tokens). Run them when a change touches a rule. Each case names, in its graders, the rule it guards; a rule change that should change a case's call changes the case in the same commit.
+
 ## Releasing
 
 Add each user-facing change to `## Unreleased` in `CHANGELOG.md`, in the same commit as the change. Leave `version` alone until the user says to cut a release. Then, in one `chore(release): X.Y.Z` commit, rename Unreleased to the version and date and raise `version` in `.claude-plugin/plugin.json`, and build the zip with `scripts/package.sh`, which also validates the manifest. The user uploads it to claude.ai.
