@@ -20,34 +20,28 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 ## 11. GitHub access from a claude.ai session
 
-The 0.2.4 test runs on claude.ai showed that the session's `gh` is bound to the repos attached to it. GraphQL, `user/repos`, every `users/…` and `orgs/…` path, and `repos/OWNER/REPO` for any repo not attached are all refused with HTTP 403. The facts are in `docs/github-facts.md`. What each mode lost:
-- **Triage** listed its repos through `list_repos` and took their fields from the search API, but couldn't read a README or compare a fork with its parent, so it marked no repo clear. On claude.ai it's a list, not a triage.
-- **Stargazers** listed the stargazers but couldn't read a single profile, so it couldn't pick the ones worth a look, in the skill or in the review's Outcomes panel.
-- **Similar repos** described each repo from its search result, because other owners' READMEs were refused.
+On claude.ai the session's `gh` goes through a proxy bound to the repos attached to the session: GraphQL, `user/repos`, every `users/…` and `orgs/…` path and any repo not attached are refused with HTTP 403 (details in `docs/github-facts.md`). In the 0.2.4 test runs that left triage a list that marked no repo clear, stargazers unable to read a single profile, and similar repos described from search results alone.
 
-Three more probes tested the routes around this (facts in `docs/github-facts.md`). What they settled:
-- **Attaching works only with push access, and only with the user's permission.** Read access gives an anonymous git clone and nothing more. With the user's permission one chat attached all 74 of the user's public repos with push access, and an attached fork's `.parent` can be read. In auto mode, push access is refused unless the user asked for it, and even then not reliably: on 2026-11-20 two chats whose request gave permission had every `add_repo` refused. So any step that attaches a repo needs a fallback for when it can't. A candidate: the refusals come from Auto mode's automated check, and a chat in Manual mode, or with `add_repo` set to "Always ask", may ask the user instead (**unverified**).
-- **Cross-fork compare is out**, even for an attached fork: the proxy refuses it with HTTP 400.
-- **Git works** for any public repo without attaching it, through the session's proxy as in Claude Code: a sparse clone of just the README, and a fork's count beyond its parent from treeless clones.
-- **WebFetch isn't a source of exact text**: it reworded and cut a README, and was rate-limited on repo pages. A profile through it gives the name, followers and pinned repos only.
-- **Issue search answers**, so the user's merged pull requests to a parent can still be read.
+What works there:
+- **Attaching** a repo for the API takes push access and the user's permission. One chat attached all 74 public repos. Auto mode's check refuses it unreliably: on 2026-11-20 two chats whose request gave permission had every `add_repo` refused. **Unverified**: whether Manual mode, or `add_repo` set to "Always ask", lets the chat ask the user instead, and whether private repos attach the same way.
+- **Git** works for any public repo without attaching it.
+- **Issue search** answers.
+- **Not cross-fork compare**, even for an attached fork: HTTP 400.
+- **Not WebFetch for exact text**: it rewords and cuts READMEs, and a profile gives only the name, followers and pinned repos.
 
-The route, the same in both places where it can be:
+The route, the same in Claude Code where it can be:
 - **READMEs** (triage's own repos, similar repos): a sparse clone that checks out only the README.
-- **A fork against its parent**: the count and the authors from treeless clones, `git rev-list --count` and `git log`. This also lifts the compare API's limit of 250 commits. A parent as large as elixir's still costs its whole commit history.
-- **A fork's parent**: only `gh api repos/OWNER/FORK` gives it, which on claude.ai needs the fork attached with push access; `list_repos`, search and GraphQL don't (a third probe checked all three). A parent doesn't change, so the triage page records each fork's parent and its default branch, and a later triage reads them from the previous page, as it already reads that page to compare. Only forks new since then need the API. The first triage on claude.ai either attaches every fork, with the user's permission, or is run from Claude Code instead, where the user's own `gh` reads every parent; the page says which.
+- **A fork against its parent**: fetch both treeless into one repo, then `git rev-list --count` and `git log` on the fork's range. This also lifts the compare API's limit of 250 commits, but costs the parent's whole commit history. Measured in Claude Code on 2026-11-20: 11 MB in 2 s for elixir (36,543 commits), 22 MB in 3 s for erlang/otp (67,640). The speed through claude.ai's proxy is untested. Forks of the same parent can share one clone of it.
+- **A fork's parent**: only `repos/OWNER/FORK` gives it (not `list_repos`, search or GraphQL), so on claude.ai the fork must be attached. A parent doesn't change, so the triage page records each fork's parent and default branch, and a later triage reads them from the previous page. Only forks new since then need attaching.
 - **Pull requests to the parent**: issue search, as now.
-- **Stargazers' profiles**: WebFetch of `github.com/LOGIN`, one at a time, judging the field from the pinned repos' descriptions, labelled "profile page summary". Say in the reply which of bio, company and location weren't available: the profile tried had none, so whether WebFetch gives them is untested.
-- **Private repos** need attaching too.
-- **On claude.ai, triage asks once for permission to attach** the forks whose parent it doesn't know yet and the private repos, and leaves any it can't attach as `review`, saying which and why.
+- **Stargazers' profiles**: WebFetch of `github.com/LOGIN`, one at a time, judging the field from the pinned repos' descriptions, labelled "profile page summary". The reply says which of bio, company and location weren't available; whether WebFetch ever gives them is untested.
+- **Attaching on claude.ai**: triage asks once for permission to attach the private repos and the forks whose parent it doesn't know, and leaves any it can't attach as `review`, saying which and why. A first triage has no previous page, so it attaches every fork and private repo (61 and 11 on this account) or is run from Claude Code instead; the page says which.
 
-A first triage on claude.ai with no previous page to read parents from has to attach every fork and private repo (61 forks and 11 private repos on this account). One chat has attached 74 public repos; whether private repos attach the same way is **unverified**.
+Two smaller items change the same steps:
+- **Stargazers when profiles can't be read**: the scorecard falls back to "None in the same field", a judgement never made (seen in the 0.2.4 test runs). Say "Not available" with the reason, in the `stargazers` reply and in the review's Stargazers lists. Done when both skills say so and a template test checks the wording.
+- **Rate limits in triage**: the pull-request searches use the search API, whose limit is far lower than the rest of the API's, so many forks with commits could hit it. Step 8 paces them and notes any refused. Done when triage on an account with more than 30 such forks completes.
 
-Two smaller items are part of this one, since they change the same steps:
-- **Stargazers when profiles can't be read**: neither skill says what to do when Step 2 of `stargazers` can't read the profiles, so the scorecard falls back to "None in the same field", which reads as a judgement that was never made (seen in the 0.2.4 test runs, where every profile call was refused). Say "Not available" with the reason instead, in the `stargazers` reply and in the review's Stargazers lists. Done when both skills say so, and a template test checks the scorecard's wording.
-- **Rate limits in triage**: the pull-request search goes through GitHub's search API, whose rate limit is far lower than the rest of the API's, so an account with many forks that have commits could hit it. Say in Step 8 to pace the searches and to note any that were refused. Done when triage on an account with more than 30 such forks completes.
-
-**Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, stargazers there reads profiles or says plainly that it can't, and a triage with the timing log (item 2) shows per-step times on its page, with its slowest step written up here. The new route's clones are the cost to watch: a parent as large as elixir's costs its whole commit history.
+**Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, stargazers there reads profiles or says plainly that it can't, and a triage's page shows per-step times from item 2's log, with its slowest step written up here.
 
 ## 1. Traffic history
 
@@ -55,7 +49,7 @@ GitHub keeps traffic for 14 days only, so the scorecard's views, clones and refe
 
 A scheduled task would save the stars, views, clones and top referrers of every public repo, once a week, to an artifact with a shared database, and chart the trend. The scorecard's outcomes panel could then link to it.
 
-A claude.ai chat has scheduled tasks and artifact databases, its `gh` reads traffic once a repo is attached with push access, and a scheduled run gets the repos attached in the chat that created its task, traffic included (`docs/github-facts.md`). So the task is created from a chat that has attached every public repo. One chat has attached all 74 public repos with push access and read traffic for every one. **Unverified**: that each run of a recurring task, started on schedule, keeps the repos (the one run that read traffic was started by hand; an hourly check task is due to show it). If that fails, the fallback is a scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`.
+A claude.ai chat has scheduled tasks and artifact databases, its `gh` reads traffic once a repo is attached with push access, and a scheduled run gets the repos attached in the chat that created its task, traffic included (`docs/github-facts.md`). So the task is created from a chat that has attached every public repo. One chat has attached all 74 public repos with push access and read traffic for every one. A recurring task's runs on schedule got all 74 too, including one after the chat that created it was deleted, so the chat needn't be kept. A scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`, stays the fallback if a claude.ai task stops working.
 
 Until this lands, a snapshot of every public repo is saved by hand once a week to a gitignored file. The first was saved on 2026-11-20, for 74 repos, forks included: stars, forks, the daily views and clones GitHub still holds, and top referrers, so snapshots can be merged by repo and day and loaded into the page's database once it exists.
 
