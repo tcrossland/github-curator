@@ -17,6 +17,13 @@ There are three ways to run it:
 
 In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
 
+**In Claude Code.** The steps name claude.ai's tools. In Claude Code, use these in their place:
+- `add_repo`: none needed. Claude Code's `gh` and `git` use the account they're signed in with, so read the repo directly.
+- `list_repos`: `gh api --paginate 'user/repos?affiliation=owner&per_page=100'`.
+- `device_request_folder_access`, `device_bash` and `device_stage_files`: none needed. A local clone is on the same computer, so read it in the shell, still read only.
+- `list_artifacts`, `read_artifact`, `get_artifact` and `publish_files`: the Artifact tool's `list`, `read` and `publish` actions. `list` takes no query, so look for the title among the artifacts it lists, paging on until it's found or the list ends. Read an existing artifact before republishing to it, and republish by passing its `url`.
+- With no artifact tool, work as with `no-publish`, and say in the reply that the page wasn't published and the previous run couldn't be looked for.
+
 ## The questions
 
 Run all seven, in this order. Question 1 matters most.
@@ -123,9 +130,9 @@ Reading `rate_limit` costs no request, and `core.used` counts nearly every REST 
 The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
 
 Log a line only for a step that ran. The steps, in order (overview and triage name theirs in their own files):
-- **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4) and `Build` (writing the page's JSON in Step 5).
+- **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4, which starts the run's JSON with the questions) and `Build` (adding the rest of the JSON in Step 5).
 
-The page needs its timings before the template is filled, so for every page, in this order: write the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
+The page needs its timings before the template is filled, so for every page, in this order: finish the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
 
 ```python
 import json, sys
@@ -153,8 +160,8 @@ Accept any of these:
 - **Pasted text**: use it as given. Questions 2 and 3 can only be partly checked without the repo, so flag what can't be seen.
 - **A file** (attached, or in a connected folder on the user's computer): read it. If it's a README inside a repo folder, also read the files it links to.
 - **A GitHub repo or file link**: attach the repo with `add_repo` and `access: "push"` before anything else, so the GitHub API (settings, outcomes, traffic) works. Then clone it with `--depth 1` into a new, empty directory, or fetch and check out the latest default branch if a clone already exists. If push access is refused, fall back to a read-only clone, and take settings from the repo page with WebFetch. A WebFetch result is a summary, not the page, so label any quote taken from it "repo page summary, may not be verbatim".
-  Read `README.md`, every file it links to that bears on a claim, the manifest (`pyproject.toml` or equivalent), the CI workflow and the license. Read settings with `gh api repos/OWNER/REPO` (description, topics, visibility, homepage, has_issues, `license`, and for the recommendation `fork`, `archived` and `pushed_at`) and tags with `gh api repos/OWNER/REPO/tags`. For a fork, count the commits it has that its parent doesn't with `gh api 'repos/PARENT-OWNER/PARENT-REPO/compare/PARENT-BRANCH...OWNER:BRANCH' --jq .ahead_by`, taking the parent's name and default branch from `.parent` in the settings and the fork's branch from `default_branch`. For a private repo, clone the full history instead of `--depth 1`, so the secrets check before publishing can read it. GraphQL (`gh repo view --json`) is not available; use REST.
-  Read the repos pinned on the user's profile. REST doesn't list them, so take them from the profile page (`https://github.com/OWNER`) with WebFetch, asking for the pinned repositories as `owner/name` (the page shows the owner only for repos owned by someone else, so ask for it from each link's path), and label them "profile page summary, may not be complete". Where `gh api graphql` does work (in the shell on the user's computer), use `gh api graphql -f query='{user(login:"OWNER"){pinnedItems(first:6){nodes{... on Repository{nameWithOwner}}}}}'` instead. If neither works, say the pins couldn't be read and make the feature call without them.
+  Read `README.md`, every file it links to that bears on a claim, the manifest (`pyproject.toml` or equivalent), the CI workflow and the license. Read settings with `gh api repos/OWNER/REPO` (description, topics, visibility, homepage, has_issues, `license`, and for the recommendation `fork`, `archived` and `pushed_at`) and tags with `gh api repos/OWNER/REPO/tags`. For a fork, count the commits it has that its parent doesn't with `gh api 'repos/PARENT-OWNER/PARENT-REPO/compare/PARENT-BRANCH...OWNER:BRANCH' --jq .ahead_by`, taking the parent's name and default branch from `.parent` in the settings and the fork's branch from `default_branch`. For a private repo, clone the full history instead of `--depth 1`, so the secrets check before publishing can read it. Use REST for everything but the pins.
+  Read the repos pinned on the user's profile. REST doesn't list them; GraphQL does. GraphQL works in a shell on the user's computer (Claude Code's own, or `device_bash` on claude.ai), and a claude.ai session's own shell refuses it, both `gh api graphql` and `gh repo view --json`. Where it works, use `gh api graphql -f query='{user(login:"OWNER"){pinnedItems(first:6){nodes{... on Repository{nameWithOwner}}}}}'`. Otherwise take them from the profile page (`https://github.com/OWNER`) with WebFetch, asking for the pinned repositories as `owner/name` (the page shows the owner only for repos owned by someone else, so ask for it from each link's path), and label them "profile page summary, may not be complete". If neither works, say the pins couldn't be read and make the feature call without them.
   If `private` is true in that response, check it as set out under Private repos above, and add "private" to the scorecard's `subject`. If `gh api repos/OWNER/REPO` returns 404, the repo either doesn't exist or is private and not shared with this account, and the WebFetch fallback can't see a private repo either. Say so in one line and ask the user for access, a local clone or the pasted README.
 - **A local clone** (a folder on the user's computer that holds a `.git` directory): this is the pre-push check, so review the working copy exactly as it is.
   - Work through the device bridge, read only: never check out, fetch, pull, stash, commit or write anything inside the folder. If the folder isn't connected yet, ask for it with `device_request_folder_access`.
@@ -227,10 +234,8 @@ If Step 1 found a previous run, write a short list of what changed since it: the
 ## Step 4: verify, then recommend and pick the verdict
 
 Verify before building the page:
-- **Quotes**: run [verify_run.py](verify_run.py), which sits beside this file, on the run's JSON. Every file quote must appear verbatim, on the line its source names. Fix or replace any that fails.
+- **Quotes**: start the run's JSON in the working folder Step 5 uses, with only `questions`, in the shape Step 5 gives. Copy [verify_run.py](verify_run.py), which sits beside this file, into that folder, as Step 5 does the template, and run it as `python3 verify_run.py RUN.json REPO-ROOT`, where `REPO-ROOT` is the clone in the workspace, or the local clone's folder when it runs in the shell on the user's computer. Every file quote must appear verbatim, on the line its source names. Fix or replace any that fails.
 - **Numbers in your own prose**: list every number or count you wrote in the verdict, findings, fixes, signals and work-before notes ("seven phase notes", "30 links", "three commands"), and recount each one from the source with code, not from memory or the previous run. Rewrite any that don't match, or drop the number if a recount isn't possible.
-
-Copy it into the working folder, as Step 5 does the template, and run it as `python3 verify_run.py RUN.json REPO-ROOT`, where `REPO-ROOT` is the clone in the workspace, or the local clone's folder when it runs in the shell on the user's computer.
 
 With the questions settled, decide the recommendation, the feature call and their work-before lists, as set out in The recommendation above.
 
@@ -239,7 +244,7 @@ The verdict names the single most important fix. Take the earliest failing quest
 ## Step 5: build and publish the scorecard
 
 1. Copy [scorecard-template.html](scorecard-template.html), which sits beside this file, into a working folder outside any cloned repo. Fill the copy as below; don't retype or edit the template.
-2. Write the run as JSON with this shape:
+2. Add the rest of the run to the JSON Step 4 started, so it has this shape:
    - `title`: "Repo review: REPO-NAME"
    - `subject`: what was checked, including the commit or version
    - `link`, `linkText`: the repo URL and its owner/name (omit both for pasted text)

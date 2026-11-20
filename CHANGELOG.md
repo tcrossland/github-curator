@@ -2,6 +2,14 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## Unreleased
+
+## 0.2.14 (2026-11-20)
+
+- `repo-review` says what to use in Claude Code in place of each claude.ai tool, and saves the page as a file when there's no artifact tool to publish it with.
+- Step 1 says where GraphQL works for reading the profile's pins, rather than calling it unavailable and then using it.
+- The review's JSON starts in Step 4, with the questions the quote checker reads, and its timings count that writing in Step 4's row.
+
 ## 0.2.13 (2026-11-20)
 
 - A single review loads less: the overview and triage steps are in files of their own, read only in those modes, so the review's instructions are about a fifth shorter.

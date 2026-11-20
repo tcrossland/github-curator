@@ -18,7 +18,7 @@ Both read GitHub through `gh api`. Neither follows, stars or messages anyone, an
 
 ## Install and update
 
-The plugin is installed by uploading a zip of it to claude.ai (Plugins in the left sidebar > Add > Upload plugin). Edits here don't reach Claude until the plugin is uploaded again, so after every change, raise `version` in `.claude-plugin/plugin.json`, add an entry for it to [CHANGELOG.md](CHANGELOG.md), build the zip and upload it:
+The plugin is installed by uploading a zip of it to claude.ai (Plugins in the left sidebar > Add > Upload plugin). Edits here don't reach Claude until the plugin is uploaded again. Changes collect under Unreleased in [CHANGELOG.md](CHANGELOG.md); to release them, give that section the new version and date, raise `version` in `.claude-plugin/plugin.json` to match, then build the zip and upload it:
 
 ```sh
 scripts/package.sh
