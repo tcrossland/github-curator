@@ -6,7 +6,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | todo |
+| 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | in progress |
 | 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | none | todo |
 | 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | 3 | todo |
 | 7 | [Behaviour evals](#7-behaviour-evals) | Tests | M | 3 | todo |
@@ -33,6 +33,8 @@ The smaller item on the traffic claim goes with it:
 - **Recheck the traffic claim**: `docs/github-facts.md` marks "14 days, needs push access" as not rechecked. Done when it has a source and a date.
 
 **Done when** the first snapshot is saved, and item 1's three unverified points and the traffic claim each have a source and a date in `docs/github-facts.md`.
+
+**Status**: the first snapshot was saved on 2026-11-20, for all 74 public repos, forks included, to a gitignored file, with the script that takes it beside it (about 100 s). Each repo's entry keeps its stars and forks, the daily views and clones GitHub still holds, and its top referrers, so later snapshots can be merged by repo and day. It also settled the 14 days, but not push access (`docs/github-facts.md`). Still to do: the weekly snapshots, the checks on claude.ai, and a source for push access.
 
 ## 3. Split `SKILL.md` by mode
 
