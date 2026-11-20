@@ -6,7 +6,6 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 2 | [Timing](#2-timing) | Measurement | S | 0 | in progress |
 | 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | todo |
 | 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | 0 | todo |
 | 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | 3 | todo |
@@ -21,28 +20,11 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 8 | [Forks](#8-forks) | New skill | M | none | todo |
 | 9 | [Secrets scanner for publishing](#9-secrets-scanner-for-publishing) | Checklist tool | M | none | todo |
 | – | [Other smaller items](#smaller) | Fixes | S each | none | any time |
+| 2 | [Timing](#2-timing) | Measurement | S | 0 | done |
 | – | [Reply counts from the JSON](#reply-counts-from-the-json) | Fix | S | none | done |
 | 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` or `done` as work moves, and move a done item's section to the end, or delete it once the summary row says enough.
-
-## 2. Timing
-
-Nothing records how long a run takes or where the time goes. A full review clones the repo, makes many `gh api` calls, searches for similar repos and reads one profile per stargazer; triage makes several calls per fork. Measure before speeding anything up or adding a faster mode (item 4).
-
-Have each mode record, at the start and end of every step, the time from the shell (`date -u +%s`) and the number of `gh api` calls made, and put them in the page's JSON as `timings`: a list of `{step, seconds, calls}`. The template shows them in a closed section at the foot of the page; overview and triage also give the totals. The times include Claude's own work between tool calls, which is what the user waits for, but can't separate it from time spent waiting on GitHub. A skill can't read its own token use.
-
-The shell's clock on claude.ai is wall-clock (`docs/github-facts.md`).
-
-**First figures**, timed by hand in the 0.2.4 test runs, before the skill logged anything (runs 1 and 2 rebuilt from file and publish times, to about ±10 seconds): about 682 s across the four runs. In every run the time went to Claude's own work between calls, not to waiting on GitHub:
-- review of spacy-annotator: about 310 s, slowest building the run and checking its quotes and numbers (Steps 3 and 4, about 95 s);
-- overview of two repos: about 236 s, slowest Step 1 and Steps 2 to 4, about 70 s each;
-- triage: 105 s, slowest the signals (37 s), though most of its reads were refused (item 11);
-- stargazers: 31 s, slowest reading profiles (12 s), all refused.
-
-**Status**: the skill and template side is in. `SKILL.md` has a Timing section: each step appends its name, `date -u +%s` and the rate limit's `core.used` to a log, and a script turns the log into `timings`, with `calls` read from the rate limit (which costs no request) rather than counted by hand. Search requests aren't in `core.used`, so they're counted by hand as `searches`. The template shows the rows and a total in a closed section above the footer, in all three modes. It shipped in 0.2.5 (2026-11-19). One review has been logged so far, in Claude Code: 228 s, slowest the seven questions (89 s). An overview of two repos was logged in Claude Code on 2026-11-20, but its two reviews ran interleaved, which the skill didn't forbid, so each review's rows took in the other's work and the overview's rows gave one repo 356 s and the other 1 s. Its figures don't count. Since 0.2.7 an overview reviews its repos one at a time. A re-run of the same overview on 0.2.7 the same day gave each repo its own time (52 s and 44 s, 12 counted calls each), so the per-repo rows now hold. But it reused the judgements made earlier in the session, so it timed the API and shell work, not the seven questions, and its figures don't count either. It also showed that traffic requests aren't in `core.used`, so Outcomes reports 4 fewer calls than it makes (`docs/github-facts.md`); since 0.2.8 the skill names that gap. Still to do: an overview with the log, in Claude Code, on 0.2.7 or later, in a fresh session. Both runs are in Claude Code because on claude.ai, until item 11, Similar repos falls back to search-result descriptions, so the times there would describe a cut-down run. Triage's timing moved to item 11, which replaces triage's route in both places, so timing it now would measure a route that's about to go. `gh api rate_limit` answers on claude.ai and counts calls there; its count is shared with anything else using the account at the same time (`docs/github-facts.md`).
-
-**Done when** a review and an overview, both in Claude Code, each show per-step times on their pages, and the slowest step of each is written up here, as a candidate to speed up.
 
 ## 14. Save traffic until item 1 lands
 
@@ -234,8 +216,44 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 - **Three most-starred repos in `stargazers`**: it reads the first 100 repos only, and the API can't sort them by stars, so for someone with more than 100 repos the three can be wrong. Paginate, then sort by stars.
 - **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
 - **README links that don't ship**: the README is in the zip, but its "Working on it" section links to `docs/`, which isn't. Move that section to `docs/README.md`, or have `scripts/package.sh` leave it out.
+- **Timing rows that misread the rate limit**: in the cold overview of 2026-11-20 (item 2), `core.reset` came back one second apart on reads within one window (`...015` and `...016`), and one read gave `used` 0 with a reset an hour later, the next read back at 49. The timing script took each as a window reset and blanked `calls` on three of a review's rows and two of the overview's, though no reset happened. Treat a reset that moves by a second or two as the same window, and a read whose `used` falls while its reset jumps an hour ahead as unreadable. Record the behaviour in `docs/github-facts.md`. In the same change, have the Timing section say to log a step's line in a command of its own, before any of the next step's work (item 2 says why). Done when a test runs the script on those log lines and gets `calls` on every row.
 
 ## Done
+
+### 2. Timing
+
+Every mode logs, as each step ends, the shell's time (`date -u +%s`) and the rate limit's `core.used`, and a script turns the log into `timings` rows (`{step, seconds, calls, searches}`), shown in a closed section at the foot of every page; overview and triage also give totals. It shipped in 0.2.5 (2026-11-19). 0.2.7 made an overview review its repos one at a time, and 0.2.8 says that traffic requests aren't in `core.used` (`docs/github-facts.md`). The times include Claude's own work between tool calls, which is what the user waits for, and can't separate it from waiting on GitHub. A skill can't read its own token use. Triage's timing moved to item 11.
+
+**Figures**, all in Claude Code:
+- Timed by hand in the 0.2.4 test runs, before the log: a review of spacy-annotator about 310 s, an overview of two repos about 236 s, triage 105 s and stargazers 31 s.
+- One review logged on 0.2.5: 228 s, slowest the seven questions (89 s).
+- A cold overview of stat-arb-from-scratch and claude-code-methodology on 0.2.8, on 2026-11-20, in a fresh session with `no-publish`: 341 s. The overview's rows give 171 s and 134 s for the two reviews and 36 s for its own page. Two earlier overviews that day don't count: one ran its reviews interleaved, and a re-run on 0.2.7 reused judgements made earlier in its session, giving 52 s and 44 s per repo. Set against that re-run, about 120 s and 90 s of each cold review was judging.
+
+The cold reviews' rows, as seconds, counted calls and searches:
+
+| Step | stat-arb-from-scratch | claude-code-methodology |
+|---|---|---|
+| Get the draft | 35 s, 3 calls | 51 s, 3 calls |
+| Outcomes | 4 s, 3 calls | 5 s, 3 calls |
+| Similar repos | 21 s, 0 calls, 5 searches | 18 s, 0 calls, 4 searches |
+| Questions | 50 s, 1 call | 21 s, not read |
+| Compare | 19 s, 0 calls | 35 s, not read |
+| Verify and recommend | 33 s, 1 call | 1 s, not read |
+| Build | 8 s, 0 calls | 1 s, 0 calls |
+| Total | 170 s, 8 calls | 132 s, 6 calls |
+
+Each review also made 4 traffic requests and read the pins through GraphQL, none of which `core.used` counts. GitHub's share is small: Outcomes took 4 or 5 s, and the searches about 20 s.
+
+Two things limit how far the rows can be read:
+- **Step boundaries.** A step's line is stamped when the command that writes it runs, so whatever Claude thinks and writes before that command counts to the step it closes. Where one command wrote a step's line and then did the next step's work, that work went to the earlier step: claude-code-methodology's Compare (35 s) includes writing the whole page's JSON, which leaves 1 s each for Verify and recommend and for Build. So the split between neighbouring steps is uncertain by tens of seconds, while each review's total holds.
+- **Unread calls.** Three of claude-code-methodology's rows have no call count because the rate limit's reads were inconsistent (Smaller). Its total of 6 comes from its first and last lines.
+
+**Slowest steps, as candidates to speed up**:
+- **Review: the seven questions.** 89 s in the 0.2.5 review and 50 s in stat-arb-from-scratch's, the slowest step in both, and judging is most of the gap between the cold and the warm overview. Item 4's quick review answers three of the questions from the API and the README alone.
+- **Review: getting the draft.** 35 s and 51 s, the slowest step in claude-code-methodology's review. Besides the clone and the files, it reads the previous scorecard, whose whole page comes back through the artifact read (this run's saved scorecards are about 46 KB each) for the one JSON block that Step 3 compares with. Whether the read can return less is **unverified**.
+- **Overview: the reviews.** The first review, 171 s, is its slowest row, and the reviews take 305 of its 341 s. An overview gets faster only as a review does, or, for many repos, through item 4.
+
+**Done** on 2026-11-20: a review (0.2.5) and an overview (0.2.8), both in Claude Code, show per-step times on their pages, and the slowest step of each is above.
 
 ### Reply counts from the JSON
 
