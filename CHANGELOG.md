@@ -4,6 +4,8 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- A new skill, `contributions`, lists your merged pull requests to repos you don't own: those to your own organisations counted, those to employers you name with `employers:` listed apart, and those to other people's projects one row per repo with its stars, dates and what you did. Pull requests to private repos are counted, never named.
+
 ## 0.2.14 (2026-11-20)
 
 - `repo-review` says what to use in Claude Code in place of each claude.ai tool, and saves the page as a file when there's no artifact tool to publish it with.

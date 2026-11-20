@@ -38,6 +38,14 @@ They show what a repo adds, which topics it lacks, and where to point readers of
 
 A stargazer's three most-starred repos say most about their field, but GitHub can't list someone's repos sorted by stars (`docs/github-facts.md`), so the skill reads every page and sorts them itself. That costs one call per 100 repos: one for most people, but tens for an organisation with thousands. Repository search can sort by stars in one call, and works on claude.ai, but its limit is 30 requests a minute, which a run of 30 profiles, each with an organisation, would pass.
 
+## Three groups in `contributions`
+
+A merged pull request to someone else's project is evidence someone else's maintainers reviewed and accepted, but not every pull request to a repo the user doesn't own is that. Issue search's `-user:LOGIN` leaves out only the user's own account, so pull requests to the user's own organisations come back too; on the account it was built on they were more than half. Those are counted, not listed. The user's own organisations are the ones they're an admin of, since a membership alone could be an employer's.
+
+An employer's repos can't be told apart from the API: on that account the employer's 72 pull requests went to public repos, so visibility doesn't separate them. So the user names their employers, with `employers:` or in their own instructions or memory, which keeps the names out of the plugin and works on claude.ai, where there's no local file to read. Without them, the reply names the owners with the most merged pull requests and asks. Pull requests to private repos are searched apart (`is:private`) and counted without their names, because a visitor can't see them.
+
+The groups are counted by a script from the search's own results, and its total is checked against the search's `total_count`, for the same reason the review's reply counts come from the page's data: counts made by hand drift. Stars come from one repository search with up to 40 `repo:` qualifiers rather than one call per repo, because `repos/OWNER/REPO` is refused on claude.ai for any repo not attached to the session, while search answers there.
+
 ## Steps for one mode live in their own file
 
 `SKILL.md` loads in full on every run, so a single review used to carry the overview and triage steps it never runs. Those steps are in `overview.md` and `triage.md` beside it, read only in their mode, so a single review loads the shared rules and Steps 1 to 6, and changes to triage (item 11 rewrites it) don't grow every review. An overview reads its file before starting, since it holds how an overview logs its time, not only Step 7. Each mode file names the sections of `SKILL.md` it relies on.

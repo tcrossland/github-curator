@@ -11,8 +11,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
 | 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | none | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
-| 13 | [Contributions to other people's projects](#13-contributions-to-other-peoples-projects) | New skill | M | none | todo |
-| 6 | [Profile review](#6-profile-review) | New skill | M | 13 helps | todo |
+| 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
 | 8 | [Forks](#8-forks) | New skill | M | none | todo |
 | 9 | [Secrets scanner for publishing](#9-secrets-scanner-for-publishing) | Checklist tool | M | none | todo |
@@ -115,33 +114,13 @@ Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/
 
 **Done when** a review of a Python repo with a `pyproject.toml` and CI shows a Practice panel whose items match those files, with evidence for each, and `tests/` holds small fixture repos with known Practice results, one per profile, so a change to a profile can't silently break it.
 
-## 13. Contributions to other people's projects
-
-A merged pull request to someone else's project is some of the best evidence of how the user works with others: someone else's maintainers reviewed it and took it. Nothing shows it today. Triage reads the user's pull requests to a fork's parent, but only to decide about the fork, and an upstream contribution made without a fork on the account is never seen.
-
-A new skill, `contributions`, would list the user's merged pull requests to repos they don't own, from issue search (`search/issues?q=author:LOGIN+type:pr+is:merged+-user:LOGIN`, which answers on claude.ai too), and sort them into three groups:
-- **the user's own organisations' repos**, which `-user:` doesn't leave out. They're the user's own work, so they're left out of this list and counted instead;
-- **employers' repos**, work done for a job. The user says which owners were employers, kept outside the plugin, as in Author identities below: the same employer often shows up both as an organisation here and as an email domain on old commits. They're listed apart, since whether to show them is the user's call;
-- **other people's projects**, the open-source contributions: one entry per repo, with its stars, the number merged, the dates and a line on what each did, from its title, most-starred repo first.
-
-Search gives at most 100 results a page and 1,000 in all, so paginate and say when the total runs past that. Like `stargazers`, it uses public data only and contacts no one. Profile review (item 6) would use the third group to say which contributions to mention in the profile README, and triage would use it to tell a fork whose work went upstream from one whose work didn't.
-
-A search by hand on 2026-11-19 shows the shape on this account: 288 merged pull requests to repos not under `tcrossland`, 152 of them to the user's own `mailcellar` organisation, most of the remaining 136 to an employer's organisation, and the rest to open-source projects, among them `erlang/otp`, `elixir-lang/elixir`, `elixir-lsp/elixir-ls`, `beancount/fava` and `explosion/spacy-dev-resources`.
-
-The smaller item on author identities is part of this one, since both need the same list of the user's past identities:
-- **Author identities**: let the user list their past commit email domains, kept outside the plugin (in a gitignored file or an environment variable), so triage can tell their unlinked commits from other people's without asking. Done when triage reads the list and marks matching commits as the user's.
-
-**Unverified**: how the skill finds the user's own organisations on claude.ai, where `user/orgs` is refused (`list_repos` lists repos of other owners the user can push to, which may be enough), and whether search reaches every old pull request.
-
-**Done when** it lists the user's merged pull requests to other people's projects with the three groups apart, the counts add up to the search's total, and "Don't deselect date unless datepicker is multidate" to `uxsolutions/bootstrap-datepicker`, merged 2014-12-10, is among them.
-
 ## 6. Profile review
 
 The profile page is the first thing a visitor sees. A profile README (the `OWNER/OWNER` repo), the bio, the pins and the featured repos aren't checked together today.
 
 A new skill, `profile-review`, would:
 - check the bio and the pins, reusing the pin ranking from overview mode;
-- draft a short profile README in the house style that introduces the featured repos;
+- draft a short profile README in the house style that introduces the featured repos, and names the contributions to other people's projects worth mentioning, from the `contributions` skill;
 - publish a scorecard like the repo review's.
 
 **Done when**, for a real profile, it produces:
@@ -174,6 +153,8 @@ AGPL is copyleft, so gitleaks is the one to use. Calling a tool installed on the
 
 Each is done when the change is made and the tests pass, unless it says otherwise. They can be done at any time.
 
+- **Check `contributions` on claude.ai**: it was run only in Claude Code. In a claude.ai session, `gh api user` and `user/memberships/orgs` may be refused as unscoped paths, and the skill then takes the user's organisations from `list_repos`. Done when a claude.ai run gives the same three groups and counts as Claude Code on the same account, or says plainly which part it couldn't read, and the result is in `docs/github-facts.md`.
+- **Author identities**: let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. It changes triage's fork step, which item 11 is rewriting, so it waits for that. Done when triage reads the list and marks matching commits as the user's.
 - **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
 - **Test uploads between releases**: changes now collect under Unreleased, and `version` changes only when a release is cut, but trying a change on claude.ai still needs an upload. Both claude.ai's replace prompt and the install skill's sync check go by version, so a test zip with the last release's version can't be told apart once synced. A `--dev` flag on `scripts/package.sh` could stamp a pre-release version such as `0.2.15-dev.1` into the zip's manifest, leaving the committed one alone. Whether claude.ai accepts a pre-release version in `plugin.json` is **unverified**. Done when one test upload with a pre-release version is seen to install and sync, the result is in `docs/github-facts.md`, and the flag is added (or, if it's refused, the README says how to test a change instead).
 - **Check the Claude Code tool list**: 0.2.14 added a list near the top of `repo-review`'s `SKILL.md` saying what Claude Code uses in place of each claude.ai tool, and what a run does with no artifact tool. Whether Claude Code outside the desktop app has an artifact tool is **unverified**. Done when a review run in a Claude Code session started on 0.2.14 or later finds the previous scorecard by following the list, and the result is in `docs/github-facts.md`.
