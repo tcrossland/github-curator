@@ -6,7 +6,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 2 | [Timing](#2-timing) | Measurement | S | 0, 11 for triage on claude.ai | in progress |
+| 2 | [Timing](#2-timing) | Measurement | S | 0 | in progress |
 | 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | todo |
 | 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | 0 | todo |
 | 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | 3 | todo |
@@ -40,9 +40,9 @@ The shell's clock on claude.ai is wall-clock (`docs/github-facts.md`).
 - triage: 105 s, slowest the signals (37 s), though most of its reads were refused (item 11);
 - stargazers: 31 s, slowest reading profiles (12 s), all refused.
 
-**Status**: the skill and template side is in. `SKILL.md` has a Timing section: each step appends its name, `date -u +%s` and the rate limit's `core.used` to a log, and a script turns the log into `timings`, with `calls` read from the rate limit (which costs no request) rather than counted by hand. Search requests aren't in `core.used`, so they're counted by hand as `searches`. The template shows the rows and a total in a closed section above the footer, in all three modes. It shipped in 0.2.5 (2026-11-19). One review has been logged so far, in Claude Code, and its slowest step was the seven questions. Still to do: an overview with the log on claude.ai with 0.2.5, and a triage. Time the triage in Claude Code, or on claude.ai once item 11 is done: on claude.ai today most of triage's reads are refused, so its times would describe a run that skipped most of its work (105 s in the 0.2.4 test). `gh api rate_limit` answers on claude.ai and counts calls there; its count is shared with anything else using the account at the same time (`docs/github-facts.md`).
+**Status**: the skill and template side is in. `SKILL.md` has a Timing section: each step appends its name, `date -u +%s` and the rate limit's `core.used` to a log, and a script turns the log into `timings`, with `calls` read from the rate limit (which costs no request) rather than counted by hand. Search requests aren't in `core.used`, so they're counted by hand as `searches`. The template shows the rows and a total in a closed section above the footer, in all three modes. It shipped in 0.2.5 (2026-11-19). One review has been logged so far, in Claude Code: 228 s, slowest the seven questions (89 s). Still to do: an overview with the log, in Claude Code. Both runs are in Claude Code because on claude.ai, until item 11, Similar repos falls back to search-result descriptions, so the times there would describe a cut-down run. Triage's timing moved to item 11, which replaces triage's route in both places, so timing it now would measure a route that's about to go. `gh api rate_limit` answers on claude.ai and counts calls there; its count is shared with anything else using the account at the same time (`docs/github-facts.md`).
 
-**Done when** a review, an overview and a triage each show per-step times on their pages, and the slowest step of each is written up here, as a candidate to speed up.
+**Done when** a review and an overview, both in Claude Code, each show per-step times on their pages, and the slowest step of each is written up here, as a candidate to speed up.
 
 ## 14. Save traffic until item 1 lands
 
@@ -93,7 +93,7 @@ Two smaller items are part of this one, since they change the same steps:
 - **Stargazers when profiles can't be read**: neither skill says what to do when Step 2 of `stargazers` can't read the profiles, so the scorecard falls back to "None in the same field", which reads as a judgement that was never made (seen in the 0.2.4 test runs, where every profile call was refused). Say "Not available" with the reason instead, in the `stargazers` reply and in the review's Stargazers lists. Done when both skills say so, and a template test checks the scorecard's wording.
 - **Rate limits in triage**: the pull-request search goes through GitHub's search API, whose rate limit is far lower than the rest of the API's, so an account with many forks that have commits could hit it. Say in Step 8 to pace the searches and to note any that were refused. Done when triage on an account with more than 30 such forks completes.
 
-**Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, and stargazers there reads profiles or says plainly that it can't.
+**Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, stargazers there reads profiles or says plainly that it can't, and a triage with the timing log (item 2) shows per-step times on its page, with its slowest step written up here. The new route's clones are the cost to watch: a parent as large as elixir's costs its whole commit history.
 
 ## 7. Behaviour evals
 
