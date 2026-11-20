@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## 0.2.12 (2026-11-20)
+
+- `stargazers` finds a stargazer's three most-starred repos, and their organisation's, among all of them. Before, it looked only at the first 100, so for someone with more it could miss their best-known work.
+
 ## 0.2.11 (2026-11-20)
 
 - The README that comes with the plugin no longer links to notes that aren't in it.

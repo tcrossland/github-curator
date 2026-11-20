@@ -24,6 +24,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | – | [Timing rows that misread the rate limit](#timing-rows-that-misread-the-rate-limit) | Fix | S | none | done |
 | – | [Log each step in a command of its own](#log-each-step-in-a-command-of-its-own) | Fix | S | none | done |
 | – | [README links that don't ship](#readme-links-that-dont-ship) | Fix | S | none | done |
+| – | [Three most-starred repos in `stargazers`](#three-most-starred-repos-in-stargazers) | Fix | S | none | done |
 | – | [Reply counts from the JSON](#reply-counts-from-the-json) | Fix | S | none | done |
 | 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
@@ -216,10 +217,13 @@ AGPL is copyleft, so gitleaks is the one to use. Calling a tool installed on the
 
 Each is done when the change is made and the tests pass, unless it says otherwise. They can be done at any time.
 
-- **Three most-starred repos in `stargazers`**: it reads the first 100 repos only, and the API can't sort them by stars, so for someone with more than 100 repos the three can be wrong. Paginate, then sort by stars.
 - **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
 
 ## Done
+
+### Three most-starred repos in `stargazers`
+
+Step 2 read only the first 100 of a stargazer's repos, and the API can't sort them by stars, so for someone with more than 100 repos the three could be wrong. Since 0.2.12 it reads every page and sorts by stars in the shell, for a stargazer's own repos and their organisation's. `tests/test_stargazers.py` runs both commands with a stand-in `gh` serving two pages.
 
 ### README links that don't ship
 

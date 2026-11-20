@@ -34,8 +34,14 @@ For each stargazer (the 30 most recent, if there are more, unless `all` was give
 
 - their public profile with `gh api users/LOGIN`: `name`, `company`, `location`, `bio`, `followers` and `type`;
 - the date of their latest public activity with `gh api 'users/LOGIN/events/public?per_page=1'`; none in the last 90 days counts as "no recent activity";
-- their three most-starred repos that aren't forks, with `gh api 'users/LOGIN/repos?per_page=100&type=owner'`;
-- for an organisation their profile names as its company, that organisation's three most-starred repos, with `gh api 'orgs/ORG/repos?per_page=100'`.
+- their three most-starred repos that aren't forks, each with its stars, name and description. The API can't sort someone's repos by stars, so read every page and sort them here:
+  ```sh
+  gh api --paginate 'users/LOGIN/repos?per_page=100&type=owner' --jq '.[] | select(.fork | not) | [.stargazers_count, .full_name, .description // ""] | @tsv' | sort -rn | head -3
+  ```
+- for an organisation their profile names as its company, that organisation's three most-starred repos, the same way:
+  ```sh
+  gh api --paginate 'orgs/ORG/repos?per_page=100' --jq '.[] | [.stargazers_count, .full_name, .description // ""] | @tsv' | sort -rn | head -3
+  ```
 
 ## Step 3: pick the ones worth a look
 
