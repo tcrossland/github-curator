@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build the zip to upload to claude.ai (Customize > Plugins > Upload plugin).
+# Build the zip to upload to claude.ai (Plugins in the left sidebar > Add > Upload plugin).
 # It holds only what the plugin needs: the manifest, the skills, the README, the
 # changelog and the licence (LICENSE and NOTICE).
 # docs/, tests/ and scripts/ stay out, since everyone the plugin is shared with
