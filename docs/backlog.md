@@ -23,6 +23,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 2 | [Timing](#2-timing) | Measurement | S | 0 | done |
 | – | [Timing rows that misread the rate limit](#timing-rows-that-misread-the-rate-limit) | Fix | S | none | done |
 | – | [Log each step in a command of its own](#log-each-step-in-a-command-of-its-own) | Fix | S | none | done |
+| – | [README links that don't ship](#readme-links-that-dont-ship) | Fix | S | none | done |
 | – | [Reply counts from the JSON](#reply-counts-from-the-json) | Fix | S | none | done |
 | 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
@@ -217,9 +218,12 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 
 - **Three most-starred repos in `stargazers`**: it reads the first 100 repos only, and the API can't sort them by stars, so for someone with more than 100 repos the three can be wrong. Paginate, then sort by stars.
 - **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
-- **README links that don't ship**: the README is in the zip, but its "Working on it" section links to `docs/`, which isn't. Move that section to `docs/README.md`, or have `scripts/package.sh` leave it out.
 
 ## Done
+
+### README links that don't ship
+
+The README is in the zip, but its "Working on it" section linked to `docs/`, which isn't. Since 0.2.11 that section's notes are in `docs/README.md`, the README says in plain text where to find them, and `tests/test_shipped_links.py` checks that every relative link in a shipped file points to a file the zip holds.
 
 ### Log each step in a command of its own
 

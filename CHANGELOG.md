@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## 0.2.11 (2026-11-20)
+
+- The README that comes with the plugin no longer links to notes that aren't in it.
+
 ## 0.2.10 (2026-11-20)
 
 - Timings split a run's time between its steps more truly: each step's time is logged on its own as soon as the step ends. Before, the work of the next step could be counted to the one before it.

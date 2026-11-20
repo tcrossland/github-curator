@@ -5,6 +5,7 @@ A Claude plugin with two skills, `repo-review` and `stargazers`, that review a G
 ## Where things are
 
 - `skills/`: what ships. `repo-review/SKILL.md` and its `scorecard-template.html`, which renders all three modes, and `stargazers/SKILL.md`.
+- `docs/README.md`: notes for working on the plugin. The README at the root ships in the zip, so it links nothing outside it.
 - `docs/design.md`: why the skills work the way they do. Read it before changing a rule.
 - `docs/github-facts.md`: every behaviour of GitHub or Claude the skills rely on, with its source and the date it was checked.
 - `docs/backlog.md`: what to build next, in order, each item with its "done when".

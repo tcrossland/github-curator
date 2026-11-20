@@ -17,22 +17,13 @@ scripts/package.sh
 
 It validates the manifest and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README, the changelog and the licence.
 
-A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version. Typing `/reload-plugins` in the session applies plugin updates, but whether it picks up an upload to claude.ai isn't tested yet (see [`docs/github-facts.md`](docs/github-facts.md#claude-plugins-and-skills)).
+A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version. Typing `/reload-plugins` in the session applies plugin updates, but whether it picks up an upload to claude.ai isn't tested yet.
 
 The skills run as `/github-curator:repo-review` and `/github-curator:stargazers`.
 
 ## Working on it
 
-- [`docs/design.md`](docs/design.md): why the skills work the way they do. Read it before changing a rule.
-- [`docs/github-facts.md`](docs/github-facts.md): the GitHub and Claude behaviours the skills rely on, each with its source and the date it was checked.
-- [`docs/backlog.md`](docs/backlog.md): what to build next.
-
-The tests cover the quote checker in `repo-review`'s Step 4 (taken from `SKILL.md` as it stands) and the scorecard template's three modes:
-
-```sh
-python3 -m unittest discover tests
-node --test tests/*.test.mjs
-```
+Notes for changing the plugin, and how to run its tests, are in `docs/README.md` in its repository. They don't ship in the zip.
 
 ## Licence
 
