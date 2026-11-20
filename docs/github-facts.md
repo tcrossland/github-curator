@@ -37,6 +37,7 @@ The behaviours of GitHub and of Claude's plugin system that the skills state or 
 | Topic search (`topic:A+topic:B`) can rank only loosely related repos first; keyword search returns many results, also loosely ranked. | Seen | 2026-11-19 |
 | Traffic covers the last 14 days and needs push access. | Stated in the skill before this file existed; not rechecked | — |
 | Traffic requests don't raise the rate limit's `core.used`: two calls (`traffic/views`, `traffic/clones`) left it unchanged, while one call each to `stargazers` and `pulls` raised it by 1. So a review's Outcomes step reports 4 fewer calls than it makes. Not checked against GitHub's docs. | Seen, in Claude Code | 2026-11-20 |
+| `gh api rate_limit` doesn't always agree with itself within one window. Reads seconds apart gave `core.reset` values one second apart (`...015` and `...016`). One read gave `used` 0 with a reset 3,601 s after the read, as if a new window had begun, between reads that both gave `used` 49 and the earlier reset. Seen in 4 of 20 reads over about six minutes, from one shell. | Seen, in Claude Code | 2026-11-20 |
 
 ## GitHub from a claude.ai session
 

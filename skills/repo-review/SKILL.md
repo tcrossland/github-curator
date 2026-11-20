@@ -138,16 +138,16 @@ for line in open(sys.argv[1], encoding='utf-8'):
         t = int(f[1])
     except (IndexError, ValueError):
         continue
-    used = int(f[2]) if len(f) == 4 and f[2].isdigit() else None
-    cur = {'t': t, 'used': used, 'reset': f[3] if used is not None else None}
+    ok = len(f) == 4 and f[2].isdigit() and f[3].isdigit()
+    cur = {'t': t, 'used': int(f[2]) if ok else None, 'reset': int(f[3]) if ok else None}
     if prev:
-        same = used is not None and prev['used'] is not None and cur['reset'] == prev['reset']
-        rows.append({'step': f[0], 'seconds': t - prev['t'], 'calls': used - prev['used'] if same else None})
+        same = ok and prev['used'] is not None and abs(cur['reset'] - prev['reset']) <= 60 and cur['used'] >= prev['used']
+        rows.append({'step': f[0], 'seconds': t - prev['t'], 'calls': cur['used'] - prev['used'] if same else None})
     prev = cur
 print(json.dumps(rows))
 ```
 
-A step's `calls` is null when the rate limit couldn't be read at its start or its end (so one failed read blanks two rows), or when GitHub's hourly window reset during it. A line that can't be read at all is skipped, and its time goes to the next row. If `gh` isn't available, still log the times.
+A step's `calls` is null when the rate limit couldn't be read at its start or its end (so one failed read blanks two rows), when GitHub's hourly window reset during it, or when its two reads disagree. Reads within one window can give resets a second apart, so resets up to a minute apart count as one window; a real reset moves it by an hour or more. A read can also give a `used` lower than the read before it, with a reset in a later window, while the next read is back in the earlier one: that read blanks two rows, as a failed read does. A line that can't be read at all is skipped, and its time goes to the next row. If `gh` isn't available, still log the times.
 
 ## Step 1: get the draft
 

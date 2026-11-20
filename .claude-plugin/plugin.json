@@ -1,6 +1,6 @@
 {
   "name": "github-curator",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Curate a GitHub account's repos: review a repo or README draft and get a recommendation (keep, publish, archive, make private or delete) with a scorecard, triage every repo at once, and see who starred a repo and which stargazers work in the same field. It only recommends; it never changes a repo or contacts anyone.",
   "author": {
     "name": "Tomas Crossland",

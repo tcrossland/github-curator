@@ -45,6 +45,33 @@ class ConvertTest(unittest.TestCase):
         rows = convert("start\t100\t4990\t9000\nForks\t400\t12\t12600\n")
         self.assertEqual(rows, [{"step": "Forks", "seconds": 300, "calls": None}])
 
+    def test_resets_a_second_apart_are_one_window(self):
+        # Seen on 2026-11-20: two reads in one window gave resets one second apart.
+        rows = convert("start\t1795190698\t49\t1795193016\nQuestions\t1795190719\t49\t1795193015\n"
+                       "Compare\t1795190740\t52\t1795193016\n")
+        self.assertEqual([r["calls"] for r in rows], [0, 3])
+
+    def test_a_read_from_a_later_window_that_did_not_begin_blanks_two_rows(self):
+        # The log of a review on 2026-11-20: one read gave used 0 with a reset in a later window,
+        # and the next read was back in the earlier one. Only that read's two rows lose their count.
+        rows = convert(
+            "start\t1795190624\t43\t1795193016\n"
+            "Get the draft\t1795190675\t46\t1795193016\n"
+            "Outcomes\t1795190680\t49\t1795193016\n"
+            "Similar repos\t1795190698\t49\t1795193016\n"
+            "Questions\t1795190719\t49\t1795193015\n"
+            "Compare\t1795190754\t0\t1795194355\n"
+            "Verify and recommend\t1795190755\t49\t1795193016\n"
+            "Build\t1795190756\t49\t1795193016\n")
+        self.assertEqual([(r["step"], r["calls"]) for r in rows], [
+            ("Get the draft", 3), ("Outcomes", 3), ("Similar repos", 0), ("Questions", 0),
+            ("Compare", None), ("Verify and recommend", None), ("Build", 0),
+        ])
+
+    def test_calls_are_null_when_the_count_falls_within_a_window(self):
+        rows = convert("start\t100\t40\t9000\nOutcomes\t160\t12\t9010\n")
+        self.assertEqual(rows, [{"step": "Outcomes", "seconds": 60, "calls": None}])
+
     def test_calls_are_null_when_the_rate_limit_could_not_be_read(self):
         rows = convert("start\t100\t\nowner/a\t160\t\nBuild\t170\t\n")
         self.assertEqual(rows, [
