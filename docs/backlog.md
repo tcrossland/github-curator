@@ -26,12 +26,12 @@ What works there:
 - **Attaching** a repo for the API takes push access and the user's permission. One chat attached all 74 public repos. Auto mode's check refuses it unreliably: on 2026-11-20 two chats whose request gave permission had every `add_repo` refused. **Unverified**: whether Manual mode, or `add_repo` set to "Always ask", lets the chat ask the user instead, and whether private repos attach the same way.
 - **Git** works for any public repo without attaching it.
 - **Issue search** answers.
-- **Not cross-fork compare**, even for an attached fork: HTTP 400.
+- **Not cross-fork compare**, even with the fork and its parent both attached: HTTP 400.
 - **Not WebFetch for exact text**: it rewords and cuts READMEs, and a profile gives only the name, followers and pinned repos.
 
 The route, the same in Claude Code where it can be:
 - **READMEs** (triage's own repos, similar repos): a sparse clone that checks out only the README.
-- **A fork against its parent**: fetch both treeless into one repo, then `git rev-list --count` and `git log` on the fork's range. This also lifts the compare API's limit of 250 commits, but costs the parent's whole commit history. Measured in Claude Code on 2026-11-20: 11 MB in 2 s for elixir (36,543 commits), 22 MB in 3 s for erlang/otp (67,640). The speed through claude.ai's proxy is untested. Forks of the same parent can share one clone of it.
+- **A fork against its parent**: fetch both treeless into one repo, then `git rev-list --count` and `git log` on the fork's range. This also lifts the compare API's limit of 250 commits, but costs the parent's whole commit history. Measured in Claude Code on 2026-11-20: 11 MB in 2 s for elixir (36,543 commits), 22 MB in 3 s for erlang/otp (67,640). The speed through claude.ai's proxy is untested; `add_repo`'s own text warns that a large repo's shallow clone can take 5 to 10 minutes there. Forks of the same parent can share one clone of it.
 - **A fork's parent**: only `repos/OWNER/FORK` gives it (not `list_repos`, search or GraphQL), so on claude.ai the fork must be attached. A parent doesn't change, so the triage page records each fork's parent and default branch, and a later triage reads them from the previous page. Only forks new since then need attaching.
 - **Pull requests to the parent**: issue search, as now.
 - **Stargazers' profiles**: WebFetch of `github.com/LOGIN`, one at a time, judging the field from the pinned repos' descriptions, labelled "profile page summary". The reply says which of bio, company and location weren't available; whether WebFetch ever gives them is untested.
