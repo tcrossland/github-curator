@@ -16,6 +16,7 @@ A Claude plugin with three skills, `repo-review`, `stargazers` and `contribution
 - `SKILL.md` loads in full on every run, so it holds instructions only. Put the reasons in `docs/design.md`. Steps used in only one mode go in that mode's file beside it.
 - The skills only recommend. Never add a step that archives, deletes, pins, changes a repo's visibility, closes an issue or pull request, or contacts anyone.
 - Before relying on a behaviour of GitHub or Claude, check `docs/github-facts.md`. A new fact goes there with its source ("Seen", or a link) and the date; anything not checked is marked **unverified**.
+- A claude.ai chat's or run's own account of what happened is a claim: record a fact only from a command's output, a status code or the proxy's message, and mark the rest **unverified**.
 - The skills run on claude.ai as well as in Claude Code, and a claude.ai session can't reach much of what works in a local shell: GraphQL, unscoped paths, unattached repos and cross-fork compare are all refused. The facts table's claude.ai section lists what works there. Don't assume a route that works here works there.
 - Keep anything about a specific person or private repo out of shipped files.
 - Try a change to a rule or the template with `no-publish`, so the live scorecard isn't republished.
