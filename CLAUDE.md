@@ -31,7 +31,12 @@ node --test tests/*.test.mjs
 
 The Python tests run the code in the skills as it stands: the quote checker from `skills/repo-review/verify_run.py`, and the code blocks in each `SKILL.md`, found by their content: in `repo-review`, the timing script by `'reset'`, the logging line by `rate_limit`, the reply counts by `'flagged'`, the commit listing by `commits?per_page=100`, the issue listing by `issues?state=open`, the inline reply lookup by `/comments?per_page=100` and the Contributors script by `mine`; in `stargazers`, the repo listings by `users/LOGIN/repos` and `orgs/ORG/repos`; in `contributions`, the listings by `is:public`, `is:private` and `per_page=1'`, the organisations by `user/memberships/orgs`, the repo search by `search/repositories` and the grouping script by `employers`. Keep those markers. A new snippet that calls `gh` needs a stand-in `gh` in its test that checks its arguments and runs the snippet's own `--jq`, as `tests/test_timings.py` does.
 
-The behaviour evals in `evals/` check the skills' calls on known cases, offline, with `scripts/evals.sh` (`claude plugin eval` underneath; it needs the CLI signed in, and costs real tokens). Run them when a change touches a rule. Each case names, in its graders, the rule it guards; a rule change that should change a case's call changes the case in the same commit.
+The behaviour evals in `evals/` check the skills' calls on known cases, offline, with `scripts/evals.sh` (`claude plugin eval` underneath; it needs the CLI signed in, and costs real tokens). Each case names, in its graders, the rule it guards; a rule change that should change a case's call changes the case in the same commit. How much to run:
+
+- A change to a rule: only the cases whose graders name it, once each, without the runs without the plugin (`--case NAME --runs 1 --ablation none`). A case tagged `repeat` keeps its own runs: leave out `--runs`. If no case guards the rule, say so in the commit.
+- A rewrite or move of text in a `SKILL.md` that every case reads: every case, `--runs 1 --ablation none`.
+- Before cutting a release: the full suite, `scripts/evals.sh` with no arguments.
+- Nothing else needs them: the template, tests, scripts, docs, and fields copied as they are.
 
 ## Releasing
 

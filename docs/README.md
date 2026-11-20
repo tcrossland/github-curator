@@ -13,10 +13,11 @@ python3 -m unittest discover tests
 node --test tests/*.test.mjs
 ```
 
-The behaviour evals in `evals/` check the skills' calls rather than their code: each case gives one repo, offline, and the call the skill should make (`design.md` says why). Each run is a child Claude session on the CLI's own sign-in, so run `claude auth login` first if `claude auth status` says you aren't signed in. They cost real tokens (the full suite, 30 runs with and without the plugin, came to about $8 and six minutes on 2026-11-20), so run them when a change touches a rule:
+The behaviour evals in `evals/` check the skills' calls rather than their code: each case gives one repo, offline, and the call the skill should make (`design.md` says why). Each run is a child Claude session on the CLI's own sign-in, so run `claude auth login` first if `claude auth status` says you aren't signed in. They cost real tokens (the full suite, 30 runs with and without the plugin, came to about $8 and six minutes on 2026-11-20), so a change to a rule runs only the cases that guard it, once each, and the full suite runs before a release (`CLAUDE.md` has the rule):
 
 ```sh
+scripts/evals.sh --case other-people --runs 1 --ablation none
 scripts/evals.sh
 ```
 
-Extra arguments go to `claude plugin eval`: `--case triage-*` for some cases, `--runs 1` for a quick pass, `--ablation none` to skip the runs without the plugin. Results go to `evals/results/`, which git ignores.
+Extra arguments go to `claude plugin eval`: `--case` takes one glob, such as `triage-*`; `--runs 1` runs each case once (leave it out for a case tagged `repeat`); `--ablation none` skips the runs without the plugin. Results go to `evals/results/`, which git ignores.
