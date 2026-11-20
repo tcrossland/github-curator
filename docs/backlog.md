@@ -26,7 +26,7 @@ The 0.2.4 test runs on claude.ai showed that the session's `gh` is bound to the 
 - **Similar repos** described each repo from its search result, because other owners' READMEs were refused.
 
 Three more probes tested the routes around this (facts in `docs/github-facts.md`). What they settled:
-- **Attaching works only with push access, and only with the user's permission.** Read access gives an anonymous git clone and nothing more. With the user's permission one session attached 12 repos with push access, and an attached fork's `.parent` can be read. In auto mode, push access is refused unless the user asked for it, and even then not reliably: on 2026-11-20 two chats whose request gave permission had every `add_repo` refused. So any step that attaches a repo needs a fallback for when it can't.
+- **Attaching works only with push access, and only with the user's permission.** Read access gives an anonymous git clone and nothing more. With the user's permission one chat attached all 74 of the user's public repos with push access, and an attached fork's `.parent` can be read. In auto mode, push access is refused unless the user asked for it, and even then not reliably: on 2026-11-20 two chats whose request gave permission had every `add_repo` refused. So any step that attaches a repo needs a fallback for when it can't.
 - **Cross-fork compare is out**, even for an attached fork: the proxy refuses it with HTTP 400.
 - **Git works** for any public repo without attaching it, through the session's proxy as in Claude Code: a sparse clone of just the README, and a fork's count beyond its parent from treeless clones.
 - **WebFetch isn't a source of exact text**: it reworded and cut a README, and was rate-limited on repo pages. A profile through it gives the name, followers and pinned repos only.
@@ -41,7 +41,7 @@ The route, the same in both places where it can be:
 - **Private repos** need attaching too.
 - **On claude.ai, triage asks once for permission to attach** the forks whose parent it doesn't know yet and the private repos, and leaves any it can't attach as `review`, saying which and why.
 
-Still **unverified**: whether a session can attach more than 12 repos. It matters only for a first triage on claude.ai with no previous page to read parents from (62 forks and 10 private repos on this account).
+A first triage on claude.ai with no previous page to read parents from has to attach every fork and private repo (61 forks and 11 private repos on this account). One chat has attached 74 public repos; whether private repos attach the same way is **unverified**.
 
 Two smaller items are part of this one, since they change the same steps:
 - **Stargazers when profiles can't be read**: neither skill says what to do when Step 2 of `stargazers` can't read the profiles, so the scorecard falls back to "None in the same field", which reads as a judgement that was never made (seen in the 0.2.4 test runs, where every profile call was refused). Say "Not available" with the reason instead, in the `stargazers` reply and in the review's Stargazers lists. Done when both skills say so, and a template test checks the scorecard's wording.
@@ -55,7 +55,7 @@ GitHub keeps traffic for 14 days only, so the scorecard's views, clones and refe
 
 A scheduled task would save the stars, views, clones and top referrers of every public repo, once a week, to an artifact with a shared database, and chart the trend. The scorecard's outcomes panel could then link to it.
 
-A claude.ai chat has scheduled tasks and artifact databases, its `gh` reads traffic once a repo is attached with push access, and a scheduled run gets the repos attached in the chat that created its task, traffic included (`docs/github-facts.md`). So the task is created from a chat that has attached every public repo. **Unverified**: that one chat can attach every public repo with push access (74 on this account; item 11 has seen 12, and the auto mode classifier refuses some attaches), and that each run of a recurring task, started on schedule, keeps the repos (the one run that read traffic was started by hand). If either fails, the fallback is a scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`.
+A claude.ai chat has scheduled tasks and artifact databases, its `gh` reads traffic once a repo is attached with push access, and a scheduled run gets the repos attached in the chat that created its task, traffic included (`docs/github-facts.md`). So the task is created from a chat that has attached every public repo. One chat has attached all 74 public repos with push access and read traffic for every one. **Unverified**: that each run of a recurring task, started on schedule, keeps the repos (the one run that read traffic was started by hand; an hourly check task is due to show it). If that fails, the fallback is a scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`.
 
 Until this lands, a snapshot of every public repo is saved by hand once a week to a gitignored file. The first was saved on 2026-11-20, for 74 repos, forks included: stars, forks, the daily views and clones GitHub still holds, and top referrers, so snapshots can be merged by repo and day and loaded into the page's database once it exists.
 
