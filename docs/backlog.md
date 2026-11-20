@@ -6,10 +6,9 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | in progress |
 | 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | todo |
 | 7 | [Behaviour evals](#7-behaviour-evals) | Tests | M | none | todo |
-| 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | 14 | todo |
+| 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
 | 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | 7 helps | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | 7 helps | todo |
@@ -22,16 +21,6 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row, and take it out of other items' Depends on: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. A smaller item is simply deleted.
 
-## 14. Save traffic until item 1 lands
-
-GitHub drops traffic after 14 days, and item 1 waits on three unverified points, so it won't land soon. Until it does:
-- save each public repo's views, clones and top referrers once a week, by hand, to a gitignored file;
-- check on claude.ai whether scheduled tasks and artifact databases are available there, and whether a scheduled task gets the push access traffic needs, and record each in `docs/github-facts.md`.
-
-**Done when** the first snapshot is saved, and item 1's three unverified points each have a source and a date in `docs/github-facts.md`.
-
-**Status**: the first snapshot was saved on 2026-11-20, for all 74 public repos, forks included, to a gitignored file, with the script that takes it beside it (about 100 s). Each repo's entry keeps its stars and forks, the daily views and clones GitHub still holds, and its top referrers, so later snapshots can be merged by repo and day. The 14 days and push access now have GitHub's docs as their source (`docs/github-facts.md`). The docs add that a fine-grained token needs the "Administration" permission (read) for traffic, which bears on what a claude.ai session's token can do. A check on claude.ai on 2026-11-20 settled two of item 1's three points: a chat there has scheduled tasks and artifact databases, and its `gh` reads traffic for a repo attached with push access. Still to do: the weekly snapshots (the next is due on 2026-11-27), and whether a scheduled task's run can attach a repo with push access and read its traffic, from the one-off task that check created.
-
 ## 11. GitHub access from a claude.ai session
 
 The 0.2.4 test runs on claude.ai showed that the session's `gh` is bound to the repos attached to it. GraphQL, `user/repos`, every `users/…` and `orgs/…` path, and `repos/OWNER/REPO` for any repo not attached are all refused with HTTP 403. The facts are in `docs/github-facts.md`. What each mode lost:
@@ -40,7 +29,7 @@ The 0.2.4 test runs on claude.ai showed that the session's `gh` is bound to the 
 - **Similar repos** described each repo from its search result, because other owners' READMEs were refused.
 
 Three more probes tested the routes around this (facts in `docs/github-facts.md`). What they settled:
-- **Attaching works only with push access, and only with the user's permission.** Read access gives an anonymous git clone and nothing more. With the user's permission one session attached 12 repos with push access, and an attached fork's `.parent` can be read. In auto mode, push access is refused unless the user asked for it.
+- **Attaching works only with push access, and only with the user's permission.** Read access gives an anonymous git clone and nothing more. With the user's permission one session attached 12 repos with push access, and an attached fork's `.parent` can be read. In auto mode, push access is refused unless the user asked for it, and even then not reliably: on 2026-11-20 two chats whose request gave permission had every `add_repo` refused. So any step that attaches a repo needs a fallback for when it can't.
 - **Cross-fork compare is out**, even for an attached fork: the proxy refuses it with HTTP 400.
 - **Git works** for any public repo without attaching it, through the session's proxy as in Claude Code: a sparse clone of just the README, and a fork's count beyond its parent from treeless clones.
 - **WebFetch isn't a source of exact text**: it reworded and cut a README, and was rate-limited on repo pages. A profile through it gives the name, followers and pinned repos only.
@@ -51,7 +40,7 @@ The route, the same in both places where it can be:
 - **A fork against its parent**: the count and the authors from treeless clones, `git rev-list --count` and `git log`. This also lifts the compare API's limit of 250 commits. A parent as large as elixir's still costs its whole commit history.
 - **A fork's parent**: only `gh api repos/OWNER/FORK` gives it, which on claude.ai needs the fork attached with push access; `list_repos`, search and GraphQL don't (a third probe checked all three). A parent doesn't change, so the triage page records each fork's parent and its default branch, and a later triage reads them from the previous page, as it already reads that page to compare. Only forks new since then need the API. The first triage on claude.ai either attaches every fork, with the user's permission, or is run from Claude Code instead, where the user's own `gh` reads every parent; the page says which.
 - **Pull requests to the parent**: issue search, as now.
-- **Stargazers' profiles**: WebFetch of `github.com/LOGIN`, one at a time, judging the field from the pinned repos' descriptions, labelled "profile page summary". Say in the reply that bio, company and location weren't available.
+- **Stargazers' profiles**: WebFetch of `github.com/LOGIN`, one at a time, judging the field from the pinned repos' descriptions, labelled "profile page summary". Say in the reply which of bio, company and location weren't available: the profile tried had none, so whether WebFetch gives them is untested.
 - **Private repos** need attaching too.
 - **On claude.ai, triage asks once for permission to attach** the forks whose parent it doesn't know yet and the private repos, and leaves any it can't attach as `review`, saying which and why.
 
@@ -84,7 +73,9 @@ GitHub keeps traffic for 14 days only, so the scorecard's views, clones and refe
 
 A scheduled task would save the stars, views, clones and top referrers of every public repo, once a week, to an artifact with a shared database, and chart the trend. The scorecard's outcomes panel could then link to it.
 
-Scheduled tasks and artifact databases are both available in a claude.ai chat, and a chat's `gh` reads traffic once a repo is attached with push access (`docs/github-facts.md`). **Unverified**: that a scheduled task's run gets the same push access, and that one session can attach every public repo with it (74 on this account; item 11 has seen 12). Item 14 settles it and saves the data by hand until this item lands.
+A claude.ai chat has scheduled tasks and artifact databases, its `gh` reads traffic once a repo is attached with push access, and a scheduled run gets the repos attached in the chat that created its task, traffic included (`docs/github-facts.md`). So the task is created from a chat that has attached every public repo. **Unverified**: that one chat can attach every public repo with push access (74 on this account; item 11 has seen 12, and the auto mode classifier refuses some attaches), and that each run of a recurring task, started on schedule, keeps the repos (the one run that read traffic was started by hand). If either fails, the fallback is a scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`.
+
+Until this lands, a snapshot of every public repo is saved by hand once a week to a gitignored file. The first was saved on 2026-11-20, for 74 repos, forks included: stars, forks, the daily views and clones GitHub still holds, and top referrers, so snapshots can be merged by repo and day and loaded into the page's database once it exists.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page.
 
