@@ -291,7 +291,18 @@ The verdict names the single most important fix. Take the earliest failing quest
 Reply in exactly three lines (two when there is no recommendation), and nothing else:
 1. The recommendation: the action and whether to feature it, with the reason, in one sentence, and the number of `todo` items before them when there are any.
 2. The verdict: the most important fix, in one sentence.
-3. The counts, in the form `N pass · N fail · N flagged`.
+3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying.
+
+```python
+import json, sys
+qs = json.load(open(sys.argv[1], encoding='utf-8'))['questions']
+statuses = ('pass', 'fail', 'flagged')
+odd = [str(q.get('short')) for q in qs if q.get('status') not in statuses]
+if len(qs) != 7 or odd:
+    sys.exit(f"cannot count: {len(qs)} questions, expected 7; unknown status in: {', '.join(odd) or 'none'}")
+n = {s: sum(q['status'] == s for q in qs) for s in statuses}
+print(f"{n['pass']} pass · {n['fail']} fail · {n['flagged']} flagged")
+```
 
 The artifact card carries the link, so don't repeat it. With `no-publish` there is no card: add a last line with the saved file's full path.
 

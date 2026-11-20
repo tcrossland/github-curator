@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## 0.2.6 (2026-11-20)
+
+- A review's reply takes its pass, fail and flagged counts from the scorecard's own data, so the two always agree. Before, they were counted by hand and could differ.
+
 ## 0.2.5 (2026-11-19)
 
 - Every scorecard, overview and triage page has a Timings section at its foot: how long each step took and how many GitHub API calls it made, with totals. It's closed until opened.

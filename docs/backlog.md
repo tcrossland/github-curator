@@ -6,7 +6,6 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| – | [Reply counts from the JSON](#smaller) | Fix | S | none | todo |
 | 2 | [Timing](#2-timing) | Measurement | S | 0, 11 for triage on claude.ai | in progress |
 | 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | todo |
 | 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | 0 | todo |
@@ -22,6 +21,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 8 | [Forks](#8-forks) | New skill | M | none | todo |
 | 9 | [Secrets scanner for publishing](#9-secrets-scanner-for-publishing) | Checklist tool | M | none | todo |
 | – | [Other smaller items](#smaller) | Fixes | S each | none | any time |
+| – | [Reply counts from the JSON](#reply-counts-from-the-json) | Fix | S | none | done |
 | 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` or `done` as work moves, and move a done item's section to the end, or delete it once the summary row says enough.
@@ -229,14 +229,17 @@ AGPL is copyleft, so gitleaks is the one to use. Calling a tool installed on the
 
 ## Smaller
 
-Each is done when the change is made and the tests pass, unless it says otherwise. Reply counts comes first in the order; the rest can be done at any time.
+Each is done when the change is made and the tests pass, unless it says otherwise. They can be done at any time.
 
-- **Reply counts from the JSON**: Step 6's three-line reply is counted by hand, and in a review on 2026-11-19 its pass, fail and flagged counts didn't match the scorecard's. Have Step 6 take the counts from the run's JSON with a snippet, as the timings are. Done when the snippet is in `SKILL.md` and a test runs it on a sample run.
 - **Three most-starred repos in `stargazers`**: it reads the first 100 repos only, and the API can't sort them by stars, so for someone with more than 100 repos the three can be wrong. Paginate, then sort by stars.
 - **Fix prompts on the overview**: the overview page links each repo's scorecard but has no fix prompt, so acting on an overview means opening each scorecard in turn. Add a copy button to each row that has failing or flagged questions, copying that repo's fix prompt as its scorecard builds it (`fixPrompt` with every item). Keep one prompt per repo, not one for all of them: each runs in its own Claude Code session in that repo. Done when the overview's JSON carries each repo's `fixPrompt`, each row's button copies the same text as its scorecard's "All", and a template test checks it.
 - **README links that don't ship**: the README is in the zip, but its "Working on it" section links to `docs/`, which isn't. Move that section to `docs/README.md`, or have `scripts/package.sh` leave it out.
 
 ## Done
+
+### Reply counts from the JSON
+
+Step 6's reply counted its pass, fail and flagged statuses by hand, and in a review on 2026-11-19 got 2 · 0 · 5 where the scorecard had 0 · 5 · 2. Since 0.2.6 a script in Step 6 prints the counts from the run's JSON, and refuses to count when there aren't seven questions or a status is unknown; `tests/test_reply_counts.py` runs it on sample runs. The overview's reply (Step 7) still counts each repo's statuses by hand.
 
 ### 0. Prove the current version on claude.ai
 

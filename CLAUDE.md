@@ -26,7 +26,7 @@ python3 -m unittest discover tests
 node --test tests/*.test.mjs
 ```
 
-The Python tests run the code blocks in `SKILL.md` as they stand, finding each block by its content: the quote checker by `'problems:'`, the timing script by `'reset'`, the logging line by `rate_limit`. Keep those markers. A new snippet that calls `gh` needs a stand-in `gh` in its test that checks its arguments and runs the snippet's own `--jq`, as `tests/test_timings.py` does.
+The Python tests run the code blocks in `SKILL.md` as they stand, finding each block by its content: the quote checker by `'problems:'`, the timing script by `'reset'`, the logging line by `rate_limit`, the reply counts by `'flagged'`. Keep those markers. A new snippet that calls `gh` needs a stand-in `gh` in its test that checks its arguments and runs the snippet's own `--jq`, as `tests/test_timings.py` does.
 
 ## Releasing
 
