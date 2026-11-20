@@ -115,9 +115,10 @@ Every run logs how long each step takes and how many GitHub API requests it make
 printf '%s\t%s\t%s\n' 'NAME' "$(date -u +%s)" "$(r=$(gh api rate_limit --jq '"\(.resources.core.used)\t\(.resources.core.reset)"' 2>/dev/null) && printf %s "$r")" >> "LOG"
 ```
 
-Reading `rate_limit` costs no request, and `core.used` counts every REST request, each page of a paginated call included. It leaves out two kinds, so say so rather than guess:
+Reading `rate_limit` costs no request, and `core.used` counts nearly every REST request, each page of a paginated call included. It leaves out three kinds, so say so rather than guess:
 - **Search requests** have their own count, which resets every minute, so it can't be read across a step. Count the `search/` requests each step makes yourself, as `searches`.
 - **GraphQL requests** have their own limit and aren't counted.
+- **Traffic requests** (`traffic/views`, `traffic/clones` and `traffic/popular/...`) aren't counted, so a review's `Outcomes` row leaves out its four.
 
 The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
 

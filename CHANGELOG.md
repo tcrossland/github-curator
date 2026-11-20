@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## 0.2.8 (2026-11-20)
+
+- A review's Timings know that GitHub doesn't count traffic requests, so the Outcomes row's API calls leave out its four requests for views, clones, referrers and pages, and a run says so rather than guessing.
+
 ## 0.2.7 (2026-11-20)
 
 - An overview reviews its repos one at a time, so each scorecard's Timings and the overview's time per repo are that repo's own. Before, reviews could run side by side, and their times and API calls ran together.
