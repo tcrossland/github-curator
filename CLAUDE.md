@@ -45,4 +45,4 @@ British English, no em-dashes, plain words. Commit messages follow Conventional 
 
 - Commit on a branch; the user reviews it, then `main` is fast-forwarded to it. Never push unless asked.
 - Update the backlog in the same commit as the work it tracks. A done item is deleted, with its summary row: the changelog and the commit that closes it record it. Only when an open item depends on what it found does a short section under Done keep that part.
-- Checks on claude.ai are prompts the user pastes into a claude.ai chat. Their findings go into `docs/github-facts.md` and the backlog.
+- Checks on claude.ai are prompts the user pastes into a claude.ai chat. Their findings go into `docs/github-facts.md` and the backlog. A prompt that attaches repos tells the chat not to clone them unless a step needs a clone, since `add_repo`'s result tells it to clone at once.
