@@ -7,11 +7,11 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
 | 14 | [Save traffic until item 1 lands](#14-save-traffic-until-item-1-lands) | Stopgap and check | S | none | todo |
-| 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | 0 | todo |
+| 3 | [Split `SKILL.md` by mode](#3-split-skillmd-by-mode) | Restructure | S | none | todo |
 | 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | 3 | todo |
 | 7 | [Behaviour evals](#7-behaviour-evals) | Tests | M | 3 | todo |
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | 14 | todo |
-| 4 | [Quick review](#4-quick-review) | New mode | M | 2, 3 | todo |
+| 4 | [Quick review](#4-quick-review) | New mode | M | 3 | todo |
 | 12 | [Other people in the review](#12-other-people-in-the-review) | Scorecard panel and checks | M | 7 helps | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | 3, 7 helps | todo |
 | 13 | [Contributions to other people's projects](#13-contributions-to-other-peoples-projects) | New skill | M | none | todo |
@@ -20,15 +20,8 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | 8 | [Forks](#8-forks) | New skill | M | none | todo |
 | 9 | [Secrets scanner for publishing](#9-secrets-scanner-for-publishing) | Checklist tool | M | none | todo |
 | – | [Other smaller items](#smaller) | Fixes | S each | none | any time |
-| 2 | [Timing](#2-timing) | Measurement | S | 0 | done |
-| – | [Timing rows that misread the rate limit](#timing-rows-that-misread-the-rate-limit) | Fix | S | none | done |
-| – | [Log each step in a command of its own](#log-each-step-in-a-command-of-its-own) | Fix | S | none | done |
-| – | [README links that don't ship](#readme-links-that-dont-ship) | Fix | S | none | done |
-| – | [Three most-starred repos in `stargazers`](#three-most-starred-repos-in-stargazers) | Fix | S | none | done |
-| – | [Reply counts from the JSON](#reply-counts-from-the-json) | Fix | S | none | done |
-| 0 | [Prove the current version on claude.ai](#done) | Check | S | none | done |
 
-Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` or `done` as work moves, and move a done item's section to the end, or delete it once the summary row says enough.
+Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row, and take it out of other items' Depends on: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. A smaller item is simply deleted.
 
 ## 14. Save traffic until item 1 lands
 
@@ -52,7 +45,7 @@ The smaller item on the quote checker goes with it, since both move code out of 
 
 ## 11. GitHub access from a claude.ai session
 
-The 0.2.4 test runs on claude.ai (see Done, below) showed that the session's `gh` is bound to the repos attached to it. GraphQL, `user/repos`, every `users/…` and `orgs/…` path, and `repos/OWNER/REPO` for any repo not attached are all refused with HTTP 403. The facts are in `docs/github-facts.md`. What each mode lost:
+The 0.2.4 test runs on claude.ai showed that the session's `gh` is bound to the repos attached to it. GraphQL, `user/repos`, every `users/…` and `orgs/…` path, and `repos/OWNER/REPO` for any repo not attached are all refused with HTTP 403. The facts are in `docs/github-facts.md`. What each mode lost:
 - **Triage** listed its repos through `list_repos` and took their fields from the search API, but couldn't read a README or compare a fork with its parent, so it marked no repo clear. On claude.ai it's a list, not a triage.
 - **Stargazers** listed the stargazers but couldn't read a single profile, so it couldn't pick the ones worth a look, in the skill or in the review's Outcomes panel.
 - **Similar repos** described each repo from its search result, because other owners' READMEs were refused.
@@ -221,25 +214,11 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 
 ## Done
 
-### Three most-starred repos in `stargazers`
-
-Step 2 read only the first 100 of a stargazer's repos, and the API can't sort them by stars, so for someone with more than 100 repos the three could be wrong. Since 0.2.12 it reads every page and sorts by stars in the shell, for a stargazer's own repos and their organisation's. `tests/test_stargazers.py` runs both commands with a stand-in `gh` serving two pages.
-
-### README links that don't ship
-
-The README is in the zip, but its "Working on it" section linked to `docs/`, which isn't. Since 0.2.11 that section's notes are in `docs/README.md`, the README says in plain text where to find them, and `tests/test_shipped_links.py` checks that every relative link in a shipped file points to a file the zip holds.
-
-### Log each step in a command of its own
-
-A step's timing line is stamped when its command runs, so in the cold overview of 2026-11-20 (item 2) work written into the same command as a step's line was timed to that step. Since 0.2.10 the Timing section says to append each step's line in a command of its own, before any of the next step's work.
-
-### Timing rows that misread the rate limit
-
-In the cold overview of 2026-11-20 (item 2), reads of the rate limit disagreed within one window: resets a second apart, and one read with `used` 0 and a reset in a window that hadn't begun (`docs/github-facts.md`). The timing script took each as a reset and blanked `calls` on three of a review's rows and two of the overview's. Since 0.2.9 it takes resets up to a minute apart as one window and gives no count across a read whose `used` falls, so only the stray read's two rows go blank. `tests/test_timings.py` runs it on that review's log.
+What finished items found that open items still use.
 
 ### 2. Timing
 
-Every mode logs, as each step ends, the shell's time (`date -u +%s`) and the rate limit's `core.used`, and a script turns the log into `timings` rows (`{step, seconds, calls, searches}`), shown in a closed section at the foot of every page; overview and triage also give totals. It shipped in 0.2.5 (2026-11-19). 0.2.7 made an overview review its repos one at a time, and 0.2.8 says that traffic requests aren't in `core.used` (`docs/github-facts.md`). The times include Claude's own work between tool calls, which is what the user waits for, and can't separate it from waiting on GitHub. A skill can't read its own token use. Triage's timing moved to item 11.
+Item 4 measures against these figures. Every page's Timings section gives each step's seconds and GitHub calls, logged as `docs/design.md` describes. The times include Claude's own work between tool calls, which can't be told apart from waiting on GitHub.
 
 **Figures**, all in Claude Code:
 - Timed by hand in the 0.2.4 test runs, before the log: a review of spacy-annotator about 310 s, an overview of two repos about 236 s, triage 105 s and stargazers 31 s.
@@ -262,26 +241,10 @@ The cold reviews' rows, as seconds, counted calls and searches:
 Each review also made 4 traffic requests and read the pins through GraphQL, none of which `core.used` counts. GitHub's share is small: Outcomes took 4 or 5 s, and the searches about 20 s.
 
 Two things limit how far the rows can be read:
-- **Step boundaries.** A step's line is stamped when the command that writes it runs, so whatever Claude thinks and writes before that command counts to the step it closes. Where one command wrote a step's line and then did the next step's work, that work went to the earlier step: claude-code-methodology's Compare (35 s) includes writing the whole page's JSON, which leaves 1 s each for Verify and recommend and for Build. So the split between neighbouring steps is uncertain by tens of seconds, while each review's total holds.
+- **Step boundaries.** A step's line is stamped when the command that writes it runs, so whatever Claude thinks and writes before that command counts to the step it closes. Where one command wrote a step's line and then did the next step's work, that work went to the earlier step: claude-code-methodology's Compare (35 s) includes writing the whole page's JSON, which leaves 1 s each for Verify and recommend and for Build. So the split between neighbouring steps is uncertain by tens of seconds, while each review's total holds. Since 0.2.10 each step's line has a command of its own.
 - **Unread calls.** Three of claude-code-methodology's rows have no call count because the rate limit's reads were inconsistent. On 0.2.9 only the two rows either side of the stray read would lack one. Its total of 6 comes from its first and last lines.
 
 **Slowest steps, as candidates to speed up**:
 - **Review: the seven questions.** 89 s in the 0.2.5 review and 50 s in stat-arb-from-scratch's, the slowest step in both, and judging is most of the gap between the cold and the warm overview. Item 4's quick review answers three of the questions from the API and the README alone.
 - **Review: getting the draft.** 35 s and 51 s, the slowest step in claude-code-methodology's review. Besides the clone and the files, it reads the previous scorecard, whose whole page comes back through the artifact read (this run's saved scorecards are about 46 KB each) for the one JSON block that Step 3 compares with. Whether the read can return less is **unverified**.
 - **Overview: the reviews.** The first review, 171 s, is its slowest row, and the reviews take 305 of its 341 s. An overview gets faster only as a review does, or, for many repos, through item 4.
-
-**Done** on 2026-11-20: a review (0.2.5) and an overview (0.2.8), both in Claude Code, show per-step times on their pages, and the slowest step of each is above.
-
-### Reply counts from the JSON
-
-Step 6's reply counted its pass, fail and flagged statuses by hand, and in a review on 2026-11-19 got 2 · 0 · 5 where the scorecard had 0 · 5 · 2. Since 0.2.6 a script in Step 6 prints the counts from the run's JSON, and refuses to count when there aren't seven questions or a status is unknown. Step 7 runs the same script on the overview's JSON for its per-repo entries. `tests/test_reply_counts.py` runs it on sample runs of both.
-
-### 0. Prove the current version on claude.ai
-
-0.2.4 was uploaded and every mode run once on 2026-11-19, recorded in the doc "github-curator 0.2.4: test report". Each run finished and published:
-- the review of spacy-annotator recommended archive and keeping it pinned, with all seven questions passing, and one item before archiving still to do, where none was expected: third-party text in the repo with no source named. That's a finding about the repo, not a fault in the plugin;
-- the overview of stat-arb-from-scratch and claude-code-methodology passed;
-- triage listed 82 repos through the `list_repos` fallback, but marked none clear (item 11);
-- stargazers listed 13 stargazers but read no profiles (item 11, which now covers what to show then).
-
-The scorecard template loaded through its relative link, pins came through WebFetch, GraphQL is refused, and `argument-hint` caused no trouble. Each is now in `docs/github-facts.md`.

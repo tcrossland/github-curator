@@ -40,5 +40,5 @@ British English, no em-dashes, plain words. Commit messages follow Conventional 
 ## Working agreement
 
 - Commit on a branch; the user reviews it, then `main` is fast-forwarded to it. Never push unless asked.
-- Update the backlog in the same commit as the work it tracks. A done item moves to the Done section at the end.
+- Update the backlog in the same commit as the work it tracks. A done item is deleted, with its summary row: the changelog and the commit that closes it record it. Only when an open item depends on what it found does a short section under Done keep that part.
 - Checks on claude.ai are prompts the user pastes into a claude.ai chat. Their findings go into `docs/github-facts.md` and the backlog.
