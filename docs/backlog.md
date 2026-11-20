@@ -28,12 +28,9 @@ GitHub drops traffic after 14 days, and item 1 waits on three unverified points,
 - save each public repo's views, clones and top referrers once a week, by hand, to a gitignored file;
 - check on claude.ai whether scheduled tasks and artifact databases are available there, and whether a scheduled task gets the push access traffic needs, and record each in `docs/github-facts.md`.
 
-The smaller item on the traffic claim goes with it:
-- **Recheck the traffic claim**: `docs/github-facts.md` marks "14 days, needs push access" as not rechecked. Done when it has a source and a date.
+**Done when** the first snapshot is saved, and item 1's three unverified points each have a source and a date in `docs/github-facts.md`.
 
-**Done when** the first snapshot is saved, and item 1's three unverified points and the traffic claim each have a source and a date in `docs/github-facts.md`.
-
-**Status**: the first snapshot was saved on 2026-11-20, for all 74 public repos, forks included, to a gitignored file, with the script that takes it beside it (about 100 s). Each repo's entry keeps its stars and forks, the daily views and clones GitHub still holds, and its top referrers, so later snapshots can be merged by repo and day. It also settled the 14 days, but not push access (`docs/github-facts.md`). Still to do: the weekly snapshots, the checks on claude.ai, and a source for push access.
+**Status**: the first snapshot was saved on 2026-11-20, for all 74 public repos, forks included, to a gitignored file, with the script that takes it beside it (about 100 s). Each repo's entry keeps its stars and forks, the daily views and clones GitHub still holds, and its top referrers, so later snapshots can be merged by repo and day. The 14 days and push access now have GitHub's docs as their source (`docs/github-facts.md`). The docs add that a fine-grained token needs the "Administration" permission (read) for traffic, which bears on what a claude.ai session's token can do. A check on claude.ai on 2026-11-20 settled two of item 1's three points: a chat there has scheduled tasks and artifact databases, and its `gh` reads traffic for a repo attached with push access. Still to do: the weekly snapshots (the next is due on 2026-11-27), and whether a scheduled task's run can attach a repo with push access and read its traffic, from the one-off task that check created.
 
 ## 11. GitHub access from a claude.ai session
 
@@ -87,7 +84,7 @@ GitHub keeps traffic for 14 days only, so the scorecard's views, clones and refe
 
 A scheduled task would save the stars, views, clones and top referrers of every public repo, once a week, to an artifact with a shared database, and chart the trend. The scorecard's outcomes panel could then link to it.
 
-**Unverified**: that scheduled tasks and artifact databases are available where the plugin runs, and that the scheduled task gets the push access traffic needs. Item 14 settles these and saves the data by hand until this item lands.
+Scheduled tasks and artifact databases are both available in a claude.ai chat, and a chat's `gh` reads traffic once a repo is attached with push access (`docs/github-facts.md`). **Unverified**: that a scheduled task's run gets the same push access, and that one session can attach every public repo with it (74 on this account; item 11 has seen 12). Item 14 settles it and saves the data by hand until this item lands.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page.
 
