@@ -42,7 +42,7 @@ A stargazer's three most-starred repos say most about their field, but GitHub ca
 
 `SKILL.md` loads in full on every run, so a single review used to carry the overview and triage steps it never runs. Those steps are in `overview.md` and `triage.md` beside it, read only in their mode, so a single review loads the shared rules and Steps 1 to 6, and changes to triage (item 11 rewrites it) don't grow every review. An overview reads its file before starting, since it holds how an overview logs its time, not only Step 7. Each mode file names the sections of `SKILL.md` it relies on.
 
-The quote checker is a file, `verify_run.py`, copied into the working folder the way the template is, so it's run as written rather than retyped from the page. The supporting files load on claude.ai by the same route as the template, which was seen to work there (`docs/github-facts.md`); a script copied that way hasn't been tried there yet.
+The quote checker is a file, `verify_run.py`, copied into the working folder the way the template is, so it's run as written rather than retyped from the page. The supporting files load on claude.ai by the same route as the template, which was seen to work there (`docs/github-facts.md`); a script copied that way has been seen to run in Claude Code, and a single review there left the mode files unopened, but it hasn't been tried on claude.ai yet.
 
 ## One list of Claude Code's tools
 
