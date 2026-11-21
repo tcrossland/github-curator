@@ -2,7 +2,7 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
-## Unreleased
+## 0.3.0 (2026-11-21)
 
 - The review's Outcomes panel shows the other people in a repo: everyone else with commits, by login or by the name on their commits (never an email address), and the open issues and pull requests other people opened, each with its age and whether you've replied.
 - Tone is flagged when the README presents shared work as yours alone, and the fix credits the others by name. Way in is flagged when the README doesn't say whether the repo wants contributions while someone's issue waits, or asks for issues that are turned off, or invites pull requests on an archived repo.
