@@ -4,7 +4,7 @@ github-curator is a [Claude plugin](https://claude.com/docs/plugins/build.md) th
 
 I built it to sort out my own GitHub account, which had years of forks, experiments and half-finished work on it: to see it the way a potential employer or collaborator meets it, and to find out how far a Claude plugin can go on work whose every claim can be checked. One thing it showed me: my first triages counted a fork's commits on its default branch only, and of the 52 forks I deleted on that count, 17 held commits of mine on other branches, such as `develop`. GitHub keeps a deleted fork's commits with the original project, so I could still fetch them, and the review now counts every branch.
 
-![A question from this repo's own scorecard: the finding, the README line it quotes with its file and line number, and the replacement sentence it suggests](https://github.com/tcrossland/github-curator/raw/main/docs/images/scorecard-finding.png)
+![The first question on this repo's own scorecard, marked pass: the finding, and the README line it quotes with its file and line number](https://github.com/tcrossland/github-curator/raw/main/docs/images/scorecard-finding.png)
 
 It holds five skills, each a set of instructions Claude follows when you run its command:
 
