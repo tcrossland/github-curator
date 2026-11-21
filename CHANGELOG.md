@@ -2,7 +2,7 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
-## Unreleased
+## 0.5.0 (2026-11-21)
 
 - A scorecard shows the fix prompt straight after the questions' strip, before the Outcomes panel and Similar repos. Those two, the changes since the last check, the recommendation's signals and its before-lists start closed, each with a summary of what's inside, such as how many items are to do. Triage's changes since the last triage start closed too.
 
