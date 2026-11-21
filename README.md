@@ -1,8 +1,14 @@
 # github-curator
 
-A Claude plugin for keeping a public GitHub portfolio in shape. It holds five skills:
+A Claude plugin that reviews the repos on a GitHub account the way a visitor meets them, and recommends one thing to do with each: keep it, publish it, archive it with an account of what it was, make it private or delete it, and whether to feature it among the profile's pinned repos. Every finding on its scorecard quotes the file and line it rests on, and the plugin changes nothing itself. It holds five skills:
 
-- [`repo-review`](skills/repo-review/SKILL.md): recommends what to do with a repo (keep, publish, archive, make private or delete), whether to feature it among the profile's pinned repos, and the work worth doing first; finds similar repos; checks it, or a README draft, against seven questions; and publishes a scorecard as an artifact, with a fix prompt for Claude Code. `repo-review triage` makes a quick first pass over all of an account's repos from the API, settles the clear deletes and names the repos worth a full review; `repo-review overview` reviews several repos and ranks them. `triage org:NAME` triages an organisation's repos instead, and `no-publish` in any mode saves the page as a file rather than publishing it.
+> **Placeholder for the author:** a screenshot of a scorecard goes here.
+
+- [`repo-review`](skills/repo-review/SKILL.md): recommends what to do with a repo and the work worth doing first, finds similar repos, checks the repo or a README draft against seven questions, and publishes a scorecard as an artifact, with a fix prompt for Claude Code. It runs in these modes:
+  - `repo-review` with a repo URL, a local clone's folder, a file or pasted text: one full review.
+  - `repo-review triage`: a quick first pass over all of an account's repos from the API, which settles the clear deletes and names the repos worth a full review. `triage org:NAME` does the same for an organisation's repos.
+  - `repo-review overview`: reviews several repos and ranks them.
+  - `no-publish`, in any mode: saves the page as a file rather than publishing it.
 
   The seven questions, most important first, each marked pass, fail or flagged:
   - **Hook**: would someone outside the niche understand what it is, why it's interesting and what it found?
