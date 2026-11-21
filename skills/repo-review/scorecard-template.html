@@ -115,6 +115,7 @@ footer { color: var(--muted); font-size: 12.5px; }
 .ohead { display: flex; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; align-items: baseline; }
 .ohead .label { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 .ohead .asof { font-size: 12.5px; color: var(--muted); }
+.ohead .asof a { color: var(--accent); }
 .tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 @media (max-width: 640px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .tile { display: grid; gap: 2px; align-content: start; padding: 6px 10px; border-left: 3px solid var(--rule); min-width: 0; }
@@ -339,7 +340,9 @@ footer { color: var(--muted); font-size: 12.5px; }
   if (d.outcomes) {
     var o = d.outcomes;
     html += '<section class="outcomes" aria-label="Outcomes"><div class="ohead"><span class="label">Outcomes · context, not scored</span>' +
-            '<span class="asof">' + esc(o.source) + ' · read ' + esc(o.asOf) + '</span></div><div class="tiles">';
+            '<span class="asof">' + esc(o.source) + ' · read ' + esc(o.asOf) +
+            (/^https:\/\/claude\.ai\/(code\/)?artifact\/[A-Za-z0-9-]+$/.test(o.history || '') ? ' · <a href="' + esc(o.history) + '" target="_blank" rel="noopener">Traffic history</a>' : '') +
+            '</span></div><div class="tiles">';
     (o.items || []).forEach(function (t) {
       html += '<div class="tile"><span class="v">' + esc(t.value) + '</span><span class="l">' + esc(t.label) + '</span>' + (t.note ? '<span class="nt">' + fmt(t.note) + '</span>' : '') + '</div>';
     });

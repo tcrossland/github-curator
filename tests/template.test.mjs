@@ -64,6 +64,18 @@ test('draft replies get their own filter, and only when there are any', () => {
   assert.equal(els['fp-text'].value, 'HEADER\n\nFAIL\n\nBEFORE\n\nREPLY\n\nFOOTER');
 });
 
+test('outcomes link to the traffic history page, and only to a claude.ai artifact', () => {
+  assert.doesNotMatch(render(review).html, /Traffic history/);
+  const url = 'https://claude.ai/artifact/YS5xnw166Fi27myFgNDjrv';
+  const { html } = render({ ...review, outcomes: { ...review.outcomes, history: url } });
+  assert.match(html, /<span class="asof">GitHub API · read 2026-11-19 · <a href="https:\/\/claude\.ai\/artifact\/YS5xnw166Fi27myFgNDjrv" target="_blank" rel="noopener">Traffic history<\/a><\/span>/);
+  const code = render({ ...review, outcomes: { ...review.outcomes, history: 'https://claude.ai/code/artifact/0b6f2c1e-5a1d-4c55-9a2e-7f0d3c9b8e11' } }).html;
+  assert.match(code, /href="https:\/\/claude\.ai\/code\/artifact\/0b6f2c1e-5a1d-4c55-9a2e-7f0d3c9b8e11"/);
+  for (const bad of ['javascript:alert(1)', 'https://example.com/artifact/x', 'https://claude.ai/artifact/x" onmouseover="y']) {
+    assert.doesNotMatch(render({ ...review, outcomes: { ...review.outcomes, history: bad } }).html, /Traffic history/);
+  }
+});
+
 test('empty outcome lists use their own message, or None', () => {
   const { html } = render(review);
   assert.match(html, /<h3>Stargazers<\/h3><ul><li class="none">None<\/li>/);

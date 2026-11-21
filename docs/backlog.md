@@ -24,9 +24,9 @@ The `traffic` skill saves a snapshot of every public repo's stars, forks, daily 
 
 A claude.ai chat attached all 74 public repos in Auto mode and created the weekly task, which runs early on Mondays, and a run of it started by hand saved a snapshot of all 74 (`docs/github-facts.md`). The page holds four snapshots, three of them from 2026-11-21.
 
-What's left:
-- **The first run on schedule**, due 2026-11-23. If it doesn't save a snapshot, the fallback is a scheduled task in the Claude Code desktop app, and until one works a snapshot is saved by hand by 2026-11-27.
-- **The scorecard's link.** The review's Outcomes panel links to the page.
+The review's Outcomes panel links to the page.
+
+What's left is **the first run on schedule**, due 2026-11-23. If it doesn't save a snapshot, the fallback is a scheduled task in the Claude Code desktop app, and until one works a snapshot is saved by hand by 2026-11-27.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task on its schedule.
 
