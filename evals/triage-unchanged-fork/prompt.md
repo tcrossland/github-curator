@@ -22,7 +22,7 @@ There is no previous triage page.
 {"total_count": 1, "items": [{"full_name": "slider-works/vue-range-slider", "archived": false}]}
 ```
 
-Step 1's git commands for the fork (the parent's default branch is `master`) print `0` and no commits.
+Step 1's git commands for the fork print `master`, then `0`, and no commits.
 
 The search for my pull requests (`search/issues?q=author:octo-dev+type:pr+-user:octo-dev`) gives none to `slider-works/vue-range-slider`.
 

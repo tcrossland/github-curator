@@ -101,34 +101,61 @@ class ForkCommitsTest(unittest.TestCase):
                date="2017-08-22T10:00:00Z")
         commit(self.parent, "lib.txt", "upstream\n", "Parent moves on")
         lines = self.run_snippet()
-        self.assertEqual(lines[0], "2")
-        self.assertEqual([l.split("\t") for l in lines[1:]], [
-            ["Alex Rivera", "oldjob.example", "2017-08-22", "Build dist files"],
-            ["Alex Rivera", "oldjob.example", "2017-08-20", "Parse two-digit years"],
+        self.assertEqual(lines[:2], ["main", "2"])
+        self.assertEqual([l.split("\t") for l in lines[2:]], [
+            ["main", "Alex Rivera", "oldjob.example", "2017-08-22", "Build dist files"],
+            ["main", "Alex Rivera", "oldjob.example", "2017-08-20", "Parse two-digit years"],
         ])
         self.assertNotIn("alex@", "\n".join(lines))
 
     def test_an_unchanged_fork_counts_zero_even_when_the_parent_has_moved_on(self):
         commit(self.parent, "lib.txt", "upstream\n", "Parent moves on")
-        self.assertEqual(self.run_snippet(), ["0"])
+        self.assertEqual(self.run_snippet(), ["main", "0"])
 
-    def test_the_parent_s_default_branch_is_read_from_git(self):
+    def test_commits_on_another_branch_count_and_name_the_branch(self):
+        git(self.fork, "switch", "-q", "-c", "develop")
+        commit(self.fork, "lib.txt", "mine\n", "Only on develop", author=("Alex Rivera", "a@x.example"), date="2017-08-20T10:00:00Z")
+        git(self.fork, "switch", "-q", "main")
+        lines = self.run_snippet()
+        self.assertEqual(lines[:2], ["main", "1"])
+        self.assertEqual(lines[2].split("\t"), ["develop", "Alex Rivera", "x.example", "2017-08-20", "Only on develop"])
+
+    def test_a_branch_the_parent_holds_or_has_tagged_counts_nothing(self):
+        git(self.parent, "switch", "-q", "-c", "1.x")
+        commit(self.parent, "lib.txt", "old line\n", "On the parent's 1.x")
+        git(self.parent, "tag", "v1.0")
+        commit(self.parent, "lib.txt", "older\n", "Then deleted")
+        git(self.parent, "switch", "-q", "main")
+        git(self.fork, "fetch", "-q", str(self.parent), "1.x:1.x")
+        git(self.parent, "branch", "-q", "-D", "1.x")
+        git(self.fork, "branch", "-q", "-f", "1.x", "1.x~1")
+        self.assertEqual(self.run_snippet(), ["main", "0"])
+
+    def test_a_fork_whose_default_branch_has_another_name_counts_only_its_own_commits(self):
         # The fork's default branch is an old master; the parent's is main.
         git(self.fork, "branch", "-m", "main", "master")
         commit(self.fork, "lib.txt", "mine\n", "On the old branch", author=("Alex Rivera", "a@x.example"))
-        self.assertEqual(self.run_snippet()[0], "1")
+        self.assertEqual(self.run_snippet()[1], "1")
 
     @unittest.skipUnless(shutil.which("zsh"), "zsh is needed")
     def test_zsh_keeps_the_branch_name_whole(self):
-        # Claude Code on a Mac runs commands in zsh, where $b:r is a modifier that cuts the name at its last dot.
+        # Claude Code on a Mac runs commands in zsh, where $b:r is a modifier: a branch name with a dot must survive.
         git(self.parent, "branch", "-m", "main", "5.0.x")
         commit(self.fork, "lib.txt", "mine\n", "Mine", author=("Alex Rivera", "a@x.example"))
-        self.assertEqual(self.run_snippet("zsh")[0], "1")
+        self.assertEqual(self.run_snippet("zsh")[:2], ["main", "1"])
 
     def test_a_clone_left_from_an_earlier_run_is_brought_up_to_date(self):
         self.run_snippet()
         commit(self.fork, "lib.txt", "later\n", "Later", author=("Alex Rivera", "a@x.example"))
-        self.assertEqual(self.run_snippet()[0], "1")
+        self.assertEqual(self.run_snippet()[1], "1")
+
+    def test_a_branch_deleted_from_the_fork_since_an_earlier_run_is_dropped(self):
+        git(self.fork, "switch", "-q", "-c", "spike")
+        commit(self.fork, "lib.txt", "spike\n", "Spike", author=("Alex Rivera", "a@x.example"))
+        git(self.fork, "switch", "-q", "main")
+        self.assertEqual(self.run_snippet()[1], "1")
+        git(self.fork, "branch", "-q", "-D", "spike")
+        self.assertEqual(self.run_snippet()[1], "0")
 
     def test_a_parent_that_cannot_be_read_fails_the_command(self):
         script = (block(REVIEW, "refs/parent/")

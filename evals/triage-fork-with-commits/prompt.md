@@ -24,16 +24,17 @@ There is no previous triage page.
 
 `gh api user --jq '.login, .name'` gives `octo-dev` and `Alex Rivera`.
 
-Step 1's git commands for the fork (the parent's default branch is `master`) print:
+Step 1's git commands for the fork print:
 
 ```
+master
 6
-Alex Rivera	oldjob.example	2017-08-22	Build dist files
-Alex Rivera	oldjob.example	2017-08-21	Style disabled dates for the booking form
-Alex Rivera	oldjob.example	2017-08-21	Disable dates outside the booking window
-Alex Rivera	oldjob.example	2017-08-18	Add a test for two-digit years
-Alex Rivera	oldjob.example	2017-08-18	Keep the picker open while the month changes
-Alex Rivera	oldjob.example	2017-08-17	Parse two-digit years in the en-GB locale
+master	Alex Rivera	oldjob.example	2017-08-22	Build dist files
+master	Alex Rivera	oldjob.example	2017-08-21	Style disabled dates for the booking form
+master	Alex Rivera	oldjob.example	2017-08-21	Disable dates outside the booking window
+master	Alex Rivera	oldjob.example	2017-08-18	Add a test for two-digit years
+master	Alex Rivera	oldjob.example	2017-08-18	Keep the picker open while the month changes
+master	Alex Rivera	oldjob.example	2017-08-17	Parse two-digit years in the en-GB locale
 ```
 
 The search for my pull requests (`search/issues?q=author:octo-dev+type:pr+-user:octo-dev`) gives none to `picker-org/datepicker`.

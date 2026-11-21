@@ -6,6 +6,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 - A new skill, `traffic`, saves the views, clones, stars and top referrers of every public repo you own to a page titled "Traffic history", one snapshot at a time, and charts them across snapshots, so they outlast GitHub's 14 days. `schedule` sets up a weekly task that saves the next ones. A public repo's review links to the page from its Outcomes panel.
 - In Claude Code, the commands that read a fork's commits and a README's opening work as written: Claude Code put the skill's arguments in place of awk's `$0`, `$1` and `$2`, so triage's README listing broke, and an overview given repo URLs would have broken the fork commands too. The README listing also no longer prints errors in zsh, and the fork commands no longer fail there for every fork: zsh read part of the parent's branch name as a modifier.
+- A fork's commits beyond its parent are counted on every branch of the fork, against every branch and tag of the parent, not on its default branch alone, and the review and triage name any other branch that holds your commits. Before, a fork whose only work of yours was on a branch such as `develop` could be marked clear to delete.
 - In Claude Code, the review and triage clone private repos with `gh`'s login, since `git` alone can't answer its prompt for a password there.
 
 ## 0.3.0 (2026-11-21)
