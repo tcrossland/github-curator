@@ -5,6 +5,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 ## Unreleased
 
 - The README opens with what the plugin decides and what sets it apart, and lists `repo-review`'s modes one to a line.
+- The README says what a claude.ai chat can't do yet that Claude Code can, and that the no-changes promise is a rule in the skills' instructions.
 - A new skill, `forks`, lists the forks of one of your repos that hold commits of their own, on any branch, with what those commits change and who made them, and picks out the ones worth a look. It reads only forks pushed to after they were made, the 30 most recent unless you add `all`. A public repo's review lists them in its Outcomes panel as "Forks with commits".
 - A new skill, `traffic`, saves the views, clones, stars and top referrers of every public repo you own to a page titled "Traffic history", one snapshot at a time, and charts them across snapshots, so they outlast GitHub's 14 days. `schedule` sets up a weekly task that saves the next ones. A public repo's review links to the page from its Outcomes panel.
 - In Claude Code, the commands that read a fork's commits and a README's opening work as written: Claude Code put the skill's arguments in place of awk's `$0`, `$1` and `$2`, so triage's README listing broke, and an overview given repo URLs would have broken the fork commands too. The README listing also no longer prints errors in zsh, and the fork commands no longer fail there for every fork: zsh read part of the parent's branch name as a modifier.
