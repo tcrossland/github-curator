@@ -18,7 +18,8 @@ There are three ways to run it:
 In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
 
 **In Claude Code.** The steps name claude.ai's tools. In Claude Code, use these in their place:
-- `add_repo`: none needed. Claude Code's `gh` and `git` use the account they're signed in with, so read the repo directly.
+- `add_repo`: none needed. Claude Code's `gh` uses the account it's signed in with, so read the repo directly.
+- `git` reads a private repo over HTTPS only with a credential, and Claude Code's shell can't answer git's prompt for one. Give every clone and fetch of a private repo `gh`'s login, which changes no setting: `git -c credential.helper='!gh auth git-credential' clone ...`, and the same before `-C` in a fetch.
 - `list_repos`: `gh api --paginate 'user/repos?affiliation=owner&per_page=100'`.
 - `device_request_folder_access`, `device_bash` and `device_stage_files`: none needed. A local clone is on the same computer, so read it in the shell, still read only.
 - `list_artifacts`, `read_artifact`, `get_artifact` and `publish_files`: the Artifact tool's `list`, `read` and `publish` actions. `list` takes no query, so look for the title among the artifacts it lists, paging on until it's found or the list ends. Read an existing artifact before republishing to it, and republish by passing its `url`.
@@ -190,10 +191,10 @@ Accept any of these:
   Read the fork's commits with git, not the compare API. In the working folder, clone the fork without its files and fetch the parent's default branch into it the same way (a public parent needs no attaching on claude.ai):
   ```sh
   d="forks/REPO.git" && { [ -d "$d" ] && git -C "$d" fetch -q origin '+refs/heads/*:refs/heads/*' || git clone -q --bare --filter=tree:0 "https://github.com/OWNER/REPO.git" "$d"; } &&
-  b=$(git ls-remote --symref "https://github.com/PARENT-OWNER/PARENT-REPO.git" HEAD | awk '$1 == "ref:" {sub("refs/heads/", "", $2); print $2}') &&
+  b=$(git ls-remote --symref "https://github.com/PARENT-OWNER/PARENT-REPO.git" HEAD | sed -n 's|^ref: refs/heads/\(.*\)[[:space:]]HEAD$|\1|p') &&
   git -C "$d" fetch -q --filter=tree:0 "https://github.com/PARENT-OWNER/PARENT-REPO.git" "refs/heads/$b:refs/parent/$b" &&
   git -C "$d" rev-list --count "refs/parent/$b..HEAD" &&
-  git -C "$d" log --format='%an%x09%ae%x09%ad%x09%s' --date=short "refs/parent/$b..HEAD" | awk -F'\t' -v OFS='\t' '{sub(/.*@/, "", $2); print}'
+  git -C "$d" log --format='%an%x09%ae%x09%ad%x09%s' --date=short "refs/parent/$b..HEAD" | awk -F'\t' -v OFS='\t' -v email=2 '{sub(/.*@/, "", $email); print}'
   ```
   The first line is the count of commits the fork has that its parent doesn't; then one line per commit, newest first: the author's name, their email's domain (never the address), the date and the subject. If the parent can't be cloned (deleted, or private and not attached), say so and leave the count out.
   Read the repos pinned on the user's profile. REST doesn't list them; GraphQL does. GraphQL works in a shell on the user's computer (Claude Code's own, or `device_bash` on claude.ai), and a claude.ai session's own shell refuses it, both `gh api graphql` and `gh repo view --json`. Where it works, use `gh api graphql -f query='{user(login:"OWNER"){pinnedItems(first:6){nodes{... on Repository{nameWithOwner}}}}}'`. Otherwise take them from the profile page (`https://github.com/OWNER`) with WebFetch, asking for the pinned repositories as `owner/name` (the page shows the owner only for repos owned by someone else, so ask for it from each link's path), and label them "profile page summary, may not be complete". If neither works, say the pins couldn't be read and make the feature call without them.
@@ -275,7 +276,7 @@ Find up to five popular repos that do much the same thing, for any draft whose s
 ```sh
 d="readmes/OWNER--REPO" && { [ -d "$d" ] || { git clone -q --depth 1 --filter=blob:none --sparse "https://github.com/OWNER/REPO.git" "$d" &&
   git -C "$d" sparse-checkout set --no-cone '/[Rr][Ee][Aa][Dd][Mm][Ee]*' '/.github/[Rr][Ee][Aa][Dd][Mm][Ee]*' '/docs/[Rr][Ee][Aa][Dd][Mm][Ee]*'; }; } &&
-{ f=; for p in .github/ '' docs/; do f=$(cd "$d" && ls -d "$p"[Rr][Ee][Aa][Dd][Mm][Ee]* 2>/dev/null | awk '{print length, $0}' | sort -n | head -1 | cut -d' ' -f2-); [ -n "$f" ] && break; done
+{ f=; for p in .github . docs; do f=$(cd "$d" && find "$p" -maxdepth 1 -iname 'readme*' ! -type d 2>/dev/null | while IFS= read -r x; do echo "${#x} ${x#./}"; done | sort -n | head -1 | cut -d' ' -f2-); [ -n "$f" ] && break; done
   if [ -n "$f" ]; then echo "== $f"; head -20 "$d/$f"; else echo "no README"; fi; }
 ```
 It prints the README's path and its first 20 lines, or `no README`. A private repo needs attaching first on claude.ai.

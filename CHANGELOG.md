@@ -2,6 +2,11 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## Unreleased
+
+- In Claude Code, the commands that read a fork's commits and a README's opening work as written: Claude Code put the skill's arguments in place of awk's `$0`, `$1` and `$2`, so triage's README listing broke, and an overview given repo URLs would have broken the fork commands too. The README listing also no longer prints errors in zsh.
+- In Claude Code, the review and triage clone private repos with `gh`'s login, since `git` alone can't answer its prompt for a password there.
+
 ## 0.3.0 (2026-11-21)
 
 - The review's Outcomes panel shows the other people in a repo: everyone else with commits, by login or by the name on their commits (never an email address), and the open issues and pull requests other people opened, each with its age and whether you've replied.

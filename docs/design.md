@@ -121,6 +121,8 @@ The overview carries each repo's fix prompt as its scorecard has it, with a copy
 
 Each skill reads its arguments as words (`overview`, `triage forks`, `org:NAME`, `since:2026-01-01`, `no-publish`) rather than through Claude Code's positional placeholders (`$0`, `$name`). The modes take lists of any length, and a draft can be pasted text with spaces, so a fixed position for each argument would misread most calls. The `argument-hint` in each skill's frontmatter shows the words in Claude Code's autocomplete.
 
+Claude Code still fills those placeholders wherever they appear in `SKILL.md`, code blocks included (`docs/github-facts.md`), so no `SKILL.md` holds a `$` before a digit or `ARGUMENTS`, and none declares `arguments` in its frontmatter, which would make names such as `$email` placeholders too. Claude Code's docs give `\$0` as an escape, but a claude.ai run may not strip the backslash, so the commands avoid the form instead: `sed` in place of awk where a field number was needed, and a named awk variable (`$email`) where awk stays. A test fails on any that come back.
+
 An organisation's triage is stricter than the user's own. Other people may rely on an organisation's repos, and only its admins can archive or delete them, so an unchanged fork there goes to review instead of being a clear delete, and a repo the user isn't an admin of is marked as an admin's call. Its page has its own title, so it doesn't replace the triage of the user's own repos.
 
 `no-publish` exists for working on the skill: a test run of a changed rule or template would otherwise republish the live scorecard.

@@ -177,6 +177,16 @@ class ReadmeTest(unittest.TestCase):
         out, _ = self.readme({"main.py": "print()\n"})
         self.assertEqual(out, "no README\n")
 
+    @unittest.skipUnless(shutil.which("zsh"), "zsh is needed")
+    def test_zsh_finds_it_without_complaining_about_the_places_with_none(self):
+        # Claude Code on a Mac runs commands in zsh, which stops a command on a glob that matches nothing.
+        repo = new_repo(self.tmp / "repo", "main")
+        commit(repo, "docs/README.md", "docs\n", "Add docs/README.md")
+        script = block(REVIEW, "sparse-checkout").replace("https://github.com/OWNER/REPO.git", f"file://{repo}") \
+            .replace("OWNER--REPO", "o--r")
+        out = subprocess.run(["zsh", "-c", script], cwd=self.work, env=GIT_ENV, capture_output=True, text=True)
+        self.assertEqual((out.returncode, out.stdout, out.stderr), (0, "== docs/README.md\ndocs\n", ""))
+
     def test_a_repo_that_cannot_be_cloned_prints_nothing(self):
         script = block(REVIEW, "sparse-checkout").replace("https://github.com/OWNER/REPO.git", f"file://{self.tmp}/gone")
         out = run_sh(script, self.work)
