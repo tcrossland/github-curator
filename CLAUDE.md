@@ -38,6 +38,8 @@ The behaviour evals in `evals/` check the skills' calls on known cases, offline,
 - Before cutting a release: the full suite, `scripts/evals.sh` with no arguments.
 - Nothing else needs them: the template, tests, scripts, docs, and fields copied as they are.
 
+Runs go one at a time unless given `-j N` (up to 8), which `scripts/evals.sh` passes on: the full suite took 43 minutes one at a time, so run it with `-j 4`. The runs share one rate limit.
+
 ## Releasing
 
 Add each user-facing change to `## Unreleased` in `CHANGELOG.md`, in the same commit as the change. Leave `version` alone until the user says to cut a release. Then, in one `chore(release): X.Y.Z` commit, rename Unreleased to the version and date and raise `version` in `.claude-plugin/plugin.json`, and build the zip with `scripts/package.sh`, which also validates the manifest. The user uploads it to claude.ai.
