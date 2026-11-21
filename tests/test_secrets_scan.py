@@ -1,16 +1,21 @@
 """Tests for the secrets scan in skills/repo-review/SKILL.md (Work before the action).
 
-The script is taken from the skill as it stands, found by 'betterleaks'. Most tests run
+The scripts are taken from the skill as it stands: the scan found by '--redact', and the
+claude.ai fetch of betterleaks by 'checksums.txt'. Most scan tests run
 it with a stand-in betterleaks that checks its arguments and writes a report in the
 shape each major version writes. One test runs real betterleaks over a repo with fake
 keys planted in its history; it runs when betterleaks is on PATH, or with BETTERLEAKS
-set to one or more binaries separated by ':'. Run: python3 -m unittest discover tests
+set to one or more binaries separated by ':'. The fetch tests use a stand-in curl and
+uname, and a made-up release archive. Run: python3 -m unittest discover tests
 """
+import hashlib
+import io
 import json
 import os
 import re
 import shutil
 import subprocess
+import tarfile
 import tempfile
 import unittest
 from pathlib import Path
@@ -18,11 +23,19 @@ from pathlib import Path
 SKILL = Path(__file__).resolve().parent.parent / "skills" / "repo-review" / "SKILL.md"
 
 
-def scan_script():
-    found = [b for b in re.findall(r"```sh\n(.*?)\n```", SKILL.read_text(encoding="utf-8"), re.S) if "betterleaks" in b]
+def sh_block(marker):
+    found = [b for b in re.findall(r"```sh\n(.*?)\n```", SKILL.read_text(encoding="utf-8"), re.S) if marker in b]
     if len(found) != 1:
-        raise ValueError(f"expected one sh block containing 'betterleaks' in SKILL.md, found {len(found)}")
+        raise ValueError(f"expected one sh block containing {marker!r} in SKILL.md, found {len(found)}")
     return found[0]
+
+
+def scan_script():
+    return sh_block("--redact")
+
+
+def fetch_script():
+    return sh_block("checksums.txt")
 
 
 V1_ARGS = "git CLONE --no-banner --redact --exit-code 0 --report-format json --report-path secrets.json"
@@ -46,13 +59,17 @@ V2_REPORT = {
 
 @unittest.skipUnless(shutil.which("jq"), "the script reads the report with jq")
 class StandInTest(unittest.TestCase):
-    def run_script(self, name, version, expected_args, report, status=0):
-        """Run the script with a stand-in betterleaks called NAME; return (exit code, stdout, stderr)."""
-        with tempfile.TemporaryDirectory() as bindir, tempfile.TemporaryDirectory() as work:
+    def run_script(self, name, version, expected_args, report, status=0, fetched=False):
+        """Run the script with a stand-in betterleaks called NAME, on PATH or, if FETCHED, where the
+        claude.ai fetch puts it; return (exit code, stdout, stderr)."""
+        with tempfile.TemporaryDirectory() as bindir, tempfile.TemporaryDirectory() as work, \
+                tempfile.TemporaryDirectory() as home:
             if name:
                 canned = Path(bindir) / "report.json"
                 canned.write_text(json.dumps(report))
-                stand_in = Path(bindir) / name
+                where = Path(home) / "betterleaks-1.10.1" if fetched else Path(bindir)
+                where.mkdir(exist_ok=True)
+                stand_in = where / name
                 stand_in.write_text(
                     "#!/bin/sh\n"
                     f'[ "$1" = version ] && {{ echo "{version}"; exit 0; }}\n'
@@ -63,7 +80,7 @@ class StandInTest(unittest.TestCase):
             jq_dir = Path(bindir) / "jq-only"
             jq_dir.mkdir()
             (jq_dir / "jq").symlink_to(shutil.which("jq"))
-            env = {**os.environ, "PATH": f"{bindir}:{jq_dir}:/usr/bin:/bin"}
+            env = {**os.environ, "PATH": f"{bindir}:{jq_dir}:/usr/bin:/bin", "HOME": home}
             r = subprocess.run(["sh", "-c", scan_script()], env=env, cwd=work, capture_output=True, text=True)
             return r.returncode, r.stdout, r.stderr
 
@@ -91,6 +108,11 @@ class StandInTest(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertEqual(out, "")
 
+    def test_it_finds_the_copy_fetched_on_claude_ai(self):
+        code, out, err = self.run_script("betterleaks", "1.10.1", V1_ARGS, V1_REPORT, fetched=True)
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "14d13b1\tconfig.env\t1\tgithub-pat\t2026-11-20\n")
+
     def test_without_betterleaks_it_says_so_and_fails(self):
         code, out, err = self.run_script(None, "", "", None)
         self.assertNotEqual(code, 0)
@@ -101,6 +123,84 @@ class StandInTest(unittest.TestCase):
         code, out, err = self.run_script("betterleaks", "3.0.0", "", V2_REPORT)
         self.assertNotEqual(code, 0)
         self.assertIn("3.0.0", err)
+
+
+RELEASE = "https://github.com/betterleaks/betterleaks/releases/download/v1.10.1/"
+
+
+def archive(version="1.10.1"):
+    """A release archive like the real one: a betterleaks that prints VERSION, with a README beside it."""
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w:gz") as tar:
+        for name, text, mode in (("README.md", "# betterleaks\n", 0o644),
+                                 ("betterleaks", f"#!/bin/sh\necho {version}\n", 0o755)):
+            data = text.encode()
+            info = tarfile.TarInfo(name)
+            info.size, info.mode = len(data), mode
+            tar.addfile(info, io.BytesIO(data))
+    return buf.getvalue()
+
+
+@unittest.skipUnless(shutil.which("sha256sum") and shutil.which("tar"), "the fetch checks with sha256sum and unpacks with tar")
+class FetchTest(unittest.TestCase):
+    def run_fetch(self, system="Linux", machine="x86_64", checksum=None):
+        """Run the fetch with stand-in uname and curl serving a made-up release; return
+        (exit code, stdout, stderr, HOME, the URLs curl was asked for)."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            bindir, release, home, work = tmp / "bin", tmp / "release", tmp / "home", tmp / "work"
+            for d in (bindir, release, home, work):
+                d.mkdir()
+            lines = []
+            for arch in ("x64", "arm64"):
+                name = f"betterleaks_1.10.1_linux_{arch}.tar.gz"
+                data = archive()
+                (release / name).write_bytes(data)
+                lines.append(f"{checksum or hashlib.sha256(data).hexdigest()}  {name}")
+            lines.append(f"{'0' * 64}  betterleaks_1.10.1_darwin_arm64.tar.gz")
+            (release / "checksums.txt").write_text("\n".join(lines) + "\n")
+            log = tmp / "curl.log"
+            (bindir / "uname").write_text(
+                f'#!/bin/sh\ncase $1 in -s) echo {system} ;; -m) echo {machine} ;; *) exit 2 ;; esac\n')
+            (bindir / "curl").write_text(
+                "#!/bin/sh\n"
+                '[ "$1" = -fsSLO ] || { echo "unexpected: $*" >&2; exit 2; }\n'
+                f'echo "$2" >> "{log}"\n'
+                f'case $2 in {RELEASE}*) cp "{release}/${{2##*/}}" . 2>/dev/null || exit 22 ;; *) exit 22 ;; esac\n')
+            for tool in ("uname", "curl"):
+                (bindir / tool).chmod(0o755)
+            (bindir / "sha256sum").symlink_to(shutil.which("sha256sum"))
+            env = {**os.environ, "PATH": f"{bindir}:/usr/bin:/bin", "HOME": str(home)}
+            r = subprocess.run(["sh", "-c", fetch_script()], env=env, cwd=work, capture_output=True, text=True)
+            urls = log.read_text().split() if log.exists() else []
+            fetched = home / "betterleaks-1.10.1" / "betterleaks"
+            return r.returncode, r.stdout, r.stderr, fetched.exists(), urls
+
+    def test_it_fetches_the_x64_build_checks_it_and_runs_it(self):
+        code, out, err, fetched, urls = self.run_fetch()
+        self.assertEqual(code, 0, err)
+        self.assertIn("betterleaks_1.10.1_linux_x64.tar.gz: OK", out)
+        self.assertTrue(out.rstrip().endswith("1.10.1"))
+        self.assertTrue(fetched)
+        self.assertEqual(urls, [RELEASE + "betterleaks_1.10.1_linux_x64.tar.gz", RELEASE + "checksums.txt"])
+
+    def test_it_fetches_the_arm64_build_on_arm(self):
+        code, _, err, fetched, urls = self.run_fetch(machine="aarch64")
+        self.assertEqual(code, 0, err)
+        self.assertTrue(fetched)
+        self.assertEqual(urls[0], RELEASE + "betterleaks_1.10.1_linux_arm64.tar.gz")
+
+    def test_an_archive_that_fails_its_checksum_is_never_unpacked(self):
+        code, _, _, fetched, _ = self.run_fetch(checksum="1" * 64)
+        self.assertNotEqual(code, 0)
+        self.assertFalse(fetched)
+
+    def test_it_fetches_nothing_outside_linux(self):
+        code, _, err, fetched, urls = self.run_fetch(system="Darwin", machine="arm64")
+        self.assertNotEqual(code, 0)
+        self.assertIn("only in the claude.ai VM", err)
+        self.assertFalse(fetched)
+        self.assertEqual(urls, [])
 
 
 def real_binaries():

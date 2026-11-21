@@ -28,7 +28,8 @@ Reading `git log` for secrets is weak over a long history, so the check before p
 - **Both versions.** Homebrew installs v1 while v2 is a release candidate with other flags and another report format. The script picks by `betterleaks version` and one `jq` reads both reports, so a user on either gets the scan.
 - **Redacted, and never copied.** The report holds no secret values, and the review never copies one into the scorecard, the fix prompt or the reply, which are published or pasted elsewhere.
 - **Findings stay out of the fix prompt.** Removing a secret from the history means rewriting it, which a commit can't do, and the key has to be revoked at its provider first. Both are the user's.
-- **No install.** The review doesn't install software. Without betterleaks it searches the history as before, marks the item `todo` and says the scan didn't run, so a missing scan never passes silently.
+- **No install on the user's computer.** The review doesn't install software there. Without betterleaks it searches the history as before, marks the item `todo` and says the scan didn't run, so a missing scan never passes silently.
+- **A fetch on claude.ai.** There the clone is in the session's own VM, which has no betterleaks but may download it, and which nothing else uses. So the review fetches the release it was checked with (1.10.1, the stable one) into a folder of its own there, and runs it only if it matches the release's `checksums.txt`. The checksums come from the same release, so they catch a broken or swapped download, not a release tampered with at its source; the release's sigstore bundle isn't checked. The fetch refuses to run outside Linux, so it can't land on the user's Mac. Raise the pinned version only after checking the new release's flags and report.
 
 ## Feature is separate from the action
 

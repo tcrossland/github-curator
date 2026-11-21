@@ -91,8 +91,21 @@ Before publishing:
 5. **Description and topics**: set before it goes public.
 
 **The secrets scan.** Run betterleaks over the full clone from Step 1 (never a `--depth 1` one), in the shell that holds the clone (`device_bash` for a local clone), with `CLONE` as its path, from a folder outside it so the report isn't written inside it. Both of its major versions are in use and take different flags, so the script picks by version. It scans locally: never add `--validate`, `--analyze` or `--validation`, which send each secret found to its provider to test it.
+
+On claude.ai, when the clone is in the session's own Linux VM (not on the user's computer through `device_bash`) and `command -v betterleaks` finds nothing, fetch the release this review was checked with first, in that VM's shell. It goes into a folder of its own and runs only if it matches the release's checksums:
 ```sh
-bl=$(command -v betterleaks || command -v betterleaks-v1 || echo betterleaks)
+[ "$(uname -s)" = Linux ] || { echo "fetch betterleaks only in the claude.ai VM" >&2; false; } &&
+case $(uname -m) in x86_64|amd64) f=betterleaks_1.10.1_linux_x64.tar.gz ;; aarch64|arm64) f=betterleaks_1.10.1_linux_arm64.tar.gz ;; *) echo "no betterleaks build for $(uname -m)" >&2; false ;; esac &&
+mkdir -p "$HOME/betterleaks-1.10.1" && cd "$HOME/betterleaks-1.10.1" &&
+curl -fsSLO "https://github.com/betterleaks/betterleaks/releases/download/v1.10.1/$f" &&
+curl -fsSLO https://github.com/betterleaks/betterleaks/releases/download/v1.10.1/checksums.txt &&
+grep "  $f\$" checksums.txt | sha256sum -c - &&
+tar -xzf "$f" betterleaks && ./betterleaks version
+```
+It prints `OK` and `1.10.1` when it worked; the scan below then finds it there. Never fetch it anywhere else: on the user's computer, in Claude Code or through `device_bash`, the review installs nothing.
+
+```sh
+bl=$(command -v betterleaks || command -v betterleaks-v1 || echo "$HOME/betterleaks-1.10.1/betterleaks")
 v=$("$bl" version 2>/dev/null)
 case $v in
   1.*) "$bl" git CLONE --no-banner --redact --exit-code 0 --report-format json --report-path secrets.json ;;
@@ -101,7 +114,7 @@ case $v in
 esac &&
 jq -r '(if type == "array" then . else .findings end)[] | (.attributes // .Attributes) as $a | [$a["git.sha"][:7], (.location.path // .File), (.location.start_line // .StartLine), (.rule_id // .RuleID), $a["git.date"][:10]] | @tsv' secrets.json
 ```
-Each line is a finding: commit, file, line, rule and date. With `--exit-code 0` a clean scan and one with findings both exit 0, so any other exit means the scan failed. Mark item 1 `done` only when the scan ran and found nothing, and the search for hostnames and personal data found nothing either. Otherwise mark it `todo`, with the note listing each finding as `COMMIT FILE:LINE (RULE, DATE)`. You may read a finding's line to judge it (a test fixture's fake key is still a finding, since the scan can't tell), but never copy a secret's value into the scorecard, the fix prompt or the reply. A finding is the user's to act on, so keep it out of the fix prompt: revoke the key at its provider first, since removing it from the history doesn't make it safe once it has been seen. If betterleaks isn't installed, or the scan fails, never install it: search the history yourself as well as you can, mark item 1 `todo` whatever that finds, and say in the note that the scan didn't run and why, with `brew install betterleaks` as the way to run it.
+Each line is a finding: commit, file, line, rule and date. With `--exit-code 0` a clean scan and one with findings both exit 0, so any other exit means the scan failed. Mark item 1 `done` only when the scan ran and found nothing, and the search for hostnames and personal data found nothing either. Otherwise mark it `todo`, with the note listing each finding as `COMMIT FILE:LINE (RULE, DATE)`. You may read a finding's line to judge it (a test fixture's fake key is still a finding, since the scan can't tell), but never copy a secret's value into the scorecard, the fix prompt or the reply. A finding is the user's to act on, so keep it out of the fix prompt: revoke the key at its provider first, since removing it from the history doesn't make it safe once it has been seen. If betterleaks isn't there (and, on claude.ai, the fetch above failed), or the scan fails, never install it any other way: search the history yourself as well as you can, mark item 1 `todo` whatever that finds, and say in the note that the scan didn't run and why, with `brew install betterleaks` as the way to run it.
 
 Before deleting:
 1. **Nothing of the user's own**: no commits, notes or results that exist only here.
