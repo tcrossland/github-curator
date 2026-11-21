@@ -14,6 +14,8 @@ Outcomes (stars, traffic, stargazers) and similar repos are context. They never 
 
 A private repo is checked as it would read once public. Findable is flagged rather than failed when visibility is its only gap, because making it public is a decision, not a defect.
 
+A description the review suggests is kept to GitHub's limit of 350 characters (`docs/github-facts.md`). The first review to suggest copying a manifest's description to the repo gave a command GitHub refused, since the manifest's ran to 462 characters, and a manifest's description has no reason to stay that short. The skill has Claude count the characters with code, as it recounts the numbers in its own prose, since a count by eye is unreliable at this length.
+
 ## The recommendation
 
 There are five actions, one per repo: keep, publish, archive, make-private and delete. The tie-breaker is "prefer the action that loses least": archive over make-private when anyone else has starred, forked or opened an issue, and make-private over delete whenever anything of the user's is in the repo.
