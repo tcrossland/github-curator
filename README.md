@@ -1,10 +1,10 @@
 # github-curator
 
-A Claude plugin that reviews the repos on a GitHub account the way a visitor meets them, and recommends one thing to do with each: keep it, publish it, archive it with an account of what it was, make it private or delete it, and whether to feature it among the profile's pinned repos. Every finding on its scorecard quotes the file and line it rests on, and the plugin changes nothing itself. It holds five skills:
+A [Claude plugin](https://claude.com/docs/plugins/build.md) that reviews the repos on a GitHub account the way a visitor meets them, and recommends one thing to do with each: keep it, publish it, archive it with an account of what it was, make it private or delete it, and whether to feature it among the profile's pinned repos. Every finding on its scorecard quotes the file and line it rests on, and the plugin changes nothing itself. It holds five skills, each a set of instructions Claude follows when you run its command:
 
 > **Placeholder for the author:** a screenshot of a scorecard goes here.
 
-- [`repo-review`](skills/repo-review/SKILL.md): recommends what to do with a repo and the work worth doing first, finds similar repos, checks the repo or a README draft against seven questions, and publishes a scorecard as an artifact, with a fix prompt for Claude Code. It runs in these modes:
+- [`repo-review`](skills/repo-review/SKILL.md): recommends what to do with a repo and the work worth doing first, finds similar repos, checks the repo or a README draft against seven questions, and publishes a scorecard to a page in your claude.ai account (an artifact, private until you share it), with a fix prompt to paste into Claude Code. It runs in these modes:
   - `repo-review` with a repo URL, a local clone's folder, a file or pasted text: one full review.
   - `repo-review triage`: a quick first pass over all of an account's repos from the API, which settles the clear deletes and names the repos worth a full review. `triage org:NAME` does the same for an organisation's repos.
   - `repo-review overview`: reviews several repos and ranks them.
