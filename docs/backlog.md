@@ -6,7 +6,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | in progress: to check on claude.ai |
+| 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | in progress: triage matches; stargazers to check on claude.ai |
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
@@ -32,12 +32,10 @@ The skills now take routes that work there too, the same in Claude Code where th
 
 What only a claude.ai run, on an upload that has these changes, can check:
 - **A first triage**: Manual mode asks before every `add_repo` (seen on 2026-11-21), so attaching every fork and private repo (61 and 11 on this account) is 72 approvals, and triage now suggests running a first triage from Claude Code when it's more than 10. Still to see: a claude.ai triage that asks to switch to Manual mode, attaches a few repos and runs the git commands in the VM, and whether the approval prompt offers to allow `add_repo` for the rest of the chat (**unverified**).
-- **A second triage**: on claude.ai, after a first triage from Claude Code, it reads each fork's parent from that page and attaches only the private repos and any new forks.
-- **The same calls**: it marks the clear deletes Claude Code marks on the same account.
-- **Search on claude.ai**: whether `search/repositories?q=user:LOGIN+fork:true` includes private repos there (**unverified**; triage reads private repos from the API once attached, either way), and the pull-request search's 320 results on this account.
-- **A private repo's README** from the sparse clone once it's attached (`git ls-remote` answered after attaching, but no clone has been tried).
+- **Search on claude.ai**: whether `search/repositories?q=user:LOGIN+fork:true` includes private repos there (**unverified**; triage reads private repos from the API once attached, either way).
 - **Stargazers**: the stargazer list for an attached repo (**unverified** on claude.ai), and whether WebFetch of a profile page gives the bio, company, location and the pinned repos' descriptions when a profile has them.
-- **Timings**: the triage page's per-step times, `Attach` included, with its slowest step written up here.
+
+Seen on 2026-11-21, in a second triage on claude.ai on 0.3.0 after one from Claude Code: it read every fork's parent from the page, attached only the 11 private repos, read their READMEs from the sparse clone, and marked the same 40 clear deletes and 42 repos to review, each with the same action. Its slowest step was `Attach`, 108 s for 11 approvals in Manual mode, which is the user approving each call; the rest took 137 s. Its pull-request search gave 319 results to Claude Code's 320, one private repo short, as `contributions`' searches were.
 
 **Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, stargazers there reads profiles or says plainly that it can't, and a triage's page shows per-step times from item 2's log, with its slowest step written up here.
 
