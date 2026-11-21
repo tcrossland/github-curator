@@ -31,8 +31,8 @@ The skills now take routes that work there too, the same in Claude Code where th
 - An organisation's triage on claude.ai stops and says to run it from Claude Code.
 
 What only a claude.ai run, on an upload that has these changes, can check:
-- **A first triage**: it asks to switch to Manual mode, attaches every fork and private repo (61 and 11 on this account), and runs the git commands in the VM. **Unverified**: whether Manual mode's prompt for `add_repo` can be allowed for the rest of the chat; if it can't, that's 72 approvals, and a first triage is better run from Claude Code.
-- **A second triage**: it reads each fork's parent from the first page and attaches only the private repos and any new forks.
+- **A first triage**: Manual mode asks before every `add_repo` (seen on 2026-11-21), so attaching every fork and private repo (61 and 11 on this account) is 72 approvals, and triage now suggests running a first triage from Claude Code when it's more than 10. Still to see: a claude.ai triage that asks to switch to Manual mode, attaches a few repos and runs the git commands in the VM, and whether the approval prompt offers to allow `add_repo` for the rest of the chat (**unverified**).
+- **A second triage**: on claude.ai, after a first triage from Claude Code, it reads each fork's parent from that page and attaches only the private repos and any new forks.
 - **The same calls**: it marks the clear deletes Claude Code marks on the same account.
 - **Search on claude.ai**: whether `search/repositories?q=user:LOGIN+fork:true` includes private repos there (**unverified**; triage reads private repos from the API once attached, either way), and the pull-request search's 320 results on this account.
 - **A private repo's README** from the sparse clone once it's attached (`git ls-remote` answered after attaching, but no clone has been tried).
