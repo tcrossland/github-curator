@@ -30,7 +30,7 @@ Read the user's login with `gh api user --jq .login`. Then their own organisatio
 gh api --paginate 'user/memberships/orgs?per_page=100' --jq '.[] | select(.role == "admin") | .organization.login'
 ```
 
-If that's refused (as unscoped paths are in a claude.ai session), take instead the owners, other than the user, of the repos `list_repos` lists, and say in the reply that the organisations came from there and may include an employer's. Add any given with `own:`.
+If that's refused (as it is in a claude.ai session), take instead the owners, other than the user, of the repos `list_repos` lists. Those aren't the same as the user's organisations: they can include an employer or a person whose repo the user can push to, and they leave out any organisation with no repo the user can push to. Step 5 says what the reply tells the user. Add any given with `own:`.
 
 ## Step 2: list the merged pull requests
 
@@ -42,7 +42,7 @@ gh api --paginate 'search/issues?q=author:LOGIN+type:pr+is:merged+-user:LOGIN+is
 gh api 'search/issues?q=author:LOGIN+type:pr+is:merged+-user:LOGIN&per_page=1' --jq .total_count
 ```
 
-The last gives the total the groups must add up to. Search returns at most 1,000 results for one query: when either listing's total passes 1,000, run it again for each year, adding `+merged:YYYY-01-01..YYYY-12-31` to the query, and join the files. Search allows 30 requests a minute; if a request is refused for its rate limit, wait a minute and run it again.
+The last gives the total the groups must add up to. In a claude.ai session, search can see fewer private repos than the user's own `gh` does, so the private count and the total can both be short. Search returns at most 1,000 results for one query: when either listing's total passes 1,000, run it again for each year, adding `+merged:YYYY-01-01..YYYY-12-31` to the query, and join the files. Search allows 30 requests a minute; if a request is refused for its rate limit, wait a minute and run it again.
 
 ## Step 3: sort them into groups
 
@@ -110,5 +110,6 @@ A repo that isn't in the results was renamed, moved or deleted since: say "not f
 2. **Other people's projects**: a table, most-starred repo first, with the repo, its stars (and "archived" when it is), the number merged, the dates of the first and last, and one line on what they did, from the titles.
 3. **Employers**: one line per owner, with the number merged and the years. When no employers were named, say instead which owners outside the user's organisations have the most merged pull requests, and that `employers:OWNER` lists an employer's apart.
 4. One line on what stands out, if anything does: a long-running contribution, a widely used project, or none in years.
+5. When run where `user/memberships/orgs` was refused: one line naming the owners counted as the user's own, that they came from `list_repos` and may include a person's account or miss an organisation (`own:ORG` adds one), and that private pull requests may be undercounted.
 
 Don't offer to comment on or follow up any pull request unless the user asks.
