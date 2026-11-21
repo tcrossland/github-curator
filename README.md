@@ -1,6 +1,6 @@
 # github-curator
 
-A [Claude plugin](https://claude.com/docs/plugins/build.md) that reviews the repos on a GitHub account the way a visitor meets them, and recommends one thing to do with each: keep it, publish it, archive it with an account of what it was, make it private or delete it, and whether to feature it among the profile's pinned repos. Every finding on its scorecard quotes the file and line it rests on, and the plugin changes nothing itself.
+github-curator is a [Claude plugin](https://claude.com/docs/plugins/build.md) that recommends what to do with each repo on a GitHub account: keep it, publish it, archive it, make it private or delete it, and whether to pin it to the profile. Each finding on its scorecard quotes the line it's based on, from a file or the repo's settings, and a script checks every quote from a file against that file. It only recommends; you make the changes.
 
 I built it to sort out my own GitHub account, which had years of forks, experiments and half-finished work on it: to see it the way a potential employer or collaborator meets it, and to find out how far a Claude plugin can go on work whose every claim can be checked. One thing it showed me: my first triages counted a fork's commits on its default branch only, and of the 52 forks I deleted on that count, 17 held commits of mine on other branches, such as `develop`. GitHub keeps a deleted fork's commits with the original project, so I could still fetch them, and the review now counts every branch.
 
