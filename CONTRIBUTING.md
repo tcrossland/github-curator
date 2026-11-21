@@ -1,6 +1,6 @@
 # Contributing
 
-github-curator is a personal project in a private repository, with one author. It doesn't take outside contributions yet. If you've been given access, this is how changes are made. The plugin's own `repo-review` reads this file for a repo's house style and for how its changes land, so the rules below are also the ones its fix prompts follow here.
+github-curator is a personal project with one author. It doesn't take outside contributions yet. If you've been given access, this is how changes are made. The plugin's own `repo-review` reads this file for a repo's house style and for how its changes land, so the rules below are also the ones its fix prompts follow here.
 
 ## Reporting a problem
 
