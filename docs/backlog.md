@@ -7,11 +7,11 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | todo |
+| 8 | [Forks](#8-forks) | New skill | M | none | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
-| 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
-| 8 | [Forks](#8-forks) | New skill | M | none | todo |
+| 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
 | – | [Other smaller items](#smaller) | Fixes | S each | none | any time |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row, and take it out of other items' Depends on: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. A smaller item is simply deleted.
@@ -24,20 +24,42 @@ A scheduled task would save the stars, views, clones and top referrers of every 
 
 A claude.ai chat has scheduled tasks and artifact databases, its `gh` reads traffic once a repo is attached with push access, and a scheduled run gets the repos attached in the chat that created its task, traffic included (`docs/github-facts.md`). So the task is created from a chat that has attached every public repo. One chat has attached all 74 public repos with push access and read traffic for every one. A recurring task's runs on schedule got all 74 too, including one after the chat that created it was deleted, so the chat needn't be kept. A scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`, stays the fallback if a claude.ai task stops working.
 
-Until this lands, a snapshot of every public repo is saved by hand once a week to a gitignored file. The first was saved on 2026-11-20, for 74 repos, forks included: stars, forks, the daily views and clones GitHub still holds, and top referrers, so snapshots can be merged by repo and day and loaded into the page's database once it exists.
+Until this lands, a snapshot of every public repo is saved by hand once a week to a gitignored file. The first was saved on 2026-11-20, for 74 repos, forks included: stars, forks, the daily views and clones GitHub still holds, and top referrers, so snapshots can be merged by repo and day and loaded into the page's database once it exists. The next is due by 2026-11-27; the days that snapshot covers start leaving GitHub's 14 days on 2026-12-04.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page.
+
+## 8. Forks
+
+A fork with commits says more than a star: someone used the code. This would be the `stargazers` skill's counterpart. It would list the forks that have commits beyond the user's repo, what they changed and who changed it. Its rules would match: public data only, never contact anyone. It would also tell triage how much others rely on a repo: in the triage of 2026-11-21, 6 of the 42 repos to review waited on that question, such as whether a fork's own fork relies on it, which is why this comes second. A fork's commits beyond its parent can be counted with git, as triage does, on claude.ai as well as in Claude Code.
+
+**Done when** it runs on a repo with forks, lists each fork's commits beyond the original with their authors, and is called from the repo review's outcomes panel.
 
 ## 4. Quick review
 
 A `quick` mode that reads only the API and the README, with no clone, quote checker, stargazers or search for similar repos, and answers the questions those can settle: Hook (the description and the README's opening), Findable (description and topics) and Way in (a licence, and whether the README says how to run it). It gives each repo a row of statuses and signals, not a page of its own, and its results are provisional, as triage's are.
 
-Uses:
-- **Similar repos** in a full review: a quick review of each says what it does better than the repo under review (a clearer opening, the topics people search for), where today the panel has only their descriptions.
-- **Triage's repos to review**: rank them by a quick pass before spending full reviews on them.
-- **Overview of many repos**, when a full review of each would take too long.
+Its use is **Similar repos** in a full review: a quick review of each says what it does better than the repo under review (a clearer opening, the topics people search for), where today the panel has only their descriptions. Ranking triage's repos to review was another use, but triage now reads each repo's README opening and licence itself, which covers most of Hook and Way in.
 
-**Done when** a quick review of ten repos takes a small part of the time an overview of the same ten takes (from item 2's timings), and its Hook, Findable and Way in statuses agree with the full reviews' on those repos, with each disagreement explained.
+**Done when** a full review's Similar repos panel gives each similar repo's Hook, Findable and Way in statuses with what it does better than the repo under review, those statuses agree with full reviews of two of them, with each disagreement explained, and the review's timings show what the panel costs.
+
+## 6. Profile review
+
+The profile page is the first thing a visitor sees. A profile README (the `OWNER/OWNER` repo), the bio, the pins and the featured repos aren't checked together today. On claude.ai it reads the profile page through WebFetch, so it depends on the smaller item on WebFetch of GitHub pages there.
+
+A new skill, `profile-review`, would:
+- check the bio and the pins, reusing the pin ranking from overview mode;
+- draft a short profile README in the house style that introduces the featured repos, and names the contributions to other people's projects worth mentioning, from the `contributions` skill;
+- publish a scorecard like the repo review's.
+
+**Done when**, for a real profile, it produces:
+- a pins recommendation that names what to pin and what to drop, with a reason for each;
+- a draft profile README that links every recommended pin, and would read well to a visitor who has never heard of the user.
+
+## 10. Launch drafts
+
+When the review says publish or feature, draft the announcement: where it fits, and a post for each place, in the house style. It drafts only: posting is the user's call. Traffic history (item 1) would show which places brought visitors before.
+
+**Done when**, for one repo recommended for featuring, it drafts posts for at least two places, each with the reason it fits (from the repo's referrers or where similar repos are discussed).
 
 ## 5. Benchmark against good practice
 
@@ -61,41 +83,21 @@ Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/
 
 **Done when** a review of a Python repo with a `pyproject.toml` and CI shows a Practice panel whose items match those files, with evidence for each, and `tests/` holds small fixture repos with known Practice results, one per profile, so a change to a profile can't silently break it.
 
-## 6. Profile review
-
-The profile page is the first thing a visitor sees. A profile README (the `OWNER/OWNER` repo), the bio, the pins and the featured repos aren't checked together today.
-
-A new skill, `profile-review`, would:
-- check the bio and the pins, reusing the pin ranking from overview mode;
-- draft a short profile README in the house style that introduces the featured repos, and names the contributions to other people's projects worth mentioning, from the `contributions` skill;
-- publish a scorecard like the repo review's.
-
-**Done when**, for a real profile, it produces:
-- a pins recommendation that names what to pin and what to drop, with a reason for each;
-- a draft profile README that links every recommended pin, and would read well to a visitor who has never heard of the user.
-
-## 10. Launch drafts
-
-When the review says publish or feature, draft the announcement: where it fits, and a post for each place, in the house style. It drafts only: posting is the user's call. Traffic history (item 1) would show which places brought visitors before.
-
-**Done when**, for one repo recommended for featuring, it drafts posts for at least two places, each with the reason it fits (from the repo's referrers or where similar repos are discussed).
-
-## 8. Forks
-
-A fork with commits says more than a star: someone used the code. This would be the `stargazers` skill's counterpart. It would list the forks that have commits beyond the user's repo, what they changed and who changed it. Its rules would match: public data only, never contact anyone. It would also tell triage how much others rely on a repo.
-
-**Done when** it runs on a repo with forks, lists each fork's commits beyond the original with their authors, and is called from the repo review's outcomes panel.
-
 ## Smaller
 
 Each is done when the change is made and the tests pass, unless it says otherwise. They can be done at any time.
 
 - **`contributions` on claude.ai**: its commands, run in a claude.ai chat on 2026-11-21, don't give Claude Code's groups (details in `docs/github-facts.md`). `gh api user` answers, but `user/memberships/orgs` is refused, and the fallback, the owners `list_repos` gives, missed one of the user's organisations and added a user account. The private search also found 1 pull request where Claude Code finds 2. The skill now says both in its reply on claude.ai. Done when a claude.ai run of the skill, on an upload that has it, shows both.
-- **Secrets scan on claude.ai**: `repo-review` now fetches betterleaks 1.10.1 into the claude.ai VM, checked against the release's checksums, but no review on claude.ai has run it yet. Done when a review of a private repo on claude.ai, on an upload that has the fetch, runs the scan and its page says so.
+- **Secrets scan on claude.ai**: `repo-review` now fetches betterleaks 1.10.1 into the claude.ai VM, checked against the release's checksums, but no review on claude.ai has run it yet. Done when a review of a private repo on claude.ai, on an upload that has the fetch, runs the scan and its page says so. The upload installed now, 0.3.1-dev.1, has both this and the `contributions` change above, so one claude.ai check can close both.
 - **Author identities**: let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. Triage's fork step now reads each commit's author name and email domain from git, so the list would let it mark those commits as the user's. Done when triage reads the list and marks matching commits as the user's.
-- **Stargazers' profiles on claude.ai**: WebFetch of `github.com/LOGIN` is refused with `URL_NOT_ON_ALLOWLIST` unless a web search in the chat found the URL first, and `users/LOGIN` is refused too, so on claude.ai `stargazers` reads no profile and its lists say "Not available" with the reason (seen 2026-11-21). The skill forbids searching the web for a stargazer, so the choice is whether a search for the exact profile URL, used only to fetch that page, fits the rule, or whether the README says stargazers' profiles need Claude Code. The same run fetched 12 profiles at once, where the skill says one at a time. Done when a claude.ai run reads profiles, or the README says they need Claude Code.
+- **WebFetch of GitHub pages on claude.ai**: WebFetch of a `github.com` page is refused with `URL_NOT_ON_ALLOWLIST` unless a web search in the chat found the URL first (seen 2026-11-21). Two steps rely on it there:
+  - **Pins**: `repo-review` Step 1, and triage through it, read the pins from the profile page when GraphQL is refused, as it is in a claude.ai session's own shell. A web search for the user's own `github.com/OWNER`, used only to fetch that page, is enough.
+  - **Stargazers' profiles**: `users/LOGIN` is refused too, so `stargazers` reads no profile and its lists say "Not available" with the reason. The skill forbids searching the web for a stargazer, so the choice is whether a search for the exact profile URL, used only to fetch that page, fits the rule, or whether the README says stargazers' profiles need Claude Code. The same run fetched 12 profiles at once, where the skill says one at a time.
+
+  Done when a claude.ai triage reads the pins, and a claude.ai `stargazers` run reads profiles or the README says they need Claude Code.
+- **Carry over a triage's reasons**: the second triage on claude.ai reused the previous page's reasons and questions word for word where a repo's signals hadn't changed, which the skill neither asks for nor forbids. Decide whether triage should: carrying them over keeps the page stable between runs and saves time, but hides a call that a rule change since would make differently. Done when `triage.md` says which, and `docs/design.md` says why.
 - **A first triage on claude.ai**: none has run. Manual mode asks before every `add_repo`, and whether its approval prompt offers to allow `add_repo` for the rest of the chat is **unverified**. Done when the prompt's options are recorded in `docs/github-facts.md`.
-- **Check the Claude Code tool list**: 0.2.14 added a list near the top of `repo-review`'s `SKILL.md` saying what Claude Code uses in place of each claude.ai tool, and what a run does with no artifact tool. Whether Claude Code outside the desktop app has an artifact tool is **unverified**. Done when a review run in a Claude Code session started on 0.2.14 or later finds the previous scorecard by following the list, and the result is in `docs/github-facts.md`.
+- **Check the Claude Code tool list**: 0.2.14 added a list near the top of `repo-review`'s `SKILL.md` saying what Claude Code uses in place of each claude.ai tool, and what a run does with no artifact tool. In the desktop app, the triage of 2026-11-21 followed the list: it found the previous page with the Artifact tool and republished to it. Whether Claude Code outside the desktop app has an artifact tool is **unverified**. Done when a `claude -p` session's tool list is recorded in `docs/github-facts.md`, and the list's last line matches it.
 
 ## Done
 
