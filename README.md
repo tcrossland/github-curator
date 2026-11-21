@@ -33,7 +33,7 @@ The plugin is installed by uploading a zip of it to claude.ai (Plugins in the le
 scripts/package.sh
 ```
 
-It validates the manifest and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README, the changelog and the licence.
+It validates the manifest when the `claude` CLI is installed, and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README, the changelog and the licence.
 
 To try changes before a release, build a test zip with a pre-release version, which goes only into the zip's manifest:
 

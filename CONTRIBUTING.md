@@ -14,7 +14,7 @@ Leave out other people's details, and the names of private repos, unless they're
 ## Before changing a rule
 
 - Read [docs/design.md](docs/design.md). It says why each rule is the way it is, so a change doesn't quietly undo one.
-- The skills only recommend. A change mustn't make either skill archive, delete, pin or unpin a repo, change its visibility, close an issue or pull request, or contact anyone.
+- The skills only recommend. A change mustn't make any of the skills archive, delete, pin or unpin a repo, change its visibility, close an issue or pull request, or contact anyone.
 - A behaviour of GitHub or Claude that a skill relies on goes in [docs/github-facts.md](docs/github-facts.md), with its source and the date it was checked. Mark anything not checked **unverified**. Check the claude.ai section before relying on something that works in a local shell.
 - Keep anything about a specific person or private repo out of the files that ship (the manifest, `skills/`, the README and the changelog).
 
@@ -32,7 +32,7 @@ Leave out other people's details, and the names of private repos, unless they're
    ```
 
    The Python tests run code blocks from `SKILL.md` as they stand, so a change to a block is tested as written.
-6. If a user of the plugin would notice the change, raise `version` in `.claude-plugin/plugin.json` and add an entry to `CHANGELOG.md` in the same commit, saying what changed from their side.
+6. If a user of the plugin would notice the change, add an entry under `## Unreleased` in `CHANGELOG.md` in the same commit, saying what changed from their side. Leave `version` alone: it's raised only when a release is cut.
 7. Update [docs/backlog.md](docs/backlog.md) in the same commit when the change advances or finishes an item.
 
 ## How changes land

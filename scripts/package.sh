@@ -45,6 +45,8 @@ out="$root/dist/github-curator-$version.zip"
 
 if command -v claude >/dev/null 2>&1; then
   claude plugin validate "$src"
+else
+  echo "claude CLI not found: the manifest was not validated" >&2
 fi
 
 mkdir -p dist
