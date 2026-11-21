@@ -2,7 +2,7 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
-## Unreleased
+## 0.4.0 (2026-11-21)
 
 - The README's Try it section links to the latest release, where the zip is.
 - A review that suggests a repo description keeps it to 350 characters, the most GitHub accepts, and writes a shorter one rather than copying a longer description from the manifest.
