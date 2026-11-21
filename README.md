@@ -2,7 +2,7 @@
 
 A [Claude plugin](https://claude.com/docs/plugins/build.md) that reviews the repos on a GitHub account the way a visitor meets them, and recommends one thing to do with each: keep it, publish it, archive it with an account of what it was, make it private or delete it, and whether to feature it among the profile's pinned repos. Every finding on its scorecard quotes the file and line it rests on, and the plugin changes nothing itself.
 
-> **Placeholder for the author:** a short paragraph in your own words on why you built it and one thing reviewing your own account showed you.
+I built it to sort out my own GitHub account, which had years of forks, experiments and half-finished work on it: to see it the way a potential employer or collaborator meets it, and to find out how far a Claude plugin can go on work whose every claim can be checked. One thing it showed me: my first triages counted a fork's commits on its default branch only, and of the 52 forks I deleted on that count, 17 held commits of mine on other branches, such as `develop`. GitHub keeps a deleted fork's commits with the original project, so I could still fetch them, and the review now counts every branch.
 
 > **Placeholder for the author:** a screenshot of a scorecard goes here.
 
