@@ -56,6 +56,23 @@ test('single review shows the recommendation, feature, similar repos and every q
   assert.equal(els['fp-text'].value, 'HEADER\n\nFAIL\n\nBEFORE\n\nFOOTER');
 });
 
+test('the fix prompt comes straight after the questions\' strip, before the sections that start closed', () => {
+  const changes = { since: '2026-11-19', items: ['Q1 now fails', 'New `topic`'] };
+  const { html } = render({ ...review, changes });
+  assert.match(html, /<details class="fold changes"><summary><span class="label">Since last check · 2026-11-19<\/span> <span class="cnt">2 changes<\/span><\/summary><div class="fbody"><ul><li>Q1 now fails<\/li><li>New <code>topic<\/code><\/li><\/ul><\/div><\/details>/);
+  assert.match(html, /<details class="fold sig"><summary><span class="ct">Signals<\/span> <span class="cnt">1<\/span><\/summary><div class="fbody"><ul class="signals"><li>last commit 2017-05-04<\/li><\/ul>/);
+  assert.match(html, /<details class="fold chk"><summary><span class="ct">Before archiving<\/span> <span class="cnt">1 to do · 1 n\/a<\/span><\/summary>/);
+  assert.match(html, /<details class="fold chk"><summary><span class="ct">Before featuring<\/span> <span class="cnt">1 to do<\/span><\/summary>/);
+  assert.match(html, /<details class="fold outcomes"><summary><span class="label">Outcomes · context, not scored<\/span><\/summary>/);
+  assert.match(html, /<details class="fold outcomes sim"><summary><span class="label">Similar repos · context, not scored<\/span> <span class="cnt">1 repo<\/span><\/summary>/);
+  assert.doesNotMatch(html, /<details[^>]* open/);
+  const at = (s) => html.indexOf(s);
+  assert.ok(at('class="strip"') < at('class="fixp"'));
+  assert.ok(at('class="fixp"') < at('class="fold outcomes"'));
+  assert.ok(at('class="fold outcomes"') < at('class="fold outcomes sim"'));
+  assert.ok(at('class="fold outcomes sim"') < at('class="rows"'));
+});
+
 test('draft replies get their own filter, and only when there are any', () => {
   assert.doesNotMatch(render(review).html, /data-f="reply"/);
   const items = [...review.fixPrompt.items, { question: 'Waiting on you', status: 'reply', text: 'REPLY' }];
@@ -185,4 +202,10 @@ test('triage splits clear deletes from repos to review and lists the commands', 
   assert.match(html, /Clear deletes <span>\(2\)<\/span>/);
   assert.match(html, /gh repo delete t\/b\ngh repo delete t\/c<\/textarea>/);
   assert.match(html, /None left\./);
+  assert.doesNotMatch(html, /Since last triage/);
+});
+
+test('triage\'s changes since the last triage start closed, with their count', () => {
+  const { html } = render({ triage: true, title: 'Repo triage', subject: '0 repos', date: '2026-11-21', repos: [], changes: { since: '2026-11-19', items: ['t/a archived'] } });
+  assert.match(html, /<details class="fold changes"><summary><span class="label">Since last triage · 2026-11-19<\/span> <span class="cnt">1 change<\/span><\/summary>/);
 });

@@ -135,7 +135,6 @@ footer { color: var(--muted); font-size: 12.5px; }
 .rec .signals li { font: 400 12.5px/1.3 var(--mono); background: var(--quote-bg); padding: 4px 8px; border-radius: 4px; overflow-wrap: anywhere; }
 .rec .note { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 75ch; }
 .rec .note b { color: var(--ink); font-weight: 600; }
-.rec h3 { font: 600 14px/1.2 var(--body); margin: 4px 0 0; }
 .rec ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .rec ol li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: baseline; }
 .rec .st { font: 500 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; padding: 5px 0; border-radius: 999px; text-align: center; background: var(--quote-bg); color: var(--muted); }
@@ -171,6 +170,17 @@ footer { color: var(--muted); font-size: 12.5px; }
 .timings .ov td.num, .timings .ov th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .timings .ov tfoot td { font-weight: 600; color: var(--ink); border-bottom: 0; }
 .timings p { margin: 6px 0 0; }
+details.fold { display: block; }
+.fold > summary { cursor: pointer; }
+.fold > summary::marker { color: var(--accent); }
+.fold > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.fold .cnt { font-size: 12.5px; color: var(--muted); }
+.fold .cnt::before { content: "· "; }
+.fold .fbody { display: grid; gap: 12px; margin-top: 12px; }
+.changes .fbody { gap: 6px; margin-top: 8px; }
+.fold > summary .label { font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.rec .fold .ct { font: 600 14px/1.2 var(--body); }
+.rec .fold .fbody { margin-top: 8px; }
 @media (max-width: 640px) {
   .strip { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
   .row { grid-template-columns: 1fr; }
@@ -193,6 +203,14 @@ footer { color: var(--muted); font-size: 12.5px; }
   // One builder for the fix prompt, so the overview's per-repo copy gives the same text as that repo's scorecard.
   var fpItems = function (fp, mode) { return fp.items.filter(function (x) { return mode === 'all' || x.status === mode; }); };
   var fpText = function (fp, its) { return [fp.header].concat(its.map(function (x) { return x.text; })).concat([fp.footer]).join('\n\n'); };
+  // A section that starts closed: its summary says what's inside, so the fix prompt is reached without scrolling past it.
+  var fold = function (cls, sum, body) { return '<details class="fold ' + cls + '"><summary>' + sum + '</summary><div class="fbody">' + body + '</div></details>'; };
+  var plural = function (n, one, many) { return n + ' ' + (n === 1 ? one : many); };
+  var changes = function (name, c) {
+    if (!c || !c.items || !c.items.length) return '';
+    return fold('changes', '<span class="label">' + name + ' · ' + esc(c.since) + '</span> <span class="cnt">' + plural(c.items.length, 'change', 'changes') + '</span>',
+                '<ul>' + c.items.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ul>');
+  };
   var dur = function (s) { return s == null ? '–' : s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + (s % 60 < 10 ? '0' : '') + (s % 60) + ' s'; };
   var timings = function (rows) {
     if (!rows || !rows.length) return '';
@@ -214,10 +232,7 @@ footer { color: var(--muted); font-size: 12.5px; }
     var rs = d.repos || [], rev = rs.filter(function (r) { return r.sure !== 'clear'; }), clr = rs.filter(function (r) { return r.sure === 'clear'; });
     var tally = {}; rev.forEach(function (r) { tally[r.action] = (tally[r.action] || 0) + 1; });
     var t = '<header class="meta"><h1>' + esc(d.title) + '</h1><span>' + esc(d.subject) + '</span><span>Checked ' + esc(d.date) + '</span></header>';
-    if (d.changes && d.changes.items && d.changes.items.length) {
-      t += '<section class="changes" aria-label="Since last triage"><span class="label">Since last triage · ' + esc(d.changes.since) + '</span><ul>' +
-           d.changes.items.map(function (c) { return '<li>' + fmt(c) + '</li>'; }).join('') + '</ul></section>';
-    }
+    t += changes('Since last triage', d.changes);
     t += '<section class="verdict ok" aria-label="Summary"><span class="label">Triage</span><p class="fix">' + clr.length + ' clear ' + (clr.length === 1 ? 'delete' : 'deletes') + ' · ' + rev.length + ' to review</p>' +
          '<p class="why">' + Object.keys(tally).map(function (k) { return tally[k] + ' likely ' + esc(actionName(k).toLowerCase()); }).join(' · ') + '</p></section>';
     var row = function (r, i) {
@@ -294,23 +309,24 @@ footer { color: var(--muted); font-size: 12.5px; }
           '<span>Checked ' + esc(d.date) + '</span>' +
           (d.rerun ? '<span class="rerun"><code id="rerun-cmd">' + esc(d.rerun) + '</code><button type="button" id="rerun-btn">Copy re-run command</button></span>' : '') +
           '</header>';
-  if (d.changes && d.changes.items && d.changes.items.length) {
-    html += '<section class="changes" aria-label="Since last check"><span class="label">Since last check · ' + esc(d.changes.since) + '</span><ul>' +
-            d.changes.items.map(function (c) { return '<li>' + fmt(c) + '</li>'; }).join('') + '</ul></section>';
-  }
+  html += changes('Since last check', d.changes);
   var rec = d.recommendation;
   if (rec && rec.action) {
     html += '<section class="rec ' + esc(rec.action) + '" aria-label="Recommendation"><span class="label">Recommendation</span>' +
             '<p class="act">' + esc(actionName(rec.action)) + '</p><p class="why">' + fmt(rec.why) + '</p>';
-    if (rec.signals && rec.signals.length) html += '<ul class="signals" aria-label="Signals">' + rec.signals.map(function (s) { return '<li>' + fmt(s) + '</li>'; }).join('') + '</ul>';
+    if (rec.signals && rec.signals.length) html += fold('sig', '<span class="ct">Signals</span> <span class="cnt">' + rec.signals.length + '</span>', '<ul class="signals">' + rec.signals.map(function (s) { return '<li>' + fmt(s) + '</li>'; }).join('') + '</ul>');
     if (rec.confirm) html += '<p class="note"><b>Confirm:</b> ' + fmt(rec.confirm) + '</p>';
     if (rec.caveat) html += '<p class="note"><b>What it costs:</b> ' + fmt(rec.caveat) + '</p>';
     var st = { done: 'Done', todo: 'To do', 'n/a': 'N/A' };
     var checklist = function (b) {
       if (!b || !b.items || !b.items.length) return '';
-      return '<h3>' + esc(b.title) + '</h3><ol>' + b.items.map(function (x) {
+      var tally = ['todo', 'done', 'n/a'].map(function (s) {
+        var k = b.items.filter(function (x) { return x.status === s; }).length;
+        return k ? k + ' ' + st[s].toLowerCase() : '';
+      }).filter(Boolean).join(' · ');
+      return fold('chk', '<span class="ct">' + esc(b.title) + '</span> <span class="cnt">' + tally + '</span>', '<ol>' + b.items.map(function (x) {
         return '<li><span class="st ' + (x.status === 'n/a' ? 'na' : esc(x.status)) + '">' + esc(st[x.status] || x.status) + '</span><span class="it">' + fmt(x.text) + (x.note ? '<span>' + fmt(x.note) + '</span>' : '') + '</span></li>';
-      }).join('') + '</ol>';
+      }).join('') + '</ol>');
     };
     html += checklist(rec.before);
     var f = rec.feature;
@@ -337,40 +353,6 @@ footer { color: var(--muted); font-size: 12.5px; }
     html += '<a class="chip ' + q.status + '" href="#q' + (i + 1) + '"><span class="n">Q' + (i + 1) + '</span><span class="t">' + esc(q.short) + '</span><span class="s">' + label[q.status] + '</span></a>';
   });
   html += '</nav>';
-  if (d.outcomes) {
-    var o = d.outcomes;
-    html += '<section class="outcomes" aria-label="Outcomes"><div class="ohead"><span class="label">Outcomes · context, not scored</span>' +
-            '<span class="asof">' + esc(o.source) + ' · read ' + esc(o.asOf) +
-            (/^https:\/\/claude\.ai\/(code\/)?artifact\/[A-Za-z0-9-]+$/.test(o.history || '') ? ' · <a href="' + esc(o.history) + '" target="_blank" rel="noopener">Traffic history</a>' : '') +
-            '</span></div><div class="tiles">';
-    (o.items || []).forEach(function (t) {
-      html += '<div class="tile"><span class="v">' + esc(t.value) + '</span><span class="l">' + esc(t.label) + '</span>' + (t.note ? '<span class="nt">' + fmt(t.note) + '</span>' : '') + '</div>';
-    });
-    html += '</div>';
-    if (o.lists && o.lists.length) {
-      html += '<div class="olists">';
-      o.lists.forEach(function (l) {
-        html += '<div><h3>' + esc(l.label) + '</h3><ul>' + (l.entries.length ? l.entries.map(function (e) { return '<li>' + fmt(e) + '</li>'; }).join('') : '<li class="none">' + esc(l.empty || 'None') + '</li>') + '</ul></div>';
-      });
-      html += '</div>';
-    }
-    html += '</section>';
-  }
-  var sim = d.similar;
-  if (sim && ((sim.items && sim.items.length) || sim.note)) {
-    html += '<section class="outcomes sim" aria-label="Similar repos"><div class="ohead"><span class="label">Similar repos · context, not scored</span>' +
-            (sim.asOf ? '<span class="asof">GitHub search · read ' + esc(sim.asOf) + '</span>' : '') + '</div>';
-    if (sim.note) html += '<p class="note">' + fmt(sim.note) + '</p>';
-    html += '<ul>' + (sim.items || []).map(function (s) {
-      var meta = [];
-      if (s.stars != null) meta.push(esc(s.stars) + (s.stars === 1 ? ' star' : ' stars'));
-      if (s.pushed) meta.push('pushed ' + esc(s.pushed));
-      if (s.archived) meta.push('archived');
-      return '<li><a href="' + esc(s.link) + '">' + esc(s.name) + '</a>' + (meta.length ? ' <span class="meta">' + meta.join(' · ') + '</span>' : '') +
-             (s.description ? '<span class="desc">' + esc(s.description) + '</span>' : '') +
-             (s.relation ? '<span class="rel">' + fmt(s.relation) + '</span>' : '') + '</li>';
-    }).join('') + '</ul></section>';
-  }
   var fp = d.fixPrompt;
   if (fp && fp.items && fp.items.length) {
     html += '<section class="fixp" aria-label="Fix prompt"><span class="label">Fix prompt for Claude Code</span><div class="bar"><span class="seg" role="group" aria-label="Which findings">' +
@@ -380,6 +362,39 @@ footer { color: var(--muted); font-size: 12.5px; }
             '<button type="button" data-f="all" aria-pressed="true">All</button></span>' +
             '<button type="button" class="copy" id="fp-copy">Copy fix prompt</button><span class="note" id="fp-note"></span></div>' +
             '<details><summary>Show the prompt</summary><textarea id="fp-text" readonly aria-label="Fix prompt"></textarea></details></section>';
+  }
+  if (d.outcomes) {
+    var o = d.outcomes;
+    var oh = '<div class="ohead"><span class="asof">' + esc(o.source) + ' · read ' + esc(o.asOf) +
+            (/^https:\/\/claude\.ai\/(code\/)?artifact\/[A-Za-z0-9-]+$/.test(o.history || '') ? ' · <a href="' + esc(o.history) + '" target="_blank" rel="noopener">Traffic history</a>' : '') +
+            '</span></div><div class="tiles">';
+    (o.items || []).forEach(function (t) {
+      oh += '<div class="tile"><span class="v">' + esc(t.value) + '</span><span class="l">' + esc(t.label) + '</span>' + (t.note ? '<span class="nt">' + fmt(t.note) + '</span>' : '') + '</div>';
+    });
+    oh += '</div>';
+    if (o.lists && o.lists.length) {
+      oh += '<div class="olists">';
+      o.lists.forEach(function (l) {
+        oh += '<div><h3>' + esc(l.label) + '</h3><ul>' + (l.entries.length ? l.entries.map(function (e) { return '<li>' + fmt(e) + '</li>'; }).join('') : '<li class="none">' + esc(l.empty || 'None') + '</li>') + '</ul></div>';
+      });
+      oh += '</div>';
+    }
+    html += fold('outcomes', '<span class="label">Outcomes · context, not scored</span>', oh);
+  }
+  var sim = d.similar;
+  if (sim && ((sim.items && sim.items.length) || sim.note)) {
+    var nSim = (sim.items || []).length;
+    var sb = (sim.asOf ? '<div class="ohead"><span class="asof">GitHub search · read ' + esc(sim.asOf) + '</span></div>' : '') +
+             (sim.note ? '<p class="note">' + fmt(sim.note) + '</p>' : '') + '<ul>' + (sim.items || []).map(function (s) {
+      var meta = [];
+      if (s.stars != null) meta.push(esc(s.stars) + (s.stars === 1 ? ' star' : ' stars'));
+      if (s.pushed) meta.push('pushed ' + esc(s.pushed));
+      if (s.archived) meta.push('archived');
+      return '<li><a href="' + esc(s.link) + '">' + esc(s.name) + '</a>' + (meta.length ? ' <span class="meta">' + meta.join(' · ') + '</span>' : '') +
+             (s.description ? '<span class="desc">' + esc(s.description) + '</span>' : '') +
+             (s.relation ? '<span class="rel">' + fmt(s.relation) + '</span>' : '') + '</li>';
+    }).join('') + '</ul>';
+    html += fold('outcomes sim', '<span class="label">Similar repos · context, not scored</span>' + (nSim ? ' <span class="cnt">' + plural(nSim, 'repo', 'repos') + '</span>' : ''), sb);
   }
   html += '<section class="rows">';
   d.questions.forEach(function (q, i) {

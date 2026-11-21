@@ -112,6 +112,8 @@ The claude.ai GitHub connector isn't one of those routes. In Claude Code it read
 
 The page is one template, `skills/repo-review/scorecard-template.html`, filled with the run's JSON. It renders all three modes: a single review, the overview and triage. It's a separate file so it isn't retyped on every run. A re-run republishes to the same artifact, so the page keeps one URL and can show what changed since the last check. Scorecards published before the skill was renamed have the title "Portfolio repo check: …", and re-runs still find them.
 
+A single review's page puts the decisions first and the evidence behind them later: the recommendation, the most important fix, the questions' strip and then the fix prompt, which is what most visits come for. The sections a visit reads only to check a call start closed, each with a summary that says what's inside: the changes since the last check, the recommendation's signals, its before-lists (with how many items are to do), the Outcomes panel and Similar repos. Before, the fix prompt came after Outcomes and Similar repos, more than a screen below the fix it carries out. The question rows stay open, since they hold the quotes the page stands on, and the strip links to each one.
+
 ## Timing
 
 Every page carries the time and the GitHub requests each step took, so a change made to speed a mode up can be measured. The times are wall-clock from the end of one step to the end of the next, so they include Claude's own work between tool calls. That's what the user waits for, but it can't be told apart from time spent waiting on GitHub, and a skill can't read its own token use.
