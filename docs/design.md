@@ -49,6 +49,16 @@ They show what a repo adds, which topics it lacks, and where to point readers of
 
 A stargazer's three most-starred repos say most about their field, but GitHub can't list someone's repos sorted by stars (`docs/github-facts.md`), so the skill reads every page and sorts them itself. That costs one call per 100 repos: one for most people, but tens for an organisation with thousands. Repository search can sort by stars in one call, and works on claude.ai, but its limit is 30 requests a minute, which a run of 30 profiles, each with an organisation, would pass.
 
+## Forks are read with git, from one clone of the repo
+
+`forks` clones the user's repo once, treeless, and fetches each fork's branches into it under `refs/forks/OWNER/`, then lists the commits on them that no branch or tag of the repo holds. One clone serves every fork, and each fetch brings only what that fork adds. It reads every branch, as triage now does for the user's own forks, since a fork's work is often on a branch of its own (the first real run found one fork's only commits on `grails3`). Git also works where the compare API doesn't: on claude.ai it's refused across forks, and the forks themselves can't be attached.
+
+When the user's repo is itself a fork, its parent's branches and tags are fetched into the clone as well: a fork of it that has since pulled in the parent's later commits would otherwise show them as its own.
+
+Only forks pushed to after they were made are read. GitHub's listing gives `created_at` and `pushed_at`, and a fork nobody pushed to holds nothing of its own: in a sample of 20 forks of a repo with 5,606, every fork with commits of its own was pushed to after it was made. The one fork not pushed to that showed a commit beyond the repo held the upstream maintainer's, on a branch the repo has since deleted. That cuts the work to about one fork in seven there, and the 30 most recently pushed are read unless `all` is given, as `stargazers` reads the 30 most recent profiles.
+
+Commits are listed by the author's name and never an email address, since these are other people's, and up to 20 per fork: a fork with thousands most likely carries history from somewhere else, and listing it says nothing.
+
 ## Three groups in `contributions`
 
 A merged pull request to someone else's project is evidence someone else's maintainers reviewed and accepted, but not every pull request to a repo the user doesn't own is that. Issue search's `-user:LOGIN` leaves out only the user's own account, so pull requests to the user's own organisations come back too; on the account it was built on they were more than half. Those are counted, not listed. The user's own organisations are the ones they're an admin of, since a membership alone could be an employer's.

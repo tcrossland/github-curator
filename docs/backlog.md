@@ -7,7 +7,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | in progress |
-| 8 | [Forks](#8-forks) | New skill | M | none | todo |
+| 8 | [Forks](#8-forks) | New skill | M | none | in progress |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
@@ -33,6 +33,8 @@ What's left is **the first run on schedule**, due 2026-11-23. If it doesn't save
 ## 8. Forks
 
 A fork with commits says more than a star: someone used the code. This would be the `stargazers` skill's counterpart. It would list the forks that have commits beyond the user's repo, what they changed and who changed it. Its rules would match: public data only, never contact anyone. It would also tell triage how much others rely on a repo: in the triage of 2026-11-21, 6 of the 42 repos to review waited on that question, such as whether a fork's own fork relies on it, which is why this comes second. A fork's commits beyond its parent can be counted with git, as triage does, on claude.ai as well as in Claude Code.
+
+The `forks` skill is written, and the review's Outcomes panel calls it for a list titled "Forks with commits". Its commands, run by hand on the user's five public repos with forks, found one fork of eight with commits of its own: three on a `grails3` branch. A subagent following the skill's text on two of those repos gave the same result, and its notes on the text are fixed. What's left is a run of a review that calls it, in a session started after the plugin syncs, and the check on claude.ai that `repos/OWNER/REPO/forks` answers for an attached repo (`docs/github-facts.md`).
 
 **Done when** it runs on a repo with forks, lists each fork's commits beyond the original with their authors, and is called from the repo review's outcomes panel.
 
