@@ -11,6 +11,8 @@ Open an issue that says:
 
 Leave out other people's details, and the names of private repos, unless they're needed to show the problem.
 
+A security problem goes to private vulnerability reporting instead, not an issue: [SECURITY.md](SECURITY.md) says how.
+
 ## Before changing a rule
 
 - Read [docs/design.md](docs/design.md). It says why each rule is the way it is, so a change doesn't quietly undo one.
