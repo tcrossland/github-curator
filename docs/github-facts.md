@@ -130,7 +130,7 @@ The claude.ai GitHub connector, a remote MCP server whose tools are named `get_m
 | `search_pull_requests` answers the triage's search (`author:LOGIN -user:LOGIN`, scoped to pull requests): 327 results, where `gh`'s search gave 320 the same day. | Seen, in Claude Code | 2026-11-21 |
 | `search_repositories` gives, by default (`minimal_output`), `stargazers_count`, `forks_count`, `open_issues_count`, `topics`, `archived`, `fork` and `default_branch`, but not `pushed_at`, `size`, `license` or `parent`. | Seen, in Claude Code | 2026-11-21 |
 | It has no tool for stargazers, traffic, a repo's forks, pinned repos, a repo's settings (`repos/OWNER/REPO`) or the rate limit, and it has tools that write: `create_repository`, `fork_repository`, `push_files`, `delete_file`, `merge_pull_request`, `issue_write` and the comment tools. | Seen, its tool list in Claude Code | 2026-11-21 |
-| Whether it's offered in a claude.ai chat, and whether there it reads repos not attached to the chat, is **unverified**. | Not checked | 2026-11-21 |
+| A claude.ai chat offers it, but there only its tools without an `owner` parameter answered: `get_me` and `search_repositories` (`user:LOGIN fork:true`, 19 results, as in Claude Code) worked, while `list_commits` and `get_file_contents` failed with HTTP 400, `header mismatch: missing Mcp-Param-owner header for parameter "owner" (error code -32020)`. The tool schemas mark `owner` and `repo` with `x-mcp-header`, which the claude.ai client didn't send. So on claude.ai it reads no repo's files, commits, issues or pull requests, attached or not. | Seen, the tool results pasted from a claude.ai chat | 2026-11-21 |
 
 ## Secrets scanning
 
