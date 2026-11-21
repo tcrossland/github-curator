@@ -85,12 +85,12 @@ class ForkCommitsTest(unittest.TestCase):
         self.work = self.tmp / "work"
         self.work.mkdir()
 
-    def run_snippet(self):
+    def run_snippet(self, shell="sh"):
         script = (block(REVIEW, "refs/parent/")
                   .replace("https://github.com/PARENT-OWNER/PARENT-REPO.git", f"file://{self.parent}")
                   .replace("https://github.com/OWNER/REPO.git", f"file://{self.fork}")
                   .replace("REPO", "fork"))
-        out = run_sh(script, self.work)
+        out = subprocess.run([shell, "-c", script], cwd=self.work, env=GIT_ENV, capture_output=True, text=True)
         self.assertEqual(out.returncode, 0, out.stderr)
         return out.stdout.splitlines()
 
@@ -117,6 +117,13 @@ class ForkCommitsTest(unittest.TestCase):
         git(self.fork, "branch", "-m", "main", "master")
         commit(self.fork, "lib.txt", "mine\n", "On the old branch", author=("Alex Rivera", "a@x.example"))
         self.assertEqual(self.run_snippet()[0], "1")
+
+    @unittest.skipUnless(shutil.which("zsh"), "zsh is needed")
+    def test_zsh_keeps_the_branch_name_whole(self):
+        # Claude Code on a Mac runs commands in zsh, where $b:r is a modifier that cuts the name at its last dot.
+        git(self.parent, "branch", "-m", "main", "5.0.x")
+        commit(self.fork, "lib.txt", "mine\n", "Mine", author=("Alex Rivera", "a@x.example"))
+        self.assertEqual(self.run_snippet("zsh")[0], "1")
 
     def test_a_clone_left_from_an_earlier_run_is_brought_up_to_date(self):
         self.run_snippet()

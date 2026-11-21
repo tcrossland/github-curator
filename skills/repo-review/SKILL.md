@@ -192,7 +192,7 @@ Accept any of these:
   ```sh
   d="forks/REPO.git" && { [ -d "$d" ] && git -C "$d" fetch -q origin '+refs/heads/*:refs/heads/*' || git clone -q --bare --filter=tree:0 "https://github.com/OWNER/REPO.git" "$d"; } &&
   b=$(git ls-remote --symref "https://github.com/PARENT-OWNER/PARENT-REPO.git" HEAD | sed -n 's|^ref: refs/heads/\(.*\)[[:space:]]HEAD$|\1|p') &&
-  git -C "$d" fetch -q --filter=tree:0 "https://github.com/PARENT-OWNER/PARENT-REPO.git" "refs/heads/$b:refs/parent/$b" &&
+  git -C "$d" fetch -q --filter=tree:0 "https://github.com/PARENT-OWNER/PARENT-REPO.git" "refs/heads/${b}:refs/parent/${b}" &&
   git -C "$d" rev-list --count "refs/parent/$b..HEAD" &&
   git -C "$d" log --format='%an%x09%ae%x09%ad%x09%s' --date=short "refs/parent/$b..HEAD" | awk -F'\t' -v OFS='\t' -v email=2 '{sub(/.*@/, "", $email); print}'
   ```
