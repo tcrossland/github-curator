@@ -27,6 +27,19 @@ All five read GitHub through `gh api`, and `forks` reads the forks' commits with
 
 In a claude.ai chat, GitHub answers only for the repos attached to the chat, so the skills ask you once to attach the ones they need and read public repos with git. An organisation's triage runs only in Claude Code, on your own computer, and the first triage of an account that would need more than 10 approvals to attach repos is better run there too. On claude.ai the review reads the profile's pinned repos from the profile page, which may miss some, and `contributions` can't read your organisations, so its count of private pull requests can be short.
 
+## Try it
+
+It runs in a claude.ai chat or in Claude Code. In Claude Code it reads GitHub with your own `gh`, so sign in first with `gh auth login`. In a claude.ai chat it uses the chat's own access to GitHub, and asks before attaching the repos it needs.
+
+1. Download the zip from the latest release (**Placeholder for the author:** link to the release) and upload it to claude.ai: Plugins in the left sidebar > Add > Upload plugin.
+2. In a new chat, or a new Claude Code session in the Claude desktop app, which picks up plugins uploaded to claude.ai, review one of your repos:
+
+   ```
+   /github-curator:repo-review https://github.com/OWNER/REPO
+   ```
+
+   It publishes the scorecard to a page in your claude.ai account and replies in three lines: what to do with the repo, the most important fix, and how many of the seven questions pass, fail or are flagged. On an account with many repos, start with `/github-curator:repo-review triage`.
+
 ## Install and update
 
 The plugin is installed by uploading a zip of it to claude.ai (Plugins in the left sidebar > Add > Upload plugin). Edits here don't reach Claude until the plugin is uploaded again. Changes collect under Unreleased in [CHANGELOG.md](CHANGELOG.md); to release them, give that section the new version and date, raise `version` in `.claude-plugin/plugin.json` to match, then build the zip and upload it:
@@ -49,7 +62,7 @@ The skills run as `/github-curator:repo-review`, `/github-curator:stargazers`, `
 
 ## Working on it
 
-Notes for changing the plugin, and how to run its tests, are in `docs/README.md` in its repository. They don't ship in the zip.
+It doesn't take outside contributions yet: `CONTRIBUTING.md` in its repository says how to report a problem and how changes are made. Notes for changing the plugin, and how to run its tests, are in `docs/README.md` in its repository. They don't ship in the zip.
 
 ## Licence
 
