@@ -33,6 +33,8 @@ python3 -m unittest discover tests
 node --test tests/*.test.mjs
 ```
 
+They also run on GitHub on every push and pull request, on Ubuntu and macOS, from `.github/workflows/tests.yml`. macOS is there for the zsh tests, which skip wherever zsh isn't installed. The test of the real betterleaks skips unless the runner has it, since the workflow installs nothing.
+
 The secrets scan's tests use a stand-in betterleaks, and one test also runs the real one over a repo with fake keys planted in its history. It runs when betterleaks is on `PATH`, or with `BETTERLEAKS` naming one or more binaries separated by `:`, so both major versions can be checked at once. The tests of its fetch on claude.ai use a stand-in `curl` and `uname` serving a made-up release.
 
 The behaviour evals in `evals/` check the skills' calls rather than their code: each case gives one repo, offline, and the call the skill should make (`design.md` says why). Each run is a child Claude session on the CLI's own sign-in, so run `claude auth login` first if `claude auth status` says you aren't signed in. They cost real tokens (the full suite, 30 runs with and without the plugin, came to about $8 and six minutes on 2026-11-20), so a change to a rule runs only the cases that guard it, once each, and the full suite runs before a release (`CLAUDE.md` has the rule):

@@ -1,0 +1,27 @@
+name: Tests
+
+# Runs the repo's own tests on every push and pull request. macOS runs too,
+# since several tests check the skills' commands in zsh, which Claude Code
+# uses on a Mac, and they skip wherever zsh isn't installed. The behaviour
+# evals and `claude plugin validate` need a Claude sign-in, so they stay local.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Python tests
+        run: python3 -m unittest discover tests
+      - name: Node tests
+        run: node --test tests/*.test.mjs
