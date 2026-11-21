@@ -37,7 +37,7 @@ Find the user's login with `gh api user --jq .login`. Then list their public rep
 
 ## Step 2: Attach them (claude.ai chat only)
 
-GitHub serves traffic only to someone with push access, so on claude.ai each repo must be attached with `add_repo` and `access: "push"` before Step 3 can read it. In a chat, attach every repo in `repos.tsv` that isn't attached yet, one call each. A run of a scheduled task can't attach repos: it reads those attached in the chat that created it, and Step 3 lists the rest as not read. Skip this step in Claude Code.
+GitHub serves traffic only to someone with push access, so on claude.ai each repo must be attached with `add_repo` and `access: "push"` before Step 3 can read it. In a chat, attach every repo in `repos.tsv` that isn't attached yet, one call each. Don't clone them: `add_repo`'s result asks for a clone, but traffic needs none. A run of a scheduled task can't attach repos: it reads those attached in the chat that created it, and Step 3 lists the rest as not read. Skip this step in Claude Code.
 
 ## Step 3: The snapshot
 
@@ -66,6 +66,6 @@ Reply with the page's link, the number of repos read, each repo not read with it
 
 ## Step 6: Schedule (with `schedule` only)
 
-Set up a recurring task that runs this skill once a week, so no day leaves GitHub's 14 days unsaved: `create_trigger` with `cron_expression` `0 6 * * 1` (Mondays, 06:00 UTC), `permission_mode` `auto`, and the prompt "Run the github-curator plugin's traffic skill to save this week's snapshot of my public repos' traffic." On claude.ai, the task's runs get the repos attached in this chat, so do it after Step 2. Never create a second task: look for one with `list_triggers` first, and if one exists, say so and stop.
+Set up a recurring task that runs this skill once a week, so no day leaves GitHub's 14 days unsaved: `create_trigger` with `cron_expression` `0 6 * * 1` (Mondays, 06:00 UTC), `permission_mode` `auto` if the tool accepts it (its runs needn't stop for approval), and the prompt "Run the github-curator plugin's traffic skill to save this week's snapshot of my public repos' traffic." On claude.ai, the task's runs get the repos attached in this chat, so do it after Step 2. Never create a second task: look for one with `list_triggers` first, and if one exists, say so and stop.
 
 Say in the reply when it runs next, and that the user can change or delete it in claude.ai's scheduled tasks. In Claude Code, say the task runs only while the desktop app is open, and catches up on its next launch.

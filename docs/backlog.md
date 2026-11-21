@@ -22,12 +22,13 @@ GitHub keeps traffic for 14 days only, so the scorecard's views, clones and refe
 
 The `traffic` skill saves a snapshot of every public repo's stars, forks, daily views and clones and top referrers as one document in the database of a page titled "Traffic history", which charts them across snapshots, and `schedule` sets up a weekly task that runs it. The page exists, holding the hand snapshot of 2026-11-20 and one taken with the skill's script in Claude Code on 2026-11-21.
 
-What's left:
-- **A run on claude.ai.** A chat attaches the repos and saves a snapshot; then a scheduled run of a task it created saves one too. That checks the **unverified** rows in `docs/github-facts.md`'s Artifact databases section: whether a run has the plugin's skills and the artifact and database tools. If a run can't write the database, the fallback is a scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`.
-- **The weekly task**, on whichever route works. Until it runs, a snapshot is saved by hand once a week: the next is due by 2026-11-27, since the days the last one covers start leaving GitHub's 14 days on 2026-12-04.
-- **The scorecard's link.** The review's Outcomes panel links to the page once it exists.
+A claude.ai chat attached all 74 public repos in Auto mode and created the weekly task, which runs early on Mondays, and a run of it started by hand saved a snapshot of all 74 (`docs/github-facts.md`). The page holds four snapshots, three of them from 2026-11-21.
 
-**Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task.
+What's left:
+- **The first run on schedule**, due 2026-11-23. If it doesn't save a snapshot, the fallback is a scheduled task in the Claude Code desktop app, and until one works a snapshot is saved by hand by 2026-11-27.
+- **The scorecard's link.** The review's Outcomes panel links to the page.
+
+**Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task on its schedule.
 
 ## 8. Forks
 
