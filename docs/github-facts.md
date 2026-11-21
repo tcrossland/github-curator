@@ -98,6 +98,15 @@ Checked again on 2026-11-21 in claude.ai in a browser: one prompt run in three p
 | A scheduled task's run can't attach a repo: it has no `add_repo`, and the proxy's 403 for an unattached repo says so ("This is a run of a scheduled task, and a run cannot add repositories"). It gets the repos attached in the chat that created the task, though the task's saved settings don't list them: a chat attached `stat-arb-from-scratch` with push access and created a one-off task, and its run, started by hand ahead of schedule, got HTTP 200 from `repos/OWNER/REPO`, `traffic/views` (14 daily rows) and `traffic/popular/referrers`. A recurring task created from a chat that had attached 74 repos got all 74 in a run started by hand and again in its first run on schedule (due at 20:05 UTC, its command ran at 20:07:53): `traffic/views` answered for every one both times. They survive the creating chat being deleted: its next run on schedule after the chat was deleted (due at 21:05 UTC, it ran at 21:08:08) got `traffic/views` for all 74 again. In a run, `rate_limit` and issue search also answer. | Seen, in four runs' reports and the proxy's message | 2026-11-20 |
 | The session's rate limit is shared with the user's own `gh` on their computer: minutes apart, both showed the same `reset` and consecutive `used` counts (278 → 279 locally, then 279 → 280 on claude.ai). In the recheck, with `reset` 1795201190 throughout: 14 locally at 18:38:19 UTC, 14 and then 15 in the desktop app's Chat tab, 17 and then 18 in the browser chat, and 18 locally at 18:50:13. So it's most likely per account, and a run's call counts include anything else using the account at the same time. | Seen | 2026-11-20 |
 
+## Artifact databases
+
+| Fact | Source | Checked |
+|---|---|---|
+| A document is a JSON object of at most 256 KiB, and an artifact's database holds at most 25,000 documents. A path segment uses letters, digits and `_ - . ~ : @ +`, so a time such as `2026-11-20T17:04:41Z` is a valid document id. | The runtime's type definitions (contract 0.2.98) | 2026-11-21 |
+| In Claude Code, the ArtifactData tool refuses a write to an existing document without `if_version`, the version last read. A `list` with `out_dir` saves each document's body as a file, without its version, which the tool's result lists instead. A `batch` of up to 50 writes, each from a file, committed atomically. | Seen, and the tool's description | 2026-11-21 |
+| `traffic`'s first live snapshot, in Claude Code, read 74 public repos (222 traffic requests) in 94 s, and made a 19,024-byte document. | Seen | 2026-11-21 |
+| Whether a scheduled task's run on claude.ai has the plugin's skills, and the artifact and database tools (`list_artifacts`, `publish_files`, `db_write`), is **unverified**. Whether `db_write` takes a file, and whether `gh api user` and repository search answer in a run, are **unverified** too. | | |
+
 ## Secrets scanning
 
 Checked with the release archives of betterleaks 1.10.1 and 2.0.0-rc.9 for macOS arm64, verified against each release's `checksums.txt`, run over a test repo with a GitHub token added then removed on `main` and a Stripe key on a branch never merged.

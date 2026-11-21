@@ -1,0 +1,352 @@
+<title>Traffic history</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="traffic-page" content="1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout: a header line, two daily charts side by side, then one table row per repo with its own sparkline. Same plex type and tokens as the repo review's pages. */
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --ink: #1b2330;
+  --muted: #5d6878;
+  --rule: #d9dde4;
+  --grid: #e8ebf0;
+  --accent: #2c4f86;
+  --accent-fill: rgba(44, 79, 134, .12);
+  --up: #1f7a4d;
+  --quote-bg: #f0f2f6;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --surface: #1a2029; --ink: #e6e9ee; --muted: #9aa4b2; --rule: #2c3440; --grid: #252c37;
+    --accent: #8fb0e6; --accent-fill: rgba(143, 176, 230, .16); --up: #6fd3a0; --quote-bg: #222a35; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a2029; --ink: #e6e9ee; --muted: #9aa4b2; --rule: #2c3440; --grid: #252c37;
+  --accent: #8fb0e6; --accent-fill: rgba(143, 176, 230, .16); --up: #6fd3a0; --quote-bg: #222a35; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.55 var(--body); }
+main { max-width: 1040px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+header { display: grid; gap: 4px; }
+h1 { font: 600 24px/1.2 var(--display); margin: 0; letter-spacing: .01em; text-wrap: balance; }
+h2 { font: 600 17px/1.3 var(--display); margin: 0; letter-spacing: .01em; }
+.meta { color: var(--muted); font-size: 13px; margin: 0; }
+.meta b { color: var(--ink); font-weight: 500; }
+.note { color: var(--muted); margin: 0; max-width: 72ch; }
+.state { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 22px; display: grid; gap: 6px; }
+.state p { margin: 0; max-width: 70ch; }
+code { font: 400 13px/1.4 var(--mono); background: var(--quote-bg); padding: 2px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.chart { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px 10px; display: grid; gap: 6px; min-width: 0; position: relative; }
+.chart .head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.chart .total { font: 500 13px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart svg text { fill: var(--muted); font: 400 10px var(--mono); }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font: 500 12px/1.35 var(--mono); padding: 6px 8px; border-radius: 4px; white-space: nowrap; transform: translate(-50%, -100%); }
+section { display: grid; gap: 10px; }
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+th { font: 500 11px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); white-space: nowrap; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 13px; }
+td a { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
+td a:hover, td a:focus-visible { text-decoration: underline; }
+.tag { font: 500 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--rule); border-radius: 999px; padding: 3px 6px; margin-left: 6px; white-space: nowrap; }
+.up { color: var(--up); }
+.ref { color: var(--muted); font-size: 13px; }
+td.spark svg { display: block; width: 140px; height: 28px; }
+details { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 14px; }
+summary { cursor: pointer; color: var(--muted); }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.quiet { margin: 8px 0 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+ul.snaps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+ul.snaps li { font-size: 14px; }
+ul.snaps .d { font: 500 13px var(--mono); margin-right: 8px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main>
+  <header>
+    <h1>Traffic history</h1>
+    <p class="meta" id="meta">Reading the saved snapshots…</p>
+  </header>
+  <p class="note">GitHub keeps a repo's views, clones and referrers for 14 days. Each weekly snapshot adds those days here, so the trend outlasts the fortnight. The last day is partial until the next snapshot. Counts are GitHub's; unique visitors are left out because they don't add up across days.</p>
+  <div class="state" id="state" hidden></div>
+  <div class="charts" id="charts" hidden>
+    <div class="chart" id="chart-views"></div>
+    <div class="chart" id="chart-clones"></div>
+  </div>
+  <section id="repos" hidden>
+    <h2>Repos</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Repo</th><th class="n">Stars</th><th class="n">Views</th><th class="n">Clones</th><th>Views per day</th><th>Top referrer</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <details id="quiet" hidden><summary id="quiet-sum"></summary><p class="quiet" id="quiet-list"></p></details>
+  </section>
+  <section id="snaps" hidden>
+    <h2>Snapshots</h2>
+    <ul class="snaps" id="snap-list"></ul>
+  </section>
+</main>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, attrs, text) => {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  const NS = "http://www.w3.org/2000/svg";
+  const svgEl = (tag, attrs) => {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+    return e;
+  };
+  const fmt = (n) => n.toLocaleString("en-GB");
+  const dayMs = 86400000;
+  const addDays = (iso, n) => new Date(Date.parse(iso + "T00:00:00Z") + n * dayMs).toISOString().slice(0, 10);
+  const short = (iso) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+
+  function showState(title, body) {
+    const s = $("state");
+    s.replaceChildren(el("p", {}, null), el("p", {}, null));
+    s.children[0].append(el("b", {}, title));
+    s.children[1].append(...body);
+    s.hidden = false;
+  }
+
+  // The days from the first to the last held by any repo.
+  function dayRange(repos) {
+    let lo = null, hi = null;
+    for (const r of repos) for (const k of ["views", "clones"]) for (const d of Object.keys(r[k] || {})) {
+      if (!lo || d < lo) lo = d;
+      if (!hi || d > hi) hi = d;
+    }
+    if (!lo) return [];
+    const days = [];
+    for (let d = lo; d <= hi; d = addDays(d, 1)) days.push(d);
+    return days;
+  }
+
+  // Per day, the sum over repos that hold that day; null when no repo does (a gap between snapshots).
+  function totals(repos, days, key) {
+    return days.map((d) => {
+      let sum = null;
+      for (const r of repos) { const v = (r[key] || {})[d]; if (v) sum = (sum || 0) + v[0]; }
+      return sum;
+    });
+  }
+
+  function niceMax(v) {
+    if (v <= 4) return 4;
+    const p = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
+    return 10 * p;
+  }
+
+  // An area chart of one series, with gaps where no snapshot holds the day, and a crosshair tooltip.
+  function drawChart(box, title, days, values) {
+    const W = 480, H = 170, L = 34, R = 8, T = 10, B = 22;
+    const max = niceMax(Math.max(1, ...values.filter((v) => v != null)));
+    const x = (i) => L + (days.length < 2 ? 0 : (i * (W - L - R)) / (days.length - 1));
+    const y = (v) => T + (H - T - B) * (1 - v / max);
+    const total = values.reduce((a, v) => a + (v || 0), 0);
+    const head = el("div", { class: "head" });
+    head.append(el("h2", {}, title), el("span", { class: "total" }, fmt(total) + " in " + days.length + " days"));
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${title}: ${fmt(total)} from ${short(days[0])} to ${short(days[days.length - 1])}` });
+    for (let i = 0; i <= 4; i++) {
+      const v = (max * i) / 4, yy = y(v);
+      svg.append(svgEl("line", { x1: L, x2: W - R, y1: yy, y2: yy, stroke: "var(--grid)", "stroke-width": 1 }));
+      const t = svgEl("text", { x: L - 6, y: yy + 3, "text-anchor": "end" }); t.textContent = fmt(v); svg.append(t);
+    }
+    // Month starts, or every 7th day when the range is short.
+    const ticks = days.length > 60 ? days.map((d, i) => (d.endsWith("-01") ? i : -1)).filter((i) => i >= 0)
+      : days.map((_, i) => i).filter((i) => (days.length - 1 - i) % 7 === 0);
+    for (const i of ticks) {
+      const t = svgEl("text", { x: x(i), y: H - 6, "text-anchor": "middle" }); t.textContent = short(days[i]); svg.append(t);
+    }
+    // One path per run of held days.
+    let run = [];
+    const flush = () => {
+      if (!run.length) return;
+      const pts = run.map((i) => `${x(i).toFixed(1)},${y(values[i]).toFixed(1)}`);
+      const base = y(0).toFixed(1);
+      if (run.length > 1) {
+        svg.append(svgEl("path", { d: `M${x(run[0]).toFixed(1)},${base}L${pts.join("L")}L${x(run[run.length - 1]).toFixed(1)},${base}Z`, fill: "var(--accent-fill)" }));
+        svg.append(svgEl("path", { d: "M" + pts.join("L"), fill: "none", stroke: "var(--accent)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+      } else {
+        svg.append(svgEl("circle", { cx: x(run[0]), cy: y(values[run[0]]), r: 3, fill: "var(--accent)" }));
+      }
+      run = [];
+    };
+    values.forEach((v, i) => (v == null ? flush() : run.push(i)));
+    flush();
+    const last = values.map((v, i) => (v == null ? -1 : i)).filter((i) => i >= 0).pop();
+    if (last != null) svg.append(svgEl("circle", { cx: x(last), cy: y(values[last]), r: 4, fill: "var(--accent)", stroke: "var(--surface)", "stroke-width": 2 }));
+    const cross = svgEl("line", { y1: T, y2: H - B, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3", visibility: "hidden" });
+    svg.append(cross);
+    const hit = svgEl("rect", { x: L, y: T, width: W - L - R, height: H - T - B, fill: "transparent" });
+    svg.append(hit);
+    const tip = el("div", { class: "tip", hidden: "" });
+    const move = (ev) => {
+      const box2 = svg.getBoundingClientRect();
+      const px = ((ev.clientX - box2.left) / box2.width) * W;
+      const i = Math.max(0, Math.min(days.length - 1, Math.round(((px - L) / (W - L - R)) * (days.length - 1))));
+      cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("visibility", "visible");
+      tip.textContent = short(days[i]) + " · " + (values[i] == null ? "not saved" : fmt(values[i]));
+      tip.style.left = ((x(i) / W) * box2.width + svg.offsetLeft) + "px";
+      tip.style.top = (svg.offsetTop + ((values[i] == null ? T : y(values[i])) / H) * box2.height - 6) + "px";
+      tip.hidden = false;
+    };
+    hit.addEventListener("pointermove", move);
+    hit.addEventListener("pointerleave", () => { tip.hidden = true; cross.setAttribute("visibility", "hidden"); });
+    box.replaceChildren(head, svg, tip);
+  }
+
+  function spark(days, series) {
+    const W = 140, H = 28;
+    const vals = days.map((d) => (series[d] ? series[d][0] : null));
+    const max = Math.max(1, ...vals.filter((v) => v != null));
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, "aria-hidden": "true" });
+    const x = (i) => (days.length < 2 ? 0 : (i * (W - 4)) / (days.length - 1)) + 2;
+    const y = (v) => 2 + (H - 4) * (1 - v / max);
+    let run = [];
+    const flush = () => {
+      if (run.length > 1) svg.append(svgEl("path", { d: "M" + run.map((i) => `${x(i).toFixed(1)},${y(vals[i]).toFixed(1)}`).join("L"), fill: "none", stroke: "var(--accent)", "stroke-width": 1.5, "stroke-linejoin": "round" }));
+      else if (run.length === 1) svg.append(svgEl("circle", { cx: x(run[0]), cy: y(vals[run[0]]), r: 1.5, fill: "var(--accent)" }));
+      run = [];
+    };
+    vals.forEach((v, i) => (v == null ? flush() : run.push(i)));
+    flush();
+    return svg;
+  }
+
+  // One entry per repo from every snapshot, oldest first, so a later snapshot wins for a day both hold.
+  // A snapshot stores only days with traffic; the rest of its from..to span were zero.
+  function merge(snaps) {
+    const repos = new Map();
+    for (const s of snaps) {
+      const day = s.id.slice(0, 10);
+      for (const [name, r] of Object.entries(s.data.repos || {})) {
+        if (!repos.has(name)) repos.set(name, { name, views: {}, clones: {}, counts: {}, referrers: {} });
+        const m = repos.get(name);
+        m.fork = r.fork; m.archived = r.archived;
+        m.counts[day] = [r.stars, r.forks];
+        m.referrers[day] = r.referrers || [];
+        for (const key of ["views", "clones"]) {
+          const sp = r[key];
+          if (!sp || !sp.from) continue;
+          for (let d = sp.from; d <= sp.to; d = addDays(d, 1)) m[key][d] = (sp.days || {})[d] || [0, 0];
+        }
+      }
+    }
+    return [...repos.values()];
+  }
+
+  const sum = (series, days) => days.reduce((a, d) => a + ((series || {})[d] ? series[d][0] : 0), 0);
+  const latest = (obj) => { const ks = Object.keys(obj || {}).sort(); return ks.length ? obj[ks[ks.length - 1]] : null; };
+  const earliest = (obj) => { const ks = Object.keys(obj || {}).sort(); return ks.length ? obj[ks[0]] : null; };
+
+  function render(repos, snaps) {
+    $("state").hidden = true;
+    if (!repos.length) {
+      $("meta").textContent = "No snapshots yet";
+      showState("Nothing saved yet.", ["The first snapshot appears here once ", el("code", {}, "/github-curator:traffic"), " has run."]);
+      return;
+    }
+    // GitHub's 14 days end earlier for a repo with no recent traffic, so before the first snapshot's
+    // latest first day only some repos are held. The charts start there, where every repo is.
+    const first = Object.values(snaps.length ? snaps[0].data.repos || {} : {});
+    const start = first.flatMap((r) => [r.views && r.views.from, r.clones && r.clones.from]).filter(Boolean).sort().pop();
+    const days = dayRange(repos).filter((d) => !start || d >= start);
+    const owners = [...new Set(repos.map((r) => r.name.split("/")[0]))];
+    const lastSnap = snaps.length ? snaps[snaps.length - 1].id.slice(0, 10) : null;
+    const meta = $("meta");
+    meta.replaceChildren(
+      el("b", {}, owners.join(", ")), document.createTextNode(` · ${repos.length} public repos · `),
+      el("b", {}, `${snaps.length} snapshot${snaps.length === 1 ? "" : "s"}`),
+      document.createTextNode(lastSnap ? `, latest ${short(lastSnap)}` : ""),
+      document.createTextNode(days.length ? ` · days held ${short(days[0])} to ${short(days[days.length - 1])}` : "")
+    );
+    if (days.length) {
+      drawChart($("chart-views"), "Views per day, all repos", days, totals(repos, days, "views"));
+      drawChart($("chart-clones"), "Clones per day, all repos", days, totals(repos, days, "clones"));
+      $("charts").hidden = false;
+    }
+    const rows = repos.map((r) => ({ r, views: sum(r.views, days), clones: sum(r.clones, days) }))
+      .sort((a, b) => b.views - a.views || b.clones - a.clones || a.r.name.localeCompare(b.r.name));
+    const tbody = $("rows");
+    tbody.replaceChildren();
+    const quiet = [];
+    for (const { r, views, clones } of rows) {
+      const now = latest(r.counts), first = earliest(r.counts);
+      if (!views && !clones && !(now && first && now[0] !== first[0])) { quiet.push(r.name); continue; }
+      const tr = el("tr");
+      const name = el("td");
+      name.append(el("a", { href: "https://github.com/" + r.name, target: "_blank", rel: "noopener" }, r.name.split("/")[1]));
+      if (r.fork) name.append(el("span", { class: "tag" }, "fork"));
+      if (r.archived) name.append(el("span", { class: "tag" }, "archived"));
+      const stars = el("td", { class: "n" }, now ? fmt(now[0]) : "–");
+      if (now && first && now[0] !== first[0]) stars.append(el("span", { class: now[0] > first[0] ? "up" : "" }, ` (${now[0] > first[0] ? "+" : ""}${now[0] - first[0]})`));
+      const sp = el("td", { class: "spark" });
+      sp.append(spark(days, r.views || {}));
+      const refs = latest(r.referrers) || [];
+      const ref = el("td", { class: "ref" }, refs.length ? `${refs[0][0]} · ${fmt(refs[0][1])}` : "–");
+      tr.append(name, stars, el("td", { class: "n" }, fmt(views)), el("td", { class: "n" }, fmt(clones)), sp, ref);
+      tbody.append(tr);
+    }
+    if (quiet.length) {
+      $("quiet-sum").textContent = `${quiet.length} repo${quiet.length === 1 ? "" : "s"} with no views, clones or new stars`;
+      $("quiet-list").textContent = quiet.map((n) => n.split("/")[1]).join(", ");
+      $("quiet").hidden = false;
+    } else $("quiet").hidden = true;
+    $("repos").hidden = false;
+    const list = $("snap-list");
+    list.replaceChildren();
+    for (const s of [...snaps].reverse()) {
+      const li = el("li");
+      li.append(el("span", { class: "d" }, s.id.slice(0, 16).replace("T", " ") + " UTC"));
+      const missing = s.data.missing || [];
+      li.append(document.createTextNode(`${fmt(Object.keys(s.data.repos || {}).length)} repos read` + (missing.length ? `; not read: ${missing.map((m) => m.name.split("/")[1] + " (" + m.reason + ")").join(", ")}` : "")));
+      list.append(li);
+    }
+    $("snaps").hidden = !snaps.length;
+  }
+
+  async function start() {
+    const db = await (window.claude && window.claude.use ? window.claude.use("db") : null);
+    if (!db) {
+      $("meta").textContent = "Snapshots not available";
+      showState("This view can't read the saved snapshots.", ["Open the page on claude.ai, signed in to the account that owns it."]);
+      return;
+    }
+    // Render whatever has arrived, cached or not; the timer only warns while nothing confirmed has come.
+    let confirmed = false, failed = false;
+    const timer = setTimeout(() => {
+      if (!confirmed && !failed) showState("The snapshots can't be reached yet.", ["The page keeps trying; anything already shown may be out of date."]);
+    }, 10000);
+    // Document ids are the UTC time each snapshot was taken, so id order is time order.
+    db.collection("snapshots").onSnapshot((q) => {
+      if (!q.metadata.fromCache) { confirmed = true; clearTimeout(timer); }
+      const snaps = q.docs.filter((d) => d.exists).map((d) => ({ id: d.id, data: d.data() }));
+      if (!failed) render(merge(snaps), snaps);
+    }, (e) => {
+      failed = true; clearTimeout(timer);
+      showState("The snapshots couldn't be read.", [String((e && (e.message || e.code)) || e)]);
+    });
+  }
+  start();
+})();
+</script>

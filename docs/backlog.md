@@ -6,7 +6,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | todo |
+| 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | in progress |
 | 8 | [Forks](#8-forks) | New skill | M | none | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
@@ -20,13 +20,14 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 GitHub keeps traffic for 14 days only, so the scorecard's views, clones and referrers are lost after a fortnight. Nothing can show whether featuring or sharing a repo changed anything. This is the only item that loses something for every week it waits.
 
-A scheduled task would save the stars, views, clones and top referrers of every public repo, once a week, to an artifact with a shared database, and chart the trend. The scorecard's outcomes panel could then link to it.
+The `traffic` skill saves a snapshot of every public repo's stars, forks, daily views and clones and top referrers as one document in the database of a page titled "Traffic history", which charts them across snapshots, and `schedule` sets up a weekly task that runs it. The page exists, holding the hand snapshot of 2026-11-20 and one taken with the skill's script in Claude Code on 2026-11-21.
 
-A claude.ai chat has scheduled tasks and artifact databases, its `gh` reads traffic once a repo is attached with push access, and a scheduled run gets the repos attached in the chat that created its task, traffic included (`docs/github-facts.md`). So the task is created from a chat that has attached every public repo. One chat has attached all 74 public repos with push access and read traffic for every one. A recurring task's runs on schedule got all 74 too, including one after the chat that created it was deleted, so the chat needn't be kept. A scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`, stays the fallback if a claude.ai task stops working.
+What's left:
+- **A run on claude.ai.** A chat attaches the repos and saves a snapshot; then a scheduled run of a task it created saves one too. That checks the **unverified** rows in `docs/github-facts.md`'s Artifact databases section: whether a run has the plugin's skills and the artifact and database tools. If a run can't write the database, the fallback is a scheduled task in the Claude Code desktop app, which runs on the user's computer with their own `gh`.
+- **The weekly task**, on whichever route works. Until it runs, a snapshot is saved by hand once a week: the next is due by 2026-11-27, since the days the last one covers start leaving GitHub's 14 days on 2026-12-04.
+- **The scorecard's link.** The review's Outcomes panel links to the page once it exists.
 
-Until this lands, a snapshot of every public repo is saved by hand once a week to a gitignored file. The first was saved on 2026-11-20, for 74 repos, forks included: stars, forks, the daily views and clones GitHub still holds, and top referrers, so snapshots can be merged by repo and day and loaded into the page's database once it exists. The next is due by 2026-11-27; the days that snapshot covers start leaving GitHub's 14 days on 2026-12-04.
-
-**Done when** two weekly snapshots of every public repo are saved and charted on the page.
+**Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task.
 
 ## 8. Forks
 

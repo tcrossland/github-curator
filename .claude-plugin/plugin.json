@@ -1,7 +1,7 @@
 {
   "name": "github-curator",
   "version": "0.3.0",
-  "description": "Curate a GitHub account's repos: review a repo or README draft and get a recommendation (keep, publish, archive, make private or delete) with a scorecard, triage every repo at once, see who starred a repo and which stargazers work in the same field, and list your merged pull requests to other people's projects. It only recommends; it never changes a repo or contacts anyone.",
+  "description": "Curate a GitHub account's repos: review a repo or README draft and get a recommendation (keep, publish, archive, make private or delete) with a scorecard, triage every repo at once, see who starred a repo and which stargazers work in the same field, list your merged pull requests to other people's projects, and keep a weekly history of your repos' traffic. It only recommends; it never changes a repo or contacts anyone.",
   "author": {
     "name": "Tomas Crossland",
     "url": "https://github.com/tcrossland"
