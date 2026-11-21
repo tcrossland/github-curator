@@ -117,6 +117,21 @@ Checked again on 2026-11-21 in claude.ai in a browser: one prompt run in three p
 | The chat reported that `create_trigger` accepted only `"default"` for `permission_mode`, and that a task created without it still had automatic approval (shown as "Auto" in its card). This contradicts the one-off task created with `"auto"` on 2026-11-20 (above), so it is **unverified**. A cron of `0 6 * * 1` was stored as given, with the next run at 06:08:25 UTC. | The chat's report, and its task card | 2026-11-21 |
 | A task created with `create_trigger` has no time zone, so its cron is read in UTC, and claude.ai shows a notice: "One of your scheduled tasks has no time zone, so it may run an hour early or late for part of the year", offering to set it to the user's own. | Seen | 2026-11-21 |
 
+## The GitHub connector
+
+The claude.ai GitHub connector, a remote MCP server whose tools are named `get_me`, `search_repositories`, `get_file_contents`, `list_commits`, `search_pull_requests` and so on, reached a Claude Code desktop session as a claude.ai connector. Which server it is, and which scopes its token holds, is **unverified**.
+
+| Fact | Source | Checked |
+|---|---|---|
+| It acts as the signed-in GitHub account: `get_me` gave the user's login, name and public repo count (19). | Seen, in Claude Code | 2026-11-21 |
+| It doesn't see the user's private repos: `get_file_contents` on a private repo of theirs gave `404 Not Found`, and `search_repositories` for `user:LOGIN fork:true` gave 19, the public ones only (`gh` gives 85 with the private ones), and 0 with `is:private`. | Seen, in Claude Code | 2026-11-21 |
+| It reads other owners' public repos without attaching anything: `list_commits` on a stranger's fork, on a branch other than the default, gave its commits. | Seen, in Claude Code | 2026-11-21 |
+| Its commits carry each author's email address (`commit.author.email`), which the skills never record, so a skill using it would have to drop them. | Seen, in Claude Code | 2026-11-21 |
+| `search_pull_requests` answers the triage's search (`author:LOGIN -user:LOGIN`, scoped to pull requests): 327 results, where `gh`'s search gave 320 the same day. | Seen, in Claude Code | 2026-11-21 |
+| `search_repositories` gives, by default (`minimal_output`), `stargazers_count`, `forks_count`, `open_issues_count`, `topics`, `archived`, `fork` and `default_branch`, but not `pushed_at`, `size`, `license` or `parent`. | Seen, in Claude Code | 2026-11-21 |
+| It has no tool for stargazers, traffic, a repo's forks, pinned repos, a repo's settings (`repos/OWNER/REPO`) or the rate limit, and it has tools that write: `create_repository`, `fork_repository`, `push_files`, `delete_file`, `merge_pull_request`, `issue_write` and the comment tools. | Seen, its tool list in Claude Code | 2026-11-21 |
+| Whether it's offered in a claude.ai chat, and whether there it reads repos not attached to the chat, is **unverified**. | Not checked | 2026-11-21 |
+
 ## Secrets scanning
 
 Checked with the release archives of betterleaks 1.10.1 and 2.0.0-rc.9 for macOS arm64, verified against each release's `checksums.txt`, run over a test repo with a GitHub token added then removed on `main` and a Stripe key on a branch never merged.
