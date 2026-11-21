@@ -27,6 +27,12 @@ scripts/package.sh
 
 It validates the manifest and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README, the changelog and the licence.
 
+To try changes before a release, build a test zip with a pre-release version, which goes only into the zip's manifest:
+
+```sh
+scripts/package.sh --dev 0.3.1-dev.1
+```
+
 A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version. Typing `/reload-plugins` in the session applies plugin updates, but whether it picks up an upload to claude.ai isn't tested yet.
 
 The skills run as `/github-curator:repo-review`, `/github-curator:stargazers` and `/github-curator:contributions`.
