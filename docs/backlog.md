@@ -6,7 +6,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
-| 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | todo |
+| 11 | [GitHub access from a claude.ai session](#11-github-access-from-a-claudeai-session) | Fix | M | none | in progress: to check on claude.ai |
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | todo |
 | 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
@@ -19,26 +19,25 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 ## 11. GitHub access from a claude.ai session
 
-On claude.ai the session's `gh` goes through a proxy bound to the repos attached to the session: GraphQL, `user/repos`, every `users/…` and `orgs/…` path and any repo not attached are refused with HTTP 403 (details in `docs/github-facts.md`). In the 0.2.4 test runs that left triage a list that marked no repo clear, stargazers unable to read a single profile, and similar repos described from search results alone.
+On claude.ai the session's `gh` goes through a proxy bound to the repos attached to the session: GraphQL, `user/repos`, every `users/…` and `orgs/…` path and any repo not attached are refused with HTTP 403, and compare across forks with 400 (details in `docs/github-facts.md`). In the 0.2.4 test runs that left triage a list that marked no repo clear, stargazers unable to read a single profile, and similar repos described from search results alone.
 
-What works there:
-- **Attaching** a repo for the API takes push access for a public repo and the user's permission; a private repo attaches with the default access. One chat attached all 74 public repos. Auto mode's check refuses it unreliably: on 2026-11-20 two chats whose request gave permission had every `add_repo` refused, while on 2026-11-21 none of seven calls was. In Manual mode the chat asks the user before each `add_repo`, and the call then attaches. **Unverified**: whether `add_repo` can be set to "Always ask", and what that does.
-- **Git** works for any public repo without attaching it.
-- **Issue search** answers.
-- **Not cross-fork compare**, even with the fork and its parent both attached: HTTP 400.
-- **Not WebFetch for exact text**: it rewords and cuts READMEs, and a profile gives only the name, followers and pinned repos.
+The skills now take routes that work there too, the same in Claude Code where they can be (the reasons are in `docs/design.md`, under Routes that work on claude.ai too):
+- READMEs from a clone that checks out only the README.
+- A fork's commits beyond its parent from a treeless clone of the fork with the parent's default branch fetched into it. In Claude Code its count matched the compare API's for all 61 of this account's forks.
+- A fork's parent recorded on the triage page and read from there by the next triage, so only forks new since need attaching.
+- On claude.ai, the listing's fields from one repository search, and attaching through Manual mode, asked for once, with any repo not attached sent to review.
+- The user's pull requests to the parents from one search, 100 a page, rather than one search per fork, so the search API's 30 a minute isn't reached (this replaces pacing the searches).
+- Stargazers' profiles from the profile page by WebFetch when `users/LOGIN` is refused, labelled "profile page summary", and "Not available" with the reason, in the reply and the review's Stargazers lists, when no profile could be read.
+- An organisation's triage on claude.ai stops and says to run it from Claude Code.
 
-The route, the same in Claude Code where it can be:
-- **READMEs** (triage's own repos, similar repos): a sparse clone that checks out only the README.
-- **A fork against its parent**: fetch both treeless into one repo, then `git rev-list --count` and `git log` on the fork's range. This also lifts the compare API's limit of 250 commits, but costs the parent's whole commit history. Measured in Claude Code on 2026-11-20: 11 MB in 2 s for elixir (36,543 commits), 22 MB in 3 s for erlang/otp (67,640). Through claude.ai's proxy on 2026-11-21 it was as fast, without attaching: 3 s and 24 MB for otp, 2 s and 9.9 MB for elixir, with the same counts as Claude Code, though `add_repo`'s own text warns that a large repo's shallow clone can take 5 to 10 minutes there. Forks of the same parent can share one clone of it.
-- **A fork's parent**: only `repos/OWNER/FORK` gives it (not `list_repos`, search or GraphQL), so on claude.ai the fork must be attached. A parent doesn't change, so the triage page records each fork's parent and default branch, and a later triage reads them from the previous page. Only forks new since then need attaching.
-- **Pull requests to the parent**: issue search, as now.
-- **Stargazers' profiles**: WebFetch of `github.com/LOGIN`, one at a time, judging the field from the pinned repos' descriptions, labelled "profile page summary". The reply says which of bio, company and location weren't available; whether WebFetch ever gives them is untested.
-- **Attaching on claude.ai**: triage asks the user to switch the chat to Manual mode, so each attach waits for their approval rather than for Auto mode's check, then asks once for permission to attach the private repos and the forks whose parent it doesn't know, and leaves any it can't attach as `review`, saying which and why. A first triage has no previous page, so it attaches every fork and private repo (61 and 11 on this account) or is run from Claude Code instead; the page says which.
-
-Two smaller items change the same steps:
-- **Stargazers when profiles can't be read**: the scorecard falls back to "None in the same field", a judgement never made (seen in the 0.2.4 test runs). Say "Not available" with the reason, in the `stargazers` reply and in the review's Stargazers lists. Done when both skills say so and a template test checks the wording.
-- **Rate limits in triage**: the pull-request searches use the search API, whose limit is far lower than the rest of the API's, so many forks with commits could hit it. Step 8 paces them and notes any refused. Done when triage on an account with more than 30 such forks completes.
+What only a claude.ai run, on an upload that has these changes, can check:
+- **A first triage**: it asks to switch to Manual mode, attaches every fork and private repo (61 and 11 on this account), and runs the git commands in the VM. **Unverified**: whether Manual mode's prompt for `add_repo` can be allowed for the rest of the chat; if it can't, that's 72 approvals, and a first triage is better run from Claude Code.
+- **A second triage**: it reads each fork's parent from the first page and attaches only the private repos and any new forks.
+- **The same calls**: it marks the clear deletes Claude Code marks on the same account.
+- **Search on claude.ai**: whether `search/repositories?q=user:LOGIN+fork:true` includes private repos there (**unverified**; triage reads private repos from the API once attached, either way), and the pull-request search's 320 results on this account.
+- **A private repo's README** from the sparse clone once it's attached (`git ls-remote` answered after attaching, but no clone has been tried).
+- **Stargazers**: the stargazer list for an attached repo (**unverified** on claude.ai), and whether WebFetch of a profile page gives the bio, company, location and the pinned repos' descriptions when a profile has them.
+- **Timings**: the triage page's per-step times, `Attach` included, with its slowest step written up here.
 
 **Done when** triage on claude.ai marks the clear deletes it marks in Claude Code on the same account, stargazers there reads profiles or says plainly that it can't, and a triage's page shows per-step times from item 2's log, with its slowest step written up here.
 
@@ -119,7 +118,7 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 - **`contributions` on claude.ai**: its commands, run in a claude.ai chat on 2026-11-21, don't give Claude Code's groups (details in `docs/github-facts.md`). `gh api user` answers, but `user/memberships/orgs` is refused, and the fallback, the owners `list_repos` gives, missed one of the user's organisations and added a user account. The private search also found 1 pull request where Claude Code finds 2. The skill now says both in its reply on claude.ai. Done when a claude.ai run of the skill, on an upload that has it, shows both.
 - **Secrets scan on claude.ai**: `repo-review` now fetches betterleaks 1.10.1 into the claude.ai VM, checked against the release's checksums, but no review on claude.ai has run it yet. Done when a review of a private repo on claude.ai, on an upload that has the fetch, runs the scan and its page says so.
 - **Draft reply holds steady**: `other-people`'s `draft-reply` passed 9 of 11 runs on 2026-11-20; the two misses weren't traced. Done when `scripts/evals.sh --case other-people --ablation none --runs 10 --keep-temp` passes every run, or each miss's trace says why and the rule or grader is fixed.
-- **Author identities**: let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. It changes triage's fork step, which item 11 is rewriting, so it waits for that. Done when triage reads the list and marks matching commits as the user's.
+- **Author identities**: let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. Triage's fork step now reads each commit's author name and email domain from git, so the list would let it mark those commits as the user's. Done when triage reads the list and marks matching commits as the user's.
 - **Test uploads between releases**: changes now collect under Unreleased, and `version` changes only when a release is cut, but trying a change on claude.ai still needs an upload. Both claude.ai's replace prompt and the install skill's sync check go by version, so a test zip with the last release's version can't be told apart once synced. A `--dev` flag on `scripts/package.sh` could stamp a pre-release version such as `0.2.15-dev.1` into the zip's manifest, leaving the committed one alone. Whether claude.ai accepts a pre-release version in `plugin.json` is **unverified**. Done when one test upload with a pre-release version is seen to install and sync, the result is in `docs/github-facts.md`, and the flag is added (or, if it's refused, the README says how to test a change instead).
 - **Check the Claude Code tool list**: 0.2.14 added a list near the top of `repo-review`'s `SKILL.md` saying what Claude Code uses in place of each claude.ai tool, and what a run does with no artifact tool. Whether Claude Code outside the desktop app has an artifact tool is **unverified**. Done when a review run in a Claude Code session started on 0.2.14 or later finds the previous scorecard by following the list, and the result is in `docs/github-facts.md`.
 

@@ -14,23 +14,17 @@ The listing (`user/repos?affiliation=owner`), filtered to forks that aren't arch
 [{"full_name": "octo-dev/vue-range-slider", "html_url": "https://github.com/octo-dev/vue-range-slider", "private": false, "fork": true, "archived": false, "pushed_at": "2019-04-11T09:12:44Z", "stargazers_count": 0, "forks_count": 0, "open_issues_count": 0, "description": "A range slider component for Vue", "topics": [], "size": 412, "default_branch": "master", "license": {"spdx_id": "MIT"}}]
 ```
 
-`gh api repos/octo-dev/vue-range-slider --jq .parent`:
+There is no previous triage page.
+
+`gh api repos/octo-dev/vue-range-slider --jq '.parent.full_name'` gives `slider-works/vue-range-slider`. The repository search for the parent gives:
 
 ```json
-{"full_name": "slider-works/vue-range-slider", "default_branch": "master", "archived": false}
+{"total_count": 1, "items": [{"full_name": "slider-works/vue-range-slider", "archived": false}]}
 ```
 
-`gh api 'repos/slider-works/vue-range-slider/compare/master...octo-dev:master'`:
+Step 1's git commands for the fork (the parent's default branch is `master`) print `0` and no commits.
 
-```json
-{"status": "behind", "ahead_by": 0, "behind_by": 212, "commits": []}
-```
-
-`gh api 'search/issues?q=repo:slider-works/vue-range-slider+author:octo-dev+type:pr'`:
-
-```json
-{"total_count": 0, "items": []}
-```
+The search for my pull requests (`search/issues?q=author:octo-dev+type:pr+-user:octo-dev`) gives none to `slider-works/vue-range-slider`.
 
 Pinned on my profile: `octo-dev/tidewatch`, `octo-dev/ledgerlint`.
 

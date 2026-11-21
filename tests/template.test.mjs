@@ -70,6 +70,17 @@ test('empty outcome lists use their own message, or None', () => {
   assert.match(html, /<h3>Top referrers<\/h3><ul><li class="none">None in the last 14 days<\/li>/);
 });
 
+test('stargazers whose profiles could not be read show Not available, as SKILL.md words it, not None in the same field', () => {
+  // The wording the skill gives for the list when no profile could be read.
+  const skill = readFileSync(fileURLToPath(new URL('../skills/repo-review/SKILL.md', import.meta.url)), 'utf8');
+  const example = skill.match(/"Stargazers worth a look" when profiles were read[^(]*\(when no profile could be read, "Not available: " and the reason, such as "(Not available: [^"]+)"\)/);
+  assert.ok(example, 'SKILL.md gives the Not available wording for Stargazers worth a look');
+  const lists = [{ label: 'Stargazers worth a look', entries: [], empty: example[1] }, { label: 'Stargazers', entries: ['2026-11-01 · `someone` · 3 followers · activity not available · profile page summary'] }];
+  const { html } = render({ ...review, outcomes: { ...review.outcomes, lists } });
+  assert.match(html, /<h3>Stargazers worth a look<\/h3><ul><li class="none">Not available: GitHub refused the profile pages<\/li>/);
+  assert.doesNotMatch(html, /None in the same field/);
+});
+
 test('text from the run is escaped, and </script> in the data does not end the block', () => {
   const { html } = render({ ...review, subject: '<b>bold</b> </script><i>' });
   assert.match(html, /&lt;b&gt;bold&lt;\/b&gt; &lt;\/script&gt;&lt;i&gt;/);

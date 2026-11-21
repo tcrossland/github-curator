@@ -10,17 +10,19 @@ Find out who starred one of the user's public GitHub repos, and which of them ar
 
 The arguments are repo URLs or `OWNER/REPO` names, taken in turn, and two optional keywords:
 - `since:YYYY-MM-DD`: only the stars given on or after that date.
-- `all`: read every stargazer's profile in Step 2, not only the 30 most recent. Each profile takes at least four API calls, so when that's more than 100 profiles, say how many before starting.
+- `all`: read every stargazer's profile in Step 2, not only the 30 most recent. Each profile takes at least four API calls (or a fetch of the profile page, on claude.ai), so when that's more than 100 profiles, say how many before starting.
 
-With no repo given, run over every public repo the user owns that has stars, listed with `gh api --paginate 'user/repos?affiliation=owner&visibility=public&per_page=100' --jq '.[] | select(.stargazers_count > 0) | .full_name'`. Run Step 1 for each, then treat their stargazers as one list, each star tagged with its repo, for Steps 2 to 4, and read a profile once even when that person starred several of the repos.
+With no repo given, run over every public repo the user owns that has stars, listed with `gh api --paginate 'user/repos?affiliation=owner&visibility=public&per_page=100' --jq '.[] | select(.stargazers_count > 0) | .full_name'`. On claude.ai that path is refused with HTTP 403; use `gh api --paginate 'search/repositories?q=user:LOGIN+fork:true&per_page=100' --jq '.items[] | select(.stargazers_count > 0) | .full_name'` instead, with the login from `gh api user`. Run Step 1 for each, then treat their stargazers as one list, each star tagged with its repo, for Steps 2 to 4, and read a profile once even when that person starred several of the repos.
 
 ## Rules
 
-- Use only what GitHub shows publicly, through `gh api`. Don't search the web or other sites for a stargazer, and don't record email addresses.
+- Use only what GitHub shows publicly, through `gh api`, or on claude.ai the profile page as Step 2 says. Don't search the web or other sites for a stargazer, and don't record email addresses.
 - Never follow, star, message or open an issue for anyone: that's the user's call. If the user asks for one of these, do it only for the people they name.
 - Say what someone's profile and repos suggest about their work. Never say they influenced, copied or were influenced by anything.
 
 ## Step 1: list the stargazers
+
+On claude.ai, the API answers for a repo only once it's attached: attach each repo first with `add_repo` and `access: "push"` (a review has already attached its repo), asking the user once for permission for all of them and suggesting they switch the chat to Manual mode, so each attach waits for their approval. Don't clone them. If a repo can't be attached, say so in one line and go on to the next.
 
 First read the repo with `gh api repos/OWNER/REPO --jq '{full_name, private, stargazers_count}'`, and use its `full_name` from here on, since the name given may differ in case or be an old one. If the call returns 404, stop and say in one line that the repo doesn't exist or isn't visible to the user. If it's private, stop and say so in one line: only people with access can star a private repo, so there are no stargazers to list yet.
 
@@ -43,14 +45,16 @@ For each stargazer (the 30 most recent, if there are more, unless `all` was give
   gh api --paginate 'orgs/ORG/repos?per_page=100' --jq '.[] | [.stargazers_count, .full_name, .description // ""] | @tsv' | sort -rn | head -3
   ```
 
+On claude.ai, `users/LOGIN` and the paths after it are refused with HTTP 403, as the session is bound to its attached repos. When the first one is refused, read each profile instead from its page, `https://github.com/LOGIN`, with WebFetch, one at a time, asking for the name, company, location, bio, followers, and each pinned repo's owner/name, stars and description. A WebFetch result is a summary, not the page, so label what it gives "profile page summary". It doesn't give the latest activity or the most-starred repos, so mark those "Not available"; the pinned repos stand in for the most-starred, and the organisation's repos aren't read. If GitHub refuses a fetch (`RATE_LIMIT_EXCEEDED`), stop fetching and mark the profiles left "Not available: GitHub refused further profile fetches".
+
 ## Step 3: pick the ones worth a look
 
-Pick the stargazers whose bio, repos or organisation are in the same field as the repo they starred. For each, write one line saying why, from what their profile and repos show, such as "maintains a popular NLP annotation library (860 stars) and works at a company in the same field; active 2026-11-18". If none are, say so.
+Pick the stargazers whose bio, repos or organisation are in the same field as the repo they starred. For each, write one line saying why, from what their profile and repos show, such as "maintains a popular NLP annotation library (860 stars) and works at a company in the same field; active 2026-11-18". From a profile page summary, judge by the pinned repos' descriptions and the bio, and say so in the line ("pins two NLP annotation tools, from the profile page summary"). If none are, say so. If no profile could be read, no pick was made: say "Not available" with the reason, never that none are in the same field.
 
 ## Step 4: reply
 
 1. **Worth a look**: one line per pick from Step 3, most relevant first, each starting with the login in backticks.
-2. **All stargazers**: a table, oldest first, with the date starred, login, what the profile gives of name, company and location, followers, and latest activity, and a column for the repo starred when the list covers more than one. When only the 30 most recent were read, say how many earlier stargazers aren't listed.
+2. **All stargazers**: a table, oldest first, with the date starred, login, what the profile gives of name, company and location, followers, and latest activity, and a column for the repo starred when the list covers more than one. When only the 30 most recent were read, say how many earlier stargazers aren't listed. When the profiles came from their pages, say so under the table, and which of bio, company and location none of them gave.
 3. One line on the pattern, if there is one, such as when most stars came, or that none have come in years.
 
 Don't offer to follow or contact anyone unless the user asks.

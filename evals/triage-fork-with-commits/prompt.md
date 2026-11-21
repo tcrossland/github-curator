@@ -14,32 +14,29 @@ The listing (`user/repos?affiliation=owner`), filtered to forks that aren't arch
 [{"full_name": "octo-dev/datepicker", "html_url": "https://github.com/octo-dev/datepicker", "private": false, "fork": true, "archived": false, "pushed_at": "2017-08-22T16:40:03Z", "stargazers_count": 0, "forks_count": 0, "open_issues_count": 0, "description": "A datepicker for Bootstrap", "topics": [], "size": 2210, "default_branch": "master", "license": {"spdx_id": "Apache-2.0"}}]
 ```
 
-`gh api repos/octo-dev/datepicker --jq .parent`:
+There is no previous triage page.
+
+`gh api repos/octo-dev/datepicker --jq '.parent.full_name'` gives `picker-org/datepicker`. The repository search for the parent gives:
 
 ```json
-{"full_name": "picker-org/datepicker", "default_branch": "master", "archived": false}
+{"total_count": 1, "items": [{"full_name": "picker-org/datepicker", "archived": false}]}
 ```
 
-`gh api 'repos/picker-org/datepicker/compare/master...octo-dev:master'`, with the commits as `.author.login`, the email domain and `.commit.message`:
+`gh api user --jq '.login, .name'` gives `octo-dev` and `Alex Rivera`.
 
-```json
-{"status": "diverged", "ahead_by": 6, "behind_by": 431, "commits": [
-  {"login": null, "email_domain": "oldjob.example", "message": "Parse two-digit years in the en-GB locale"},
-  {"login": null, "email_domain": "oldjob.example", "message": "Keep the picker open while the month changes"},
-  {"login": null, "email_domain": "oldjob.example", "message": "Add a test for two-digit years"},
-  {"login": null, "email_domain": "oldjob.example", "message": "Disable dates outside the booking window"},
-  {"login": null, "email_domain": "oldjob.example", "message": "Style disabled dates for the booking form"},
-  {"login": null, "email_domain": "oldjob.example", "message": "Build dist files"}
-]}
+Step 1's git commands for the fork (the parent's default branch is `master`) print:
+
+```
+6
+Alex Rivera	oldjob.example	2017-08-22	Build dist files
+Alex Rivera	oldjob.example	2017-08-21	Style disabled dates for the booking form
+Alex Rivera	oldjob.example	2017-08-21	Disable dates outside the booking window
+Alex Rivera	oldjob.example	2017-08-18	Add a test for two-digit years
+Alex Rivera	oldjob.example	2017-08-18	Keep the picker open while the month changes
+Alex Rivera	oldjob.example	2017-08-17	Parse two-digit years in the en-GB locale
 ```
 
-`gh api --paginate 'repos/octo-dev/datepicker/commits?author=octo-dev&per_page=100' --jq '.[].sha' | wc -l` gives `0`.
-
-`gh api 'search/issues?q=repo:picker-org/datepicker+author:octo-dev+type:pr'`:
-
-```json
-{"total_count": 0, "items": []}
-```
+The search for my pull requests (`search/issues?q=author:octo-dev+type:pr+-user:octo-dev`) gives none to `picker-org/datepicker`.
 
 Pinned on my profile: `octo-dev/tidewatch`, `octo-dev/ledgerlint`.
 
