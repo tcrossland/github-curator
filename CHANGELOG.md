@@ -4,6 +4,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- The plugin's description is shorter, to fit GitHub's limit of 350 characters for a repo's description, so the repo can use the same words.
 - The README opens with what the plugin decides and what sets it apart, and lists `repo-review`'s modes one to a line.
 - The README says what a claude.ai chat can't do yet that Claude Code can, and that the no-changes promise is a rule in the skills' instructions.
 - The README explains what a Claude plugin, a skill and an artifact are where they first appear.
