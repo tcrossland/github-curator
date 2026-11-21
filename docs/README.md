@@ -6,6 +6,26 @@ These notes are for changing the plugin. They stay out of the zip that `scripts/
 - [`github-facts.md`](github-facts.md): the GitHub and Claude behaviours the skills rely on, each with its source and the date it was checked.
 - [`backlog.md`](backlog.md): what to build next.
 
+## Building and releasing
+
+The plugin is installed by uploading a zip of it to claude.ai (Plugins in the left sidebar > Add > Upload plugin), so edits here don't reach Claude until the plugin is uploaded again. Changes collect under Unreleased in [CHANGELOG.md](../CHANGELOG.md); to release them, give that section the new version and date, raise `version` in `.claude-plugin/plugin.json` to match, then build the zip and upload it:
+
+```sh
+scripts/package.sh
+```
+
+It validates the manifest when the `claude` CLI is installed, and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, the README, the changelog and the licence.
+
+To try changes before a release, build a test zip with a pre-release version, which goes only into the zip's manifest:
+
+```sh
+scripts/package.sh --dev 0.3.1-dev.1
+```
+
+Typing `/reload-plugins` in a Claude Code session applies plugin updates, but whether it picks up an upload to claude.ai isn't tested yet.
+
+## Tests
+
 The tests run the skills' code as it stands (the quote checker, the timing script, the reply counts, the review's Contributors and Waiting on you, its secrets scan, `stargazers`' repo listings, `forks`' listing and git commands, `contributions`' searches and grouping script, and `traffic`'s repo listings and snapshot script), check that every relative link in a shipped file points to a file the zip holds, and render the scorecard template's three modes:
 
 ```sh

@@ -1,8 +1,12 @@
 # github-curator
 
-A [Claude plugin](https://claude.com/docs/plugins/build.md) that reviews the repos on a GitHub account the way a visitor meets them, and recommends one thing to do with each: keep it, publish it, archive it with an account of what it was, make it private or delete it, and whether to feature it among the profile's pinned repos. Every finding on its scorecard quotes the file and line it rests on, and the plugin changes nothing itself. It holds five skills, each a set of instructions Claude follows when you run its command:
+A [Claude plugin](https://claude.com/docs/plugins/build.md) that reviews the repos on a GitHub account the way a visitor meets them, and recommends one thing to do with each: keep it, publish it, archive it with an account of what it was, make it private or delete it, and whether to feature it among the profile's pinned repos. Every finding on its scorecard quotes the file and line it rests on, and the plugin changes nothing itself.
+
+> **Placeholder for the author:** a short paragraph in your own words on why you built it and one thing reviewing your own account showed you.
 
 > **Placeholder for the author:** a screenshot of a scorecard goes here.
+
+It holds five skills, each a set of instructions Claude follows when you run its command:
 
 - [`repo-review`](skills/repo-review/SKILL.md): recommends what to do with a repo and the work worth doing first, finds similar repos, checks the repo or a README draft against seven questions, and publishes a scorecard to a page in your claude.ai account (an artifact, private until you share it), with a fix prompt to paste into Claude Code. It runs in these modes:
   - `repo-review` with a repo URL, a local clone's folder, a file or pasted text: one full review.
@@ -42,21 +46,7 @@ It runs in a claude.ai chat or in Claude Code. In Claude Code it reads GitHub wi
 
 ## Install and update
 
-The plugin is installed by uploading a zip of it to claude.ai (Plugins in the left sidebar > Add > Upload plugin). Edits here don't reach Claude until the plugin is uploaded again. Changes collect under Unreleased in [CHANGELOG.md](CHANGELOG.md); to release them, give that section the new version and date, raise `version` in `.claude-plugin/plugin.json` to match, then build the zip and upload it:
-
-```sh
-scripts/package.sh
-```
-
-It validates the manifest when the `claude` CLI is installed, and writes `dist/github-curator-VERSION.zip`, holding only the manifest, the skills, this README, the changelog and the licence.
-
-To try changes before a release, build a test zip with a pre-release version, which goes only into the zip's manifest:
-
-```sh
-scripts/package.sh --dev 0.3.1-dev.1
-```
-
-A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version. Typing `/reload-plugins` in the session applies plugin updates, but whether it picks up an upload to claude.ai isn't tested yet.
+To update, upload the new release's zip the same way; claude.ai asks you to confirm before it replaces the version you have. A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version.
 
 The skills run as `/github-curator:repo-review`, `/github-curator:stargazers`, `/github-curator:forks`, `/github-curator:contributions` and `/github-curator:traffic`.
 
