@@ -26,7 +26,7 @@ A claude.ai chat attached all 74 public repos in Auto mode and created the weekl
 
 The review's Outcomes panel links to the page.
 
-What's left is **the first run on schedule**, due 2026-11-23. If it doesn't save a snapshot, the fallback is a scheduled task in the Claude Code desktop app, and until one works a snapshot is saved by hand by 2026-11-27.
+What's left is **the first run on schedule**: whether the weekly task saves a snapshot when nobody starts it. If it doesn't, the fallback is a scheduled task in the Claude Code desktop app.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task on its schedule.
 
@@ -91,8 +91,8 @@ Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/
 
 Each is done when the change is made and the tests pass, unless it says otherwise. They can be done at any time.
 
-- **`contributions` on claude.ai**: its commands, run in a claude.ai chat on 2026-11-21, don't give Claude Code's groups (details in `docs/github-facts.md`). `gh api user` answers, but `user/memberships/orgs` is refused, and the fallback, the owners `list_repos` gives, missed one of the user's organisations and added a user account. The private search also found 1 pull request where Claude Code finds 2. The skill now says both in its reply on claude.ai. Done when a claude.ai run of the skill, on an upload that has it, shows both.
-- **Secrets scan on claude.ai**: `repo-review` now fetches betterleaks 1.10.1 into the claude.ai VM, checked against the release's checksums, but no review on claude.ai has run it yet. Done when a review of a private repo on claude.ai, on an upload that has the fetch, runs the scan and its page says so. The upload installed now, 0.3.1-dev.1, has both this and the `contributions` change above, so one claude.ai check can close both.
+- **`contributions` on claude.ai**: its commands, run in a claude.ai chat on 2026-11-21, don't give Claude Code's groups (details in `docs/github-facts.md`). `gh api user` answers, but `user/memberships/orgs` is refused, and the fallback, the owners `list_repos` gives, missed an organisation and added a user account. The private search also found fewer pull requests than Claude Code does. The skill now says both in its reply on claude.ai. Done when a claude.ai run of the skill, on an upload that has it, shows both.
+- **Secrets scan on claude.ai**: `repo-review` now fetches betterleaks 1.10.1 into the claude.ai VM, checked against the release's checksums, but no review on claude.ai has run it yet. Done when a review of a private repo on claude.ai, on an upload that has the fetch, runs the scan and its page says so. One claude.ai check, on an upload that has both this and the `contributions` change above, can close both.
 - **Author identities**: let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. Triage's fork step now reads each commit's author name and email domain from git, so the list would let it mark those commits as the user's. Done when triage reads the list and marks matching commits as the user's.
 - **WebFetch of GitHub pages on claude.ai**: WebFetch of a `github.com` page is refused with `URL_NOT_ON_ALLOWLIST` unless a web search in the chat found the URL first (seen 2026-11-21). Two steps rely on it there:
   - **Pins**: `repo-review` Step 1, and triage through it, read the pins from the profile page when GraphQL is refused, as it is in a claude.ai session's own shell. A web search for the user's own `github.com/OWNER`, used only to fetch that page, is enough.
