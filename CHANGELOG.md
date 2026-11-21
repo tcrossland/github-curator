@@ -4,6 +4,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- The README's Try it section links to the latest release, where the zip is.
 - A review that suggests a repo description keeps it to 350 characters, the most GitHub accepts, and writes a shorter one rather than copying a longer description from the manifest.
 - The plugin's description is shorter, to fit GitHub's limit of 350 characters for a repo's description, so the repo can use the same words.
 - The README opens with what the plugin decides and what sets it apart, and lists `repo-review`'s modes one to a line.

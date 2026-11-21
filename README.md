@@ -35,7 +35,7 @@ In a claude.ai chat, GitHub answers only for the repos attached to the chat, so 
 
 It runs in a claude.ai chat or in Claude Code. In Claude Code it reads GitHub with your own `gh`, so sign in first with `gh auth login`. In a claude.ai chat it uses the chat's own access to GitHub, and asks before attaching the repos it needs.
 
-1. Download the zip from the latest release (**Placeholder for the author:** link to the release) and upload it to claude.ai: Plugins in the left sidebar > Add > Upload plugin.
+1. Download the zip from the [latest release](https://github.com/tcrossland/github-curator/releases/latest) and upload it to claude.ai: Plugins in the left sidebar > Add > Upload plugin.
 2. In a new chat, or a new Claude Code session in the Claude desktop app, which picks up plugins uploaded to claude.ai, review one of your repos:
 
    ```
