@@ -326,6 +326,8 @@ The questions and the recommendation use them:
 
 ## Step 2: run every question
 
+Start with this step's progress line, as under Timing (`Questions (4 of 7)` in a one-draft review), before any of its commands, such as checking the README's claims or reading the quote checker.
+
 Write every field fresh, from the files as they are now, even when a previous run exists.
 
 For each question, in order:
