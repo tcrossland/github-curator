@@ -4,7 +4,7 @@ The last step of `repo-review` in overview mode, read only in that mode. The ste
 
 **Timing**: log as set out under Timing in `SKILL.md`. Review the repos one at a time. Finish each repo's review, through publishing (or saving) its scorecard, before making any call for the next, and don't run two repos' steps side by side or in one command. Each repo's review keeps its own log and shows it on its scorecard, and the next repo's log starts after the last one's `Build` line. The overview's log has one line per repo, named `OWNER/NAME`, written as its scorecard is published (or saved, with `no-publish`), then `Build`.
 
-An overview runs the full review on every repo, so with more than a handful, run `triage` first and pass the repos it names to `overview`.
+An overview runs the full review on every repo, so with more than a handful, run `quick` first for the user's own repos, or `triage` when forks are among them, and pass the repos its `next` command names to `overview`.
 
 For `overview`, use the repo URLs given. If none are given, list the user's repos with `list_repos`, keep the ones the user owns, public and private, forks included, leaving out those already archived, and say in the overview's footer which repos were included and how they were chosen.
 

@@ -157,7 +157,7 @@ Reading `rate_limit` costs no request, and `core.used` counts nearly every REST 
 
 The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
 
-Log a line only for a step that ran. The steps, in order (overview and triage name theirs in their own files):
+Log a line only for a step that ran. The steps, in order (overview, triage and quick name theirs in their own files):
 - **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4, which starts the run's JSON with the questions) and `Build` (adding the rest of the JSON in Step 5).
 
 The page needs its timings before the template is filled, so for every page, in this order: finish the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
