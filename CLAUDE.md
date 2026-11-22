@@ -42,7 +42,7 @@ Runs go one at a time unless given `-j N` (up to 8), which `scripts/evals.sh` pa
 
 ## Releasing
 
-Add each user-facing change to `## Unreleased` in `CHANGELOG.md`, in the same commit as the change. Leave `version` alone until the user says to cut a release. Then, in one `chore(release): X.Y.Z` commit, rename Unreleased to the version and date and raise `version` in `.claude-plugin/plugin.json`, and build the zip with `scripts/package.sh`, which also validates the manifest. The user uploads it to claude.ai.
+Add each user-facing change to `## Unreleased` in `CHANGELOG.md`, in the same commit as the change. Leave `version` alone until the user says to cut a release. A release whose Unreleased entries change what the plugin does or shows raises the minor version; one with only fixes to what it already says, or wording, raises the patch. Then, in one `chore(release): X.Y.Z` commit, rename Unreleased to the version and date and raise `version` in `.claude-plugin/plugin.json`, and build the zip with `scripts/package.sh`, which also validates the manifest. The user uploads it to claude.ai. Once `main` is pushed, and with the user's go-ahead since it's public, publish the GitHub release the README's Try it links to: `gh release create vX.Y.Z dist/github-curator-X.Y.Z.zip --target SHA --title X.Y.Z --notes-file NOTES`, with the release commit's full hash (a short one is refused with HTTP 422) and the version's changelog entry as the notes.
 
 ## Writing
 
