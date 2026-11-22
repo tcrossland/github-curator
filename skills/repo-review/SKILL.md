@@ -239,7 +239,7 @@ Note the commit hash or version you checked. It goes in the scorecard's subject 
 - Don't set the repo's dates beside someone else's product in a list or timeline: it reads as a claim of priority or copying. Say once, in a sentence, that one came before the other, then point readers to the other.
 - Don't repeat the same noun or opening ("It was a prototype", "It is a prototype") across neighbouring paragraphs.
 
-**The previous run.** Look for this repo's existing scorecard with `list_artifacts` and the query "Repo review: REPO-NAME", or, failing that, "Portfolio repo check: REPO-NAME" (its title before the skill was renamed). If there is one, read it with `read_artifact` and parse the JSON inside `<script type="application/json" id="data">`. Use it only to compare against in Step 3. Never copy its text into this run.
+**The previous run.** Look for this repo's existing scorecard with `list_artifacts` and the query "Repo review: REPO-NAME", or, failing that, "Portfolio repo check: REPO-NAME" (its title before the skill was renamed). If there is one, read it with `read_artifact` and parse the JSON inside `<script type="application/json" id="data">`, and save it as `PREVIOUS.json` in the working folder Step 5 uses. Use it only to compare against in Step 3 and in Step 6's first line. Never copy its text into this run.
 
 ### Outcomes (context only)
 
@@ -378,7 +378,8 @@ The verdict names the single most important fix. Take the earliest failing quest
 
 ## Step 6: reply
 
-Reply in exactly three lines (two when there is no recommendation), and nothing else:
+Reply in exactly three lines (two when there is no recommendation), and nothing else, after one more line first on a re-run:
+0. On a re-run (Step 1 found a previous run), what changed since it, exactly as the script below prints it first when given the previous run's JSON too (`python3 counts.py RUN.json PREVIOUS.json`): `Since 2026-11-21: Hook fail → pass; action archive → keep`. Leave it out on a first run.
 1. The recommendation: the action and whether to feature it, with the reason, in one sentence, and the number of `todo` items before them when there are any.
 2. The verdict: the most important fix, in one sentence.
 3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the portfolio page's JSON, and Step 9 on the quick review's.
@@ -410,7 +411,21 @@ elif d.get('overview'):
     print('; '.join(f"{r['name']}: {r['action']}{' (featured)' if r.get('feature') else ''}, "
                     + counts(r['name'], list(enumerate(r['statuses'], 1))) for r in d['repos']))
 else:
-    print(counts('the run', [(q.get('short'), q.get('status')) for q in d['questions']]))
+    line = counts('the run', [(q.get('short'), q.get('status')) for q in d['questions']])
+    if len(sys.argv) > 2:
+        p = json.load(open(sys.argv[2], encoding='utf-8'))
+        since = f"Since {str(p.get('date') or 'the last run')[:10]}"
+        old = [q.get('status') for q in p.get('questions') or []]
+        if len(old) != 7 or any(s not in statuses for s in old):
+            print(f"{since}: the previous run's questions can't be compared")
+        else:
+            # By order, not label: a run before 0.7 names questions 4 to 6 differently.
+            moved = [f"{q['short']} {o} → {q['status']}" for q, o in zip(d['questions'], old) if o != q['status']]
+            a, b = (p.get('recommendation') or {}).get('action'), (d.get('recommendation') or {}).get('action')
+            if a and b and a != b:
+                moved.append(f"action {a} → {b}")
+            print(f"{since}: " + ('; '.join(moved) or 'no status or action changed'))
+    print(line)
 ```
 
 The artifact card carries the link, so don't repeat it. With `no-publish` there is no card: add a last line with the saved file's full path.

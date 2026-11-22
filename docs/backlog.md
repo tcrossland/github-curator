@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [What changed, in the reply](#what-changed-in-the-reply) | 0.7 | Reply | S | todo |
 | [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
 | [Tone's shared-work flag varies between runs](#tones-shared-work-flag-varies-between-runs) | 0.8 | Rule | S | todo |
 | [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
@@ -32,9 +31,12 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 
 Changes to what users type and see, released together rather than one at a time.
 
-### What changed, in the reply
-
-Step 3 lists what changed since the last run, but Step 6's reply leaves it out, though a user re-running after fixing things wants it first. A line such as "Since 2026-11-21: Hook fail → pass; 2 fixes landed" would come from the comparison, counted by a script as the counts are. Done when a re-run's reply has the line, a first run's doesn't, and a test covers both.
+Every item is built. What only a real run can show is left for one check with a dev build before the release, in Claude Code and on claude.ai:
+- a bare `repo-review` asks which of the three to run;
+- a review's timing rows put each step's work under its own line, and the progress lines show no cost in them;
+- a portfolio run of more than 10 repos gives its estimate before the first review;
+- a claude.ai review makes no call under `repos/` for a similar repo;
+- a re-run's reply starts with the since line, and a first run's doesn't.
 
 ## 0.8: steadier calls
 

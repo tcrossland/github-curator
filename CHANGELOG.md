@@ -15,6 +15,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - On claude.ai a review no longer asks GitHub for a similar repo's own page, which was refused for every repo not attached to the chat; the search results already hold what the Similar repos panel shows.
 - A portfolio run of more than 10 repos says first what it will take, at about five minutes a repo and on claude.ai one approval each, and offers a quick review of them or a full review of the first 10 instead. A triage on claude.ai says how long attaching its repos will take as well as how many approvals.
 - On the quick review and triage pages, each repo with a fail or flag, or marked for review, has its own review command with a copy button, so you can pick which to review in full rather than take the page's `next` command for ten.
+- A re-run's reply starts with what changed since the last run, such as `Since 2026-11-21: Hook fail → pass; action archive → keep`, printed by the same script as the counts from this run's page and the last one's.
 
 ## 0.6.0 (2026-11-22)
 

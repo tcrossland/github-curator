@@ -21,13 +21,17 @@ def script():
     return found[0]
 
 
-def run_json(doc):
-    """Run the counts script on this JSON; return (exit code, stdout, stderr)."""
+def run_json(doc, previous=None):
+    """Run the counts script on this JSON, and the previous run's when given; return (exit code, stdout, stderr)."""
     with tempfile.TemporaryDirectory() as tmp:
         path, data = Path(tmp) / "counts.py", Path(tmp) / "run.json"
         path.write_text(script(), encoding="utf-8")
         data.write_text(json.dumps(doc), encoding="utf-8")
-        out = subprocess.run([sys.executable, "-I", str(path), str(data)], capture_output=True, text=True)
+        args = [sys.executable, "-I", str(path), str(data)]
+        if previous is not None:
+            (Path(tmp) / "previous.json").write_text(json.dumps(previous), encoding="utf-8")
+            args.append(str(Path(tmp) / "previous.json"))
+        out = subprocess.run(args, capture_output=True, text=True)
         return out.returncode, out.stdout, out.stderr
 
 
@@ -63,6 +67,43 @@ class CountsTest(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertEqual(out, "")
         self.assertIn("unknown status in: Getting started", err)
+
+
+def review(date, action, *statuses):
+    return {"title": "Repo review: x", "date": date, "recommendation": {"action": action}, "questions": questions(*statuses)}
+
+
+class SinceLineTest(unittest.TestCase):
+    def test_a_first_run_has_no_since_line(self):
+        code, out, _ = run_json(review("2026-11-22", "keep", *["pass"] * 7))
+        self.assertEqual((code, out), (0, "7 pass · 0 fail · 0 flagged\n"))
+
+    def test_a_rerun_names_each_status_and_action_that_moved_first(self):
+        code, out, _ = run_json(review("2026-11-22", "keep", "pass", "pass", "flagged", *["pass"] * 4),
+                                review("2026-11-21T10:00:00Z", "archive", "fail", "pass", "pass", *["pass"] * 4))
+        self.assertEqual((code, out), (0, "Since 2026-11-21: Hook fail → pass; Getting started pass → flagged; action archive → keep\n"
+                                          "6 pass · 0 fail · 1 flagged\n"))
+
+    def test_a_rerun_with_nothing_moved_says_so(self):
+        code, out, _ = run_json(review("2026-11-22", "keep", *["pass"] * 7), review("2026-11-21", "keep", *["pass"] * 7))
+        self.assertEqual(out.splitlines()[0], "Since 2026-11-21: no status or action changed")
+
+    def test_old_labels_are_matched_by_order(self):
+        old = review("2026-11-20", "keep", *["pass"] * 7)
+        for q, name in zip(old["questions"][3:6], ["Defensible", "Context", "Way in"]):
+            q["short"] = name
+        old["questions"][5]["status"] = "fail"
+        code, out, _ = run_json(review("2026-11-22", "keep", *["pass"] * 7), old)
+        self.assertEqual(out.splitlines()[0], "Since 2026-11-20: Current fail → pass")
+
+    def test_a_previous_run_it_cannot_read_is_said_not_guessed(self):
+        code, out, _ = run_json(review("2026-11-22", "keep", *["pass"] * 7), {"date": "2026-11-01", "questions": []})
+        self.assertEqual(out.splitlines()[0], "Since 2026-11-01: the previous run's questions can't be compared")
+
+    def test_a_run_it_cannot_count_prints_nothing(self):
+        code, out, err = run_json(review("2026-11-22", "keep", *["pass"] * 6), review("2026-11-21", "keep", *["pass"] * 7))
+        self.assertNotEqual(code, 0)
+        self.assertEqual(out, "")
 
 
 def repo(name, action, feature, *statuses):
