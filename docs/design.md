@@ -110,7 +110,7 @@ The quote checker is a file, `verify_run.py`, copied into the working folder the
 
 The steps name claude.ai's tools (`add_repo`, `list_repos`, `list_artifacts` and the rest), because claude.ai is where the GitHub access is narrowest and the steps were written around it. Claude Code has none of those names, and a run there had to guess. `SKILL.md` maps each one to what Claude Code uses in one list near the top, rather than at each step, so the steps read the same on both and the mapping can be checked in one place. Without an artifact tool the run falls back to `no-publish`, since a page saved as a file loses nothing and the reply can say so. That fallback is what a terminal session gets: Claude Code outside the desktop app has no artifact tool (`docs/github-facts.md`).
 
-GraphQL is named once, in Step 1's pins, with where it works and where it's refused. Before, the settings bullet said it wasn't available at all, which was true only on claude.ai, and the next bullet used it.
+GraphQL is named once, in Step 1's pins, with where it works and where it's refused. Before, the settings bullet said it wasn't available at all, which was true only on claude.ai, and the next bullet used it. On claude.ai it goes through `device_bash` only when a folder is already connected: a review on 0.7.0-dev.2 sent the query there with none, and `device_bash` refused it unrun. Asking the user to connect a folder would put an approval in front of a review for the pins alone, which the profile page gives well enough.
 
 ## Routes that work on claude.ai too
 
