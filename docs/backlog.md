@@ -31,8 +31,7 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 
 Changes to what users type and see, released together rather than one at a time.
 
-Every item is built, and checked with 0.7.0-dev.1 in Claude Code and on claude.ai. A bare `repo-review` asked which of the three to run, a portfolio run of 24 repos gave its estimate before any review, a re-run's reply started with the since line, and a claude.ai review read its similar repos with no call under `repos/`. On 0.7.0-dev.2, a claude.ai review sent each timing line in a command of its own, with only a `cd` before it, and printed `Get the draft (1 of 7)` right after `start`. Left:
-- a review prints `Questions (4 of 7)`, which Step 2 now opens by saying: on dev.1 and dev.2 a claude.ai review went from the `Similar repos` line into the questions' commands and wrote a sentence of its own ("Now the seven answers.") in its place;
+Every item is built, and checked with 0.7.0-dev.1 in Claude Code and on claude.ai. A bare `repo-review` asked which of the three to run, a portfolio run of 24 repos gave its estimate before any review, a re-run's reply started with the since line, and a claude.ai review read its similar repos with no call under `repos/`. On 0.7.0-dev.2, a claude.ai review sent each timing line in a command of its own, with only a `cd` before it, and printed `Get the draft (1 of 7)` right after `start`. On 0.7.0-dev.3, a claude.ai review printed all seven progress lines, `Questions (4 of 7)` before the questions' first command, and read the pins from the profile page with no call through `device_bash`; it sent the `Build` line in the command that finished the run's JSON. Left:
 - a first run's reply has no since line. Every public repo of the user's already has a scorecard, so this needs a repo or draft without one.
 
 ## 0.8: steadier calls
