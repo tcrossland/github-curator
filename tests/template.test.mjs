@@ -218,7 +218,7 @@ test('triage splits clear deletes from repos to review and lists the commands', 
     triage: true, title: 'Repo triage', subject: '3 repos', date: '2026-11-19',
     repos: [repo('t/a', 'review', 'archive'), repo('t/b', 'clear', 'delete'), repo('t/c', 'clear', 'delete')],
     commands: ['gh repo delete t/b', 'gh repo delete t/c'], commandsNote: 'Needs delete_repo.',
-    next: '/github-curator:repo-review overview #', nextNote: 'None left.', footer: 'API only.',
+    next: '/github-curator:repo-review portfolio #', nextNote: 'None left.', footer: 'API only.',
     timings: [{ step: 'List repos', seconds: 3, calls: 1 }, { step: 'Forks', seconds: 61, calls: 120, searches: 17 }],
   });
   assert.match(html, /Timings · 1 min 04 s in all/);
@@ -247,7 +247,7 @@ test('quick review lists each repo with its three statuses, provisional action a
   const { html } = render({
     quick: true, title: 'Quick review', subject: '2 repos', date: '2026-11-22',
     repos: [quickRepo('me/a', ['fail', 'flagged', 'pass'], { pinned: true }), quickRepo('me/b', ['pass', 'pass', 'fail'], { visibility: 'private', stars: 1, action: 'publish' })],
-    next: '/github-curator:repo-review overview https://github.com/me/a', nextNote: 'None left.',
+    next: '/github-curator:repo-review portfolio https://github.com/me/a', nextNote: 'None left.',
     timings: [{ step: 'List repos', seconds: 5, calls: 1, searches: 1 }, { step: 'Build', seconds: 3, calls: 0 }],
     footer: 'Provisional.',
   });
@@ -259,7 +259,7 @@ test('quick review lists each repo with its three statuses, provisional action a
   assert.match(html, /<td class="act">Publish<\/td>/);
   assert.equal((html.match(/<tr><td class="num">/g) || []).length, 2);
   assert.match(html, /<span class="label">Review them in full<\/span>/);
-  assert.match(html, /<code id="next-cmd">\/github-curator:repo-review overview https:\/\/github.com\/me\/a<\/code>/);
+  assert.match(html, /<code id="next-cmd">\/github-curator:repo-review portfolio https:\/\/github.com\/me\/a<\/code>/);
   assert.match(html, /Timings · 8 s in all/);
   assert.match(html, /<footer>Provisional\.<\/footer>/);
   assert.doesNotMatch(html, /Since last quick review|class="strip"|class="fixp" aria-label="Fix prompt"/);

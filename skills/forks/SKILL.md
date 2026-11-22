@@ -1,7 +1,7 @@
 ---
 name: "forks"
 description: "List the forks of one of the user's GitHub repos that have commits of their own, what those commits change and who made them. Use when the user asks who forked a repo, what people did with their forks, or whether anyone builds on it."
-argument-hint: "[OWNER/REPO …] [all]"
+argument-hint: "[repo-url | OWNER/REPO …] [all]"
 ---
 
 # Forks

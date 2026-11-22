@@ -1,7 +1,7 @@
 ---
 name: "repo-review"
-description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: overview, triage, quick."
-argument-hint: "[repo-url | folder | file] · overview [repo-urls…] · triage [public|private|own|forks|archived|org:NAME] · quick [repo-urls…] · no-publish"
+description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: quick, triage, portfolio."
+argument-hint: "[repo | folder | file] · quick [repos…]: a glance · triage [public|private|own|forks|archived|org:NAME]: sort by action · portfolio [repos…]: full review of each · no-publish"
 ---
 
 # Repo review
@@ -11,12 +11,14 @@ The work product is a public GitHub repo, published as a portfolio piece to attr
 For a repo, the review also recommends what to do with it, whether to feature it on the user's profile, and the work worth doing before each. Not every repo should stay as it is: some are finished and should be archived with a proper account of what they were, some aren't worth showing, some private ones are ready to publish, and a few deserve one of the six pinned places on the user's profile. It also finds similar repos, so the review can say what this one adds and where readers who want a maintained tool should go.
 
 There are four ways to run it:
-- **One draft**: the arguments are a repo URL, a local clone's folder, a file, a doc link or pasted text. Run Steps 1 to 6.
-- **Overview**: the arguments start with `overview`, optionally followed by repo URLs. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7. Step 7 and how an overview logs its time are in [overview.md](overview.md) beside this file: read it before starting, and only in this mode.
+- **One draft**: the arguments are a repo, a local clone's folder, a file, a doc link or pasted text. Run Steps 1 to 6.
+- **Portfolio**: the arguments start with `portfolio`, or `overview`, its old name, optionally followed by repos. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7. Step 7 and how a portfolio run logs its time are in [portfolio.md](portfolio.md) beside this file: read it before starting, and only in this mode.
 - **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only, from [triage.md](triage.md) beside this file, read only in this mode: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
-- **Quick**: the arguments start with `quick`, optionally followed by repo URLs. Run Step 9 only, from [quick.md](quick.md) beside this file, read only in this mode: an at-a-glance review of many repos from GitHub's search and each README, answering Hook, Findable and Way in, on one page with a row per repo.
+- **Quick**: the arguments start with `quick`, optionally followed by repos. Run Step 9 only, from [quick.md](quick.md) beside this file, read only in this mode: an at-a-glance review of many repos from GitHub's search and each README, answering Hook, Findable and Way in, on one page with a row per repo.
 
-Several repo URLs with no mode word name no mode: before anything else, ask the user whether to run a quick review of them all (offered first) or an overview, which reviews each in full, and run the one chosen with those URLs. When no one can answer, as in a scheduled task, run the quick review and say why in its footer.
+A repo is given as its URL or as `OWNER/REPO`. A word of that form is a repo unless it names a folder or file that exists in the working folder.
+
+Several repos with no mode word name no mode: before anything else, ask the user whether to run a quick review of them all (offered first) or a portfolio review, which reviews each in full, and run the one chosen with those repos. When no one can answer, as in a scheduled task, run the quick review and say why in its footer.
 
 In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
 
@@ -146,7 +148,7 @@ Leave the recommendation and the feature call out for pasted text, a file, or a 
 
 ## Timing
 
-Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `overview-timings.log` or `triage-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`, in a command of its own: send it as soon as the step's work is done, and write none of the next step's work into the same command.
+Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `portfolio-timings.log`, `triage-timings.log` or `quick-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`, in a command of its own: send it as soon as the step's work is done, and write none of the next step's work into the same command.
 
 ```sh
 printf '%s\t%s\t%s\n' 'NAME' "$(date -u +%s)" "$(r=$(gh api rate_limit --jq '"\(.resources.core.used)\t\(.resources.core.reset)"' 2>/dev/null) && printf %s "$r")" >> "LOG"
@@ -159,7 +161,7 @@ Reading `rate_limit` costs no request, and `core.used` counts nearly every REST 
 
 The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
 
-Log a line only for a step that ran. The steps, in order (overview, triage and quick name theirs in their own files):
+Log a line only for a step that ran. The steps, in order (portfolio, triage and quick name theirs in their own files):
 - **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4, which starts the run's JSON with the questions) and `Build` (adding the rest of the JSON in Step 5).
 
 The page needs its timings before the template is filled, so for every page, in this order: finish the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
@@ -364,7 +366,7 @@ The verdict names the single most important fix. Take the earliest failing quest
 Reply in exactly three lines (two when there is no recommendation), and nothing else:
 1. The recommendation: the action and whether to feature it, with the reason, in one sentence, and the number of `todo` items before them when there are any.
 2. The verdict: the most important fix, in one sentence.
-3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the overview's JSON, and Step 9 on the quick review's.
+3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the portfolio page's JSON, and Step 9 on the quick review's.
 
 ```python
 import json, sys

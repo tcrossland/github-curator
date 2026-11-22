@@ -1,7 +1,7 @@
 ---
 name: "stargazers"
 description: "List who starred one of the user's GitHub repos and when, and pick out stargazers whose work is in the same field. Use when the user asks who starred a repo or which stargazers are worth a look."
-argument-hint: "[OWNER/REPO …] [since:YYYY-MM-DD] [all]"
+argument-hint: "[repo-url | OWNER/REPO …] [since:YYYY-MM-DD] [all]"
 ---
 
 # Stargazers

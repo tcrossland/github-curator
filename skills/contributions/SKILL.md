@@ -1,7 +1,7 @@
 ---
 name: "contributions"
 description: "List the user's merged pull requests to GitHub repos they don't own, with their own organisations, their employers and other people's projects kept apart. Use when the user asks what they've contributed to other projects, or which contributions are worth showing."
-argument-hint: "[employers:OWNER,…] [own:ORG,…]"
+argument-hint: "[employers:OWNER,…] [orgs:ORG,…]"
 ---
 
 # Contributions
@@ -13,7 +13,7 @@ A merged pull request to someone else's project shows how the user works with ot
 
 The arguments are optional keywords:
 - `employers:OWNER,OWNER`: the GitHub owners (organisations or users) the user worked for. Also take any the user's instructions or memory name as their employers' GitHub owners.
-- `own:ORG,ORG`: more organisations to count as the user's own, beside those found in Step 1.
+- `orgs:ORG,ORG`: more organisations to count as the user's own, beside those found in Step 1. `own:ORG,ORG`, its old name, reads the same.
 
 ## Rules
 
@@ -30,7 +30,7 @@ Read the user's login with `gh api user --jq .login`. Then their own organisatio
 gh api --paginate 'user/memberships/orgs?per_page=100' --jq '.[] | select(.role == "admin") | .organization.login'
 ```
 
-If that's refused (as it is in a claude.ai session), take instead the owners, other than the user, of the repos `list_repos` lists. Those aren't the same as the user's organisations: they can include an employer or a person whose repo the user can push to, and they leave out any organisation with no repo the user can push to. Step 5 says what the reply tells the user. Add any given with `own:`.
+If that's refused (as it is in a claude.ai session), take instead the owners, other than the user, of the repos `list_repos` lists. Those aren't the same as the user's organisations: they can include an employer or a person whose repo the user can push to, and they leave out any organisation with no repo the user can push to. Step 5 says what the reply tells the user. Add any given with `orgs:`.
 
 ## Step 2: list the merged pull requests
 
@@ -110,6 +110,6 @@ A repo that isn't in the results was renamed, moved or deleted since: say "not f
 2. **Other people's projects**: a table, most-starred repo first, with the repo, its stars (and "archived" when it is), the number merged, the dates of the first and last, and one line on what they did, from the titles.
 3. **Employers**: one line per owner, with the number merged and the years. When no employers were named, say instead which owners outside the user's organisations have the most merged pull requests, and that `employers:OWNER` lists an employer's apart.
 4. One line on what stands out, if anything does: a long-running contribution, a widely used project, or none in years.
-5. When run where `user/memberships/orgs` was refused: one line naming the owners counted as the user's own, that they came from `list_repos` and may include a person's account or miss an organisation (`own:ORG` adds one), and that private pull requests may be undercounted.
+5. When run where `user/memberships/orgs` was refused: one line naming the owners counted as the user's own, that they came from `list_repos` and may include a person's account or miss an organisation (`orgs:ORG` adds one), and that private pull requests may be undercounted.
 
 Don't offer to comment on or follow up any pull request unless the user asks.

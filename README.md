@@ -12,9 +12,9 @@ I built it to sort out my own GitHub account, which had years of forks, experime
 It holds five skills, each a set of instructions Claude follows when you run its command:
 
 - [`repo-review`](skills/repo-review/SKILL.md): recommends what to do with a repo and the work worth doing first, finds similar repos, checks the repo or a README draft against seven questions, and publishes a scorecard to a page in your claude.ai account (an artifact, private until you share it), with a fix prompt to paste into Claude Code. It runs in these modes:
-  - `repo-review` with a repo URL, a local clone's folder, a file or pasted text: one full review.
+  - `repo-review` with a repo (its URL or `OWNER/REPO`), a local clone's folder, a file or pasted text: one full review.
   - `repo-review triage`: a quick first pass over all of an account's repos from the API, which settles the clear deletes and names the repos worth a full review. `triage org:NAME` does the same for an organisation's repos.
-  - `repo-review overview`: reviews several repos and ranks them.
+  - `repo-review portfolio`: a full review of each repo you name, or of all yours, ranked, with the ones to pin. It was called `overview`, which still works.
   - `repo-review quick`: an at-a-glance review of all your repos, or the ones you name, on three of the questions, from GitHub's search and each README; much faster than a full review, and its calls are provisional.
   - `no-publish`, in any mode: saves the page as a file rather than publishing it.
 
@@ -26,16 +26,16 @@ It holds five skills, each a set of instructions Claude follows when you run its
     layout: elk
   ---
   flowchart LR
-      triage["triage<br>every repo, forks included"] -- "next: the repos to review" --> overview
-      quick["quick<br>your own repos, three questions"] -- "next: the repos with a fail or flag" --> overview
-      overview["overview URL ...<br>a full review of each, ranked"] --> review["full review<br>and its scorecard"]
+      triage["triage<br>every repo, forks included"] -- "next: the repos to review" --> portfolio
+      quick["quick<br>your own repos, three questions"] -- "next: the repos with a fail or flag" --> portfolio
+      portfolio["portfolio URL ...<br>a full review of each, ranked"] --> review["full review<br>and its scorecard"]
       single["repo-review URL"] --> review
       stargazers --> review
       forks --> review
       traffic -- "Traffic history page" --> review
   ```
 
-  Triage and quick review each end with a `next` command that passes the repos worth a full review to `overview`; triage settles the clear deletes on its own. `stargazers`, `forks` and `traffic` feed the scorecard's Outcomes panel.
+  Triage and quick review each end with a `next` command that passes the repos worth a full review to `portfolio`; triage settles the clear deletes on its own. `stargazers`, `forks` and `traffic` feed the scorecard's Outcomes panel.
 
   The seven questions, most important first, each marked pass, fail or flagged:
   - **Hook**: would someone outside the niche understand what it is, why it's interesting and what it found?
@@ -45,9 +45,9 @@ It holds five skills, each a set of instructions Claude follows when you run its
   - **Context**: are the field's terms defined or linked where they first appear?
   - **Way in**: can a visitor run it, reuse part of it or join in, under a licence that lets them?
   - **Tone**: does it read as finished work that shows the author's judgement, rather than internal notes?
-- [`stargazers`](skills/stargazers/SKILL.md): lists who starred a repo and when, and picks out the stargazers whose own work is in the same field. With no repo given it covers every public repo of yours that has stars; `since:YYYY-MM-DD` keeps only recent stars, and `all` reads every stargazer, not only the 30 most recent. GitHub lists stargazers only to a repo's owner, so it works on your own repos. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.
-- [`forks`](skills/forks/SKILL.md): lists the forks of a repo that hold commits of their own, on any branch, what those commits change and who made them, and picks out the ones worth a look, such as a fork that fixes something the repo still gets wrong. With no repo given it covers every public repo of yours that has forks; `all` reads every fork pushed to since it was made, not only the 30 most recent. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.
-- [`contributions`](skills/contributions/SKILL.md): lists your merged pull requests to repos you don't own, in three groups: your own organisations' (counted), your employers' (listed apart, once you name them with `employers:OWNER`) and other people's projects, one row per repo with its stars, the dates and what you did. Pull requests to private repos are counted, never named.
+- [`stargazers`](skills/stargazers/SKILL.md): lists who starred a repo (its URL or `OWNER/REPO`) and when, and picks out the stargazers whose own work is in the same field. With no repo given it covers every public repo of yours that has stars; `since:YYYY-MM-DD` keeps only recent stars, and `all` reads every stargazer, not only the 30 most recent. GitHub lists stargazers only to a repo's owner, so it works on your own repos. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.
+- [`forks`](skills/forks/SKILL.md): lists the forks of a repo (its URL or `OWNER/REPO`) that hold commits of their own, on any branch, what those commits change and who made them, and picks out the ones worth a look, such as a fork that fixes something the repo still gets wrong. With no repo given it covers every public repo of yours that has forks; `all` reads every fork pushed to since it was made, not only the 30 most recent. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.
+- [`contributions`](skills/contributions/SKILL.md): lists your merged pull requests to repos you don't own, in three groups: your own organisations' (counted; `orgs:ORG` adds one it misses), your employers' (listed apart, once you name them with `employers:OWNER`) and other people's projects, one row per repo with its stars, the dates and what you did. Pull requests to private repos are counted, never named.
 - [`traffic`](skills/traffic/SKILL.md): saves the views, clones, stars and top referrers of every public repo you own to a page titled "Traffic history", which charts them. GitHub keeps traffic for 14 days only, so run it once a week; `schedule` sets up a weekly task that does. On claude.ai the repos must be attached to the chat with push access first, which it asks for, and a scheduled run reads only those attached in the chat that created it.
 
 All five read GitHub through `gh api`, and `forks` reads the forks' commits with git. Before publishing a private repo, the review also scans its full history for keys and tokens with [betterleaks](https://github.com/betterleaks/betterleaks), if it's installed (`brew install betterleaks`), or on claude.ai fetched into the session's own VM and checked against its release's checksums; it only detects, and never sends a secret anywhere. The skills' instructions rule out following, starring, commenting on or messaging anyone, opening an issue or pull request, and archiving, deleting or changing the visibility of a repo: the review only recommends. Where a step needs one of those, such as deleting the repos a triage marks clear, the page gives you the commands to run yourself.

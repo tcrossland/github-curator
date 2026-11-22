@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Names and arguments](#names-and-arguments) | 0.7 | Arguments | M | todo |
 | [Question labels that say what they check](#question-labels-that-say-what-they-check) | 0.7 | Questions | S | todo |
 | [`repo-review` with no arguments](#repo-review-with-no-arguments) | 0.7 | UX | S | todo |
 | [Progress during long runs](#progress-during-long-runs) | 0.7 | UX | S | todo |
@@ -40,10 +39,6 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 
 Changes to what users type and see, released together rather than one at a time.
 
-### Names and arguments
-
-`overview` sounds light but is the costliest mode, a full review of every repo then a ranking, while `quick` is the glance; renaming it `portfolio`, after the page it publishes, with `overview` kept as an alias for a release or two, would say what it costs. The hint doesn't say how `quick` (three questions on the user's own repos) differs from `triage` (sorts every repo by action, forks included, and settles the clear deletes). `own` means repos that aren't forks in `triage own` and an organisation to count as the user's in `contributions own:ORG`, which could become `orgs:ORG`. `stargazers` and `forks` take a repo URL or `OWNER/REPO`, but `repo-review` takes URLs only. Done when `portfolio` runs the overview and `overview` still does, the hints say what each mode is for in a few words, `contributions` takes `orgs:`, every skill takes either form of a repo, and the README and changelog say so.
-
 ### Question labels that say what they check
 
 Hook, Findable, Facts and Tone say what they ask, but Defensible, Context and Way in don't, to a reader who hasn't read the rules. Evidence, Jargon and Getting started would. The template takes each label from the run's `short`, so old scorecards still render, but `counts.py`'s quick-mode check and the eval graders match the names, so they change in the same commit. Done when `SKILL.md`, `quick.md`, the README, `counts.py`, the evals and the tests use the new labels, and the changelog says so.
@@ -54,15 +49,15 @@ Hook, Findable, Facts and Tone say what they ask, but Defensible, Context and Wa
 
 ### Progress during long runs
 
-A full review takes two to five minutes and an overview of ten repos about half an hour, with only tool calls to watch. Each step already logs a timing line; the run could also print one short line as each step or repo starts ("Step 2 of 6: the questions", "Repo 3 of 10: OWNER/REPO"). Done when every mode prints one, and only one, line per step or repo, and the timings show it costs nothing measurable.
+A full review takes two to five minutes and a portfolio run of ten repos about half an hour, with only tool calls to watch. Each step already logs a timing line; the run could also print one short line as each step or repo starts ("Step 2 of 6: the questions", "Repo 3 of 10: OWNER/REPO"). Done when every mode prints one, and only one, line per step or repo, and the timings show it costs nothing measurable.
 
 ### The cost of a big run, before it starts
 
-Before an overview or triage of more than about ten repos, say what it will take ("12 repos, about 35 minutes; on claude.ai, 12 approvals to attach them"), from the per-repo times in `docs/design.md`, and offer `quick` instead. Done when `overview.md` and `triage.md` say when and how to estimate, and a run past the threshold gives the estimate before its first step.
+Before a portfolio run or triage of more than about ten repos, say what it will take ("12 repos, about 35 minutes; on claude.ai, 12 approvals to attach them"), from the per-repo times in `docs/design.md`, and offer `quick` instead. Done when `portfolio.md` and `triage.md` say when and how to estimate, and a run past the threshold gives the estimate before its first step.
 
 ### Review one repo from a quick or triage row
 
-Those pages give one `next` command for ten repos. A copy button on each row, giving `/github-curator:repo-review URL`, as the overview's rows copy their fix prompts, would let the user pick. Done when each row with a fail, flag or `review` has the button, and a template test covers it.
+Those pages give one `next` command for ten repos. A copy button on each row, giving `/github-curator:repo-review URL`, as the portfolio page's rows copy their fix prompts, would let the user pick. Done when each row with a fail, flag or `review` has the button, and a template test covers it.
 
 ### What changed, in the reply
 
@@ -144,7 +139,7 @@ Bigger features, in the order to do them.
 The profile page is the first thing a visitor sees. A profile README (the `OWNER/OWNER` repo), the bio, the pins and the featured repos aren't checked together today. On claude.ai it reads the profile page through WebFetch, so it depends on the item on WebFetch of GitHub pages there. `repo-review quick` leaves the profile README repo out for this skill, since Findable and Way in don't apply to it.
 
 A new skill, `profile-review`, would:
-- check the bio and the pins, reusing the pin ranking from overview mode;
+- check the bio and the pins, reusing the pin ranking from portfolio mode;
 - draft a short profile README in the house style that introduces the featured repos, and names the contributions to other people's projects worth mentioning, from the `contributions` skill;
 - publish a scorecard like the repo review's.
 
@@ -154,7 +149,7 @@ A new skill, `profile-review`, would:
 
 ### Links between the pages
 
-Each scorecard, the quick review, the triage page, the overview and Traffic history are separate artifacts found by title, and only the overview links to scorecards. Quick and triage rows could link to a repo's scorecard when one exists, and a scorecard's header to the latest quick review, triage and overview, from one listing of the user's artifacts. Done when each page links to the others it names, and a template test covers each link.
+Each scorecard, the quick review, the triage page, the portfolio page and Traffic history are separate artifacts found by title, and only the portfolio page links to scorecards. Quick and triage rows could link to a repo's scorecard when one exists, and a scorecard's header to the latest quick review, triage and portfolio page, from one listing of the user's artifacts. Done when each page links to the others it names, and a template test covers each link.
 
 ### 10. Launch drafts
 
@@ -186,7 +181,7 @@ Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/
 
 ### Reviews side by side
 
-`docs/design.md` has an overview review its repos one at a time, since the request count is the account's and side-by-side reviews can't be told apart. Several repo URLs with no mode word now ask which mode to run, so they no longer start separate reviews at once, but an overview whose reviews run in subagents still can. On 2026-11-21 one review ran alone, then seven ran in subagents four at a time: by their timing logs they took 2,312 s between them and the last finished 817 s after the first began. Three things came up that the skill doesn't cover. Each review's `calls` included the others' requests, and the page has no field to say so, so each footer said it in a sentence the subagents were given. The reviews share the search limit of 30 a minute (`gh api rate_limit`); none was refused, and the retry after a minute that the subagents were told to use isn't in the skill. And nothing says how many may run at once. Done when the skill either rules side-by-side reviews out, or says how to run them (how many at once, what to do when a search is refused) and the page shows when a review's counts include other runs'.
+`docs/design.md` has a portfolio run review its repos one at a time, since the request count is the account's and side-by-side reviews can't be told apart. Several repo URLs with no mode word now ask which mode to run, so they no longer start separate reviews at once, but a portfolio run whose reviews run in subagents still can. On 2026-11-21 one review ran alone, then seven ran in subagents four at a time: by their timing logs they took 2,312 s between them and the last finished 817 s after the first began. Three things came up that the skill doesn't cover. Each review's `calls` included the others' requests, and the page has no field to say so, so each footer said it in a sentence the subagents were given. The reviews share the search limit of 30 a minute (`gh api rate_limit`); none was refused, and the retry after a minute that the subagents were told to use isn't in the skill. And nothing says how many may run at once. Done when the skill either rules side-by-side reviews out, or says how to run them (how many at once, what to do when a search is refused) and the page shows when a review's counts include other runs'.
 
 ### Author identities
 

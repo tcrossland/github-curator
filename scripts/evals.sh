@@ -8,6 +8,6 @@ set -eu
 
 root=$(cd "$(dirname "$0")/.." && pwd)
 # A run may read only its own workspace, so grant Read on the skills folder:
-# repo-review's mode files (triage.md, overview.md) are read on demand.
+# repo-review's mode files (triage.md, portfolio.md, quick.md) are read on demand.
 exec claude plugin eval "$root" --no-publish --trust-plugin \
   --allow-tools "Read(/$root/skills/**)" "$@"

@@ -2,6 +2,13 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## Unreleased
+
+- `repo-review overview` is now `repo-review portfolio`, after the page it publishes, since it's the costliest mode: a full review of every repo, then a ranking. `overview` still runs it. Triage's and the quick review's `next` commands use the new name.
+- `repo-review` takes a repo as `OWNER/REPO` as well as its URL, as `stargazers` and `forks` already did, in every mode.
+- `repo-review`'s hint in Claude Code's autocomplete says what each mode is for: quick is a glance, triage sorts by action, portfolio reviews each in full.
+- `contributions` takes the organisations to count as yours with `orgs:ORG`, since `own` means repos that aren't forks in `triage own`. `own:ORG` still works.
+
 ## 0.6.0 (2026-11-22)
 
 - A new mode, `repo-review quick`, gives an at-a-glance review of your repos, or of the ones you name: Hook, Findable and Way in for each, from GitHub's search and each README alone, with a likely action and the most important fix, on one page titled "Quick review". It takes seconds a repo where a full review takes minutes, and its calls are provisional. It leaves out forks, archived repos and your profile README repo unless you name them, and ends with the command for a full review of the repos that need one.
