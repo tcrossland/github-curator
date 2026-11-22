@@ -9,7 +9,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [The cost of a big run, before it starts](#the-cost-of-a-big-run-before-it-starts) | 0.7 | UX | S | todo |
 | [Review one repo from a quick or triage row](#review-one-repo-from-a-quick-or-triage-row) | 0.7 | Pages | S | todo |
 | [What changed, in the reply](#what-changed-in-the-reply) | 0.7 | Reply | S | todo |
-| [Similar repos calls `repos/OWNER/REPO`](#similar-repos-calls-reposownerrepo) | 0.7 | Fix | S | todo |
 | [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
 | [Tone's shared-work flag varies between runs](#tones-shared-work-flag-varies-between-runs) | 0.8 | Rule | S | todo |
 | [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
@@ -46,10 +45,6 @@ Those pages give one `next` command for ten repos. A copy button on each row, gi
 ### What changed, in the reply
 
 Step 3 lists what changed since the last run, but Step 6's reply leaves it out, though a user re-running after fixing things wants it first. A line such as "Since 2026-11-21: Hook fail → pass; 2 fixes landed" would come from the comparison, counted by a script as the counts are. Done when a re-run's reply has the line, a first run's doesn't, and a test covers both.
-
-### Similar repos calls `repos/OWNER/REPO`
-
-On 2026-11-22 two claude.ai reviews, on 0.6.0-dev.2 and dev.3, called `repos/OWNER/REPO` for a similar repo, which Similar repos doesn't ask for, and each was refused with HTTP 403 (`GitHub access to this repository is not enabled for this session`); both went on from the search results. Done when Similar repos says the search results hold every field it needs and to call nothing under `repos/` for a similar repo, and a claude.ai review after the change makes no such call.
 
 ## 0.8: steadier calls
 

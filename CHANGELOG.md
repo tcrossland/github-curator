@@ -12,6 +12,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - `repo-review` with no arguments asks what to review: the repo in the current folder, when it's in a git clone, a quick review of all your repos, or a triage. When no one can answer, as in a scheduled task, it runs the quick review.
 - A review prints one line as each step starts, such as `Questions (4 of 7)`, and a portfolio run one as each repo starts, such as `Repo 3 of 10: OWNER/REPO`, so a long run shows where it is.
 - A review's timings are more often true to each step: Timing now says which work belongs to each step, where runs had put some of it before the step's line.
+- On claude.ai a review no longer asks GitHub for a similar repo's own page, which was refused for every repo not attached to the chat; the search results already hold what the Similar repos panel shows.
 
 ## 0.6.0 (2026-11-22)
 
