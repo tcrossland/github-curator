@@ -2,15 +2,15 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
-## Unreleased
+## 0.6.0 (2026-11-22)
 
 - A new mode, `repo-review quick`, gives an at-a-glance review of your repos, or of the ones you name: Hook, Findable and Way in for each, from GitHub's search and each README alone, with a likely action and the most important fix, on one page titled "Quick review". It takes seconds a repo where a full review takes minutes, and its calls are provisional. It leaves out forks, archived repos and your profile README repo unless you name them, and ends with the command for a full review of the repos that need one.
 - A review's Similar repos panel says how each similar repo relates to yours, rather than describing it in one line or judging it: whether it does the same job, what yours adds, whether it's maintained, the search words it's found by that yours lacks, one thing worth borrowing, and whether your README should name it.
 - A review of a repo no one else has starred says so in both Stargazers lists, in the same words every time: "None: no stargazers besides you".
 - Before suggesting a history written in the first person, a review checks who made a repo's commits from its Contributors list, which covers the whole history, rather than from its own shallow copy of the repo.
 - A review that recommends making a repo private, or deleting it, no longer ties its most important fix to a question number. For a repo that's already private, make-private means leaving it private for good, and keep means it stays private only until it's ready to publish.
-- The README has a diagram of how `repo-review`'s modes hand on to each other, and which skills feed a scorecard's Outcomes panel.
 - `repo-review` given several repo URLs and no mode asks whether you want a quick review of them all or an overview, rather than reviewing each in full on its own. When no one can answer, as in a scheduled task, it runs the quick review.
+- The README has a diagram of how `repo-review`'s modes hand on to each other, and which skills feed a scorecard's Outcomes panel.
 
 ## 0.5.0 (2026-11-21)
 
