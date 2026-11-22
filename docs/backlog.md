@@ -8,6 +8,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 |---|---|---|---|---|---|
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | in progress |
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
+| 11 | [Questions for each audience](#11-questions-for-each-audience) | Review rules | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
 | – | [Other smaller items](#smaller) | Fixes | S each | none | any time |
@@ -40,6 +41,16 @@ A new skill, `profile-review`, would:
 **Done when**, for a real profile, it produces:
 - a pins recommendation that names what to pin and what to drop, with a reason for each;
 - a draft profile README that links every recommended pin, and would read well to a visitor who has never heard of the user.
+
+## 11. Questions for each audience
+
+The seven questions are written for one user: someone whose repos are a portfolio for potential employers and collaborators, as the top of `repo-review`'s `SKILL.md` says. Hook, Findable, Facts and Way in fit any public repo, but Tone asks whether a repo "will land with a potential employer or collaborator", which misses a maintained library whose readers are deciding whether to depend on it, or a research repo read by others in the field. Defensible and Context matter most where a repo makes claims or sits in a niche field, and pass easily elsewhere, which costs nothing.
+
+- Tone asks whether the repo will land with the people it's for: the audience the README names, or the one the user sets.
+- An argument, such as `for:employers`, `for:users` or `for:researchers`, sets the audience, with `employers` as the default. It decides what Tone looks for, and how hard Context and Defensible are pressed.
+- Tone's shared-work flag stays as it is; tightening it is its own smaller item.
+
+**Done when** `SKILL.md` and `docs/design.md` say how each audience changes Tone, Context and Defensible, the argument is in the hint and the README, and an eval case for each audience shows a call that differs between them.
 
 ## 10. Launch drafts
 
@@ -95,3 +106,6 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 - **Links between the pages**: each scorecard, the quick review, the triage page, the overview and Traffic history are separate artifacts found by title, and only the overview links to scorecards. Quick and triage rows could link to a repo's scorecard when one exists, and a scorecard's header to the latest quick review, triage and overview, from one listing of the user's artifacts. Done when each page links to the others it names, and a template test covers each link.
 - **Review one repo from a quick or triage row**: those pages give one `next` command for ten repos. A copy button on each row, giving `/github-curator:repo-review URL`, as the overview's rows copy their fix prompts, would let the user pick. Done when each row with a fail, flag or `review` has the button, and a template test covers it.
 - **Fewer approvals on claude.ai**: in Manual mode each `add_repo` call needs an approval, so attaching N repos takes N (`docs/github-facts.md`). Auto mode attached without a prompt in the 0.6.0-dev.3 check, but its check refused `add_repo` in some earlier chats, which is why attaching goes through Manual mode (`docs/design.md`). Trying Auto first and asking for Manual only after a refusal would save most approvals. Done when a claude.ai check shows how often Auto refuses, and the Attaching rule follows from it.
+- **Names and arguments**: `overview` sounds light but is the costliest mode, a full review of every repo then a ranking, while `quick` is the glance; renaming it `portfolio`, after the page it publishes, with `overview` kept as an alias for a release or two, would say what it costs. The hint doesn't say how `quick` (three questions on the user's own repos) differs from `triage` (sorts every repo by action, forks included, and settles the clear deletes). `own` means repos that aren't forks in `triage own` and an organisation to count as the user's in `contributions own:ORG`, which could become `orgs:ORG`. `stargazers` and `forks` take a repo URL or `OWNER/REPO`, but `repo-review` takes URLs only. Done when `portfolio` runs the overview and `overview` still does, the hints say what each mode is for in a few words, `contributions` takes `orgs:`, every skill takes either form of a repo, and the README and changelog say so.
+- **Question labels that say what they check**: Hook, Findable, Facts and Tone say what they ask, but Defensible, Context and Way in don't, to a reader who hasn't read the rules. Evidence, Jargon and Getting started would. The template takes each label from the run's `short`, so old scorecards still render, but `counts.py`'s quick-mode check and the eval graders match the names, so they change in the same commit. Done when `SKILL.md`, `quick.md`, the README, `counts.py`, the evals and the tests use the new labels, and the changelog says so.
+- **A project's status on the page**: after what a repo is, a visitor asks whether it's maintained, experimental or finished. Today that's split between Facts (statuses match their source), Way in (whether it wants contributions) and the checklist before archiving, and no question asks whether the page says it. Fold it into Hook or Way in rather than adding an eighth question, which would change the counts script, the template, quick mode and every eval case. Done when one question's rule asks for it, `docs/design.md` says why there, and an eval case guards it.
