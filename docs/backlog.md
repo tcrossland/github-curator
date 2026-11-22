@@ -26,7 +26,7 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [GitHub's secret scanning on public repos](#githubs-secret-scanning-on-public-repos) | Later | Feature | S | todo |
 | [1. Traffic history](#1-traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
 
-Nothing is left for 0.7.0. Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
+Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
 
 ## 0.8: steadier calls
 
