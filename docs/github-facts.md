@@ -23,6 +23,12 @@ The behaviours of GitHub and of Claude's plugin system that the skills state or 
 | GraphQL lists pins (`user.pinnedItems`). No REST endpoint for them was found. | Seen with `gh api graphql` | 2026-11-19 |
 | WebFetch of the profile page returns the pins, but names the owner only for repos owned by someone else. The owner of the rest is in each link's path. | Seen, in Claude Code and on claude.ai | 2026-11-19 |
 
+## Markdown on github.com
+
+| Fact | Source | Checked |
+|---|---|---|
+| GitHub renders a ```` ```mermaid ```` block in a Markdown file, and honours `layout: elk` in the block's frontmatter: the README's and `docs/design.md`'s diagrams on the `feat/quick-review` branch drew with right-angled edges and aligned rows, as the ELK layout does, not dagre's curves. A list item's indented block renders too. Mermaid without its ELK package ignores `layout: elk` and draws with dagre, with no error (Mermaid 11.4.1). | Seen, in a browser | 2026-11-22 |
+
 ## API behaviour
 
 | Fact | Source | Checked |
