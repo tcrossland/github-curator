@@ -6,6 +6,8 @@ The last step of `repo-review` in portfolio mode (`portfolio`, or `overview`, it
 
 A portfolio run is a full review of every repo, so with more than a handful, run `quick` first for the user's own repos, or `triage` when forks are among them, and pass the repos its `next` command names to `portfolio`.
 
+**The cost, before starting.** Once the repos are known, and before the first one's review, count them. When there are more than 10 (a `next` command names 10 at most), say in one message what the run will take, at about five minutes a repo, and on claude.ai one approval a repo to attach it in Manual mode: `12 repos, about an hour; on claude.ai, 12 approvals to attach them`. Offer a quick review of them instead, or a full review of the first 10, and wait for the answer. When no one can answer, as in a scheduled task, run what was asked and give the estimate in the footer.
+
 Use the repos given. If none are given, list the user's repos with `list_repos`, keep the ones the user owns, public and private, forks included, leaving out those already archived, and say in the page's footer which repos were included and how they were chosen.
 
 After each repo's scorecard is published (or saved, with `no-publish`), publish or save one more page from the same template, titled "Portfolio overview", with the icon `checklist`. Republish to an existing "Portfolio overview" artifact if `list_artifacts` finds one. Its JSON:

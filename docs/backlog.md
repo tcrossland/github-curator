@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [The cost of a big run, before it starts](#the-cost-of-a-big-run-before-it-starts) | 0.7 | UX | S | todo |
 | [Review one repo from a quick or triage row](#review-one-repo-from-a-quick-or-triage-row) | 0.7 | Pages | S | todo |
 | [What changed, in the reply](#what-changed-in-the-reply) | 0.7 | Reply | S | todo |
 | [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
@@ -33,10 +32,6 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 ## 0.7: names, and how a run feels
 
 Changes to what users type and see, released together rather than one at a time.
-
-### The cost of a big run, before it starts
-
-Before a portfolio run or triage of more than about ten repos, say what it will take ("12 repos, about 35 minutes; on claude.ai, 12 approvals to attach them"), from the per-repo times in `docs/design.md`, and offer `quick` instead. Done when `portfolio.md` and `triage.md` say when and how to estimate, and a run past the threshold gives the estimate before its first step.
 
 ### Review one repo from a quick or triage row
 
