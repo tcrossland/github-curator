@@ -6,13 +6,13 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
+| [Co-authors from commit trailers](#co-authors-from-commit-trailers) | 0.8 | Rule | S | in progress |
 | [Tone's shared-work flag varies between runs](#tones-shared-work-flag-varies-between-runs) | 0.8 | Rule | S | todo |
+| [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
 | [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
 | [The user's own star in triage](#the-users-own-star-in-triage) | 0.8 | Rule | S | todo |
-| [Co-authors from commit trailers](#co-authors-from-commit-trailers) | 0.8 | Rule | S | todo |
-| [Eval cases that fail with their rule cut](#eval-cases-that-fail-with-their-rule-cut) | 0.8 | Evals | M | todo |
 | [Carry over a triage's reasons](#carry-over-a-triages-reasons) | 0.8 | Decision | S | todo |
+| [Eval cases that fail with their rule cut](#eval-cases-that-fail-with-their-rule-cut) | 0.8 | Evals | M | todo |
 | [A first run's reply](#a-first-runs-reply) | 0.8 | Check | S | todo |
 | [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [WebFetch of GitHub pages on claude.ai](#webfetch-of-github-pages-on-claudeai) | One claude.ai check | claude.ai | S | todo |
@@ -32,6 +32,16 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 Rules that decide a status or an action, and the evals that guard them.
 
+The order puts each change before the ones that build on it. Who counts as a co-author decides whose work Tone's credit flag looks for, and that flag is settled before the audiences rewrite the rest of Tone. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
+
+### Co-authors from commit trailers
+
+The review counts other people's commits from `repos/OWNER/REPO/contributors`, which counts commit authors only. For this repo it gave one contributor while GitHub's Contributors sidebar showed two, the second being Claude, named only in `Co-Authored-By` trailers, so the sidebar seems to count trailers (inferred from the counts, **unverified**). A repo whose human co-authors appear only in trailers would then look like solo work to Tone. Done when the inference is checked, and the review reads co-authors from the trailers (leaving out Claude and other tools) or `docs/design.md` says why not.
+
+### Tone's shared-work flag varies between runs
+
+The `other-people` eval case missed Tone's flag in one of three runs on Opus 5.5 (2026-11-21) and in one of three on Sonnet 5.5 (2026-11-22), the only miss in either suite. A rule that leaves too much to judgement shows up as runs that disagree (`docs/design.md`, Behaviour evals). Done when Tone's rule says plainly when shared work presented as the user's alone is flagged, and the case passes three runs out of three on both models.
+
 ### 11. Questions for each audience
 
 The seven questions are written for one user: someone whose repos are a portfolio for potential employers and collaborators, as the top of `repo-review`'s `SKILL.md` says. Hook, Findable, Facts and Getting started fit any public repo, but Tone asks whether a repo "will land with a potential employer or collaborator", which misses a maintained library whose readers are deciding whether to depend on it, or a research repo read by others in the field. Evidence and Jargon matter most where a repo makes claims or sits in a niche field, and pass easily elsewhere, which costs nothing.
@@ -42,10 +52,6 @@ The seven questions are written for one user: someone whose repos are a portfoli
 
 **Done when** `SKILL.md` and `docs/design.md` say how each audience changes Tone, Jargon and Evidence, the argument is in the hint and the README, and an eval case for each audience shows a call that differs between them.
 
-### Tone's shared-work flag varies between runs
-
-The `other-people` eval case missed Tone's flag in one of three runs on Opus 5.5 (2026-11-21) and in one of three on Sonnet 5.5 (2026-11-22), the only miss in either suite. A rule that leaves too much to judgement shows up as runs that disagree (`docs/design.md`, Behaviour evals). Done when Tone's rule says plainly when shared work presented as the user's alone is flagged, and the case passes three runs out of three on both models.
-
 ### A project's status on the page
 
 After what a repo is, a visitor asks whether it's maintained, experimental or finished. Today that's split between Facts (statuses match their source), Getting started (whether it wants contributions) and the checklist before archiving, and no question asks whether the page says it. Fold it into Hook or Getting started rather than adding an eighth question, which would change the counts script, the template, quick mode and every eval case. Done when one question's rule asks for it, `docs/design.md` says why there, and an eval case guards it.
@@ -54,17 +60,13 @@ After what a repo is, a visitor asks whether it's maintained, experimental or fi
 
 Triage reads `stargazers_count` as interest from others, but the count includes the user's own star. On 2026-11-21 triage gave one repo "A finished prototype with a star" as its reason to archive, and that star was the user's own, given the day the repo was created. Triage never lists stargazers today (`triage.md`), so telling them apart changes that rule: one stargazers call for each repo with only a few stars would do it, and `stargazers` already leaves the user's own star out. Done when triage leaves the user's own star out of its signals and reasons, `docs/design.md` says why, and the timings show what it costs.
 
-### Co-authors from commit trailers
+### Carry over a triage's reasons
 
-The review counts other people's commits from `repos/OWNER/REPO/contributors`, which counts commit authors only. For this repo it gave one contributor while GitHub's Contributors sidebar showed two, the second being Claude, named only in `Co-Authored-By` trailers, so the sidebar seems to count trailers (inferred from the counts, **unverified**). A repo whose human co-authors appear only in trailers would then look like solo work to Tone. Done when the inference is checked, and the review reads co-authors from the trailers (leaving out Claude and other tools) or `docs/design.md` says why not.
+The second triage on claude.ai reused the previous page's reasons and questions word for word where a repo's signals hadn't changed, which the skill neither asks for nor forbids. Decide whether triage should: carrying them over keeps the page stable between runs and saves time, but hides a call that a rule change since would make differently. Done when `triage.md` says which, and `docs/design.md` says why.
 
 ### Eval cases that fail with their rule cut
 
 `quick-way-in-no-usage` and `similar-relations` guard the rules that went wrong in quick mode's first live check. On 2026-11-22, one run each with the rule cut from a copy of the plugin: both Difference graders failed, as they should, but the Getting started grader and both Mention graders still passed. So those two calls are held by other statements (Step 2's question for Getting started; the Archive bullet and the old wording for Mention), or the fixtures are easier than the live case, where the review ran in full and recommended keep. Done when each grader fails with its rule cut, from a fixture closer to the live case (for Mention, a keep review that runs the recommendation), or `docs/design.md` says why a passing cut is acceptable.
-
-### Carry over a triage's reasons
-
-The second triage on claude.ai reused the previous page's reasons and questions word for word where a repo's signals hadn't changed, which the skill neither asks for nor forbids. Decide whether triage should: carrying them over keeps the page stable between runs and saves time, but hides a call that a rule change since would make differently. Done when `triage.md` says which, and `docs/design.md` says why.
 
 ### A first run's reply
 
