@@ -52,13 +52,13 @@ class QuickQuotesTest(unittest.TestCase):
                 {"name": "me/alpha", "questions": [question("Hook", "Alpha diffs tables.", "README.md, line 3"),
                                                    question("Findable", "x", "GitHub repo description, read via the search API")]},
                 {"name": "me/beta", "questions": [question("Hook", "Beta opens here.", ".github/README.md, line 1"),
-                                                  question("Way in", "Alpha diffs tables.", "README.md, line 3")]},
+                                                  question("Getting started", "Alpha diffs tables.", "README.md, line 3")]},
             ],
             {"me--alpha/README.md": "# Alpha\n\nAlpha diffs tables.\n",
              "me--beta/.github/README.md": "Beta opens here.\n"},
         )
         self.assertIn("== me/alpha\nHook: ok (README.md, line 3)\nFindable: not a file quote, skipped", out)
-        self.assertIn("== me/beta\nHook: ok (.github/README.md, line 1)\nWay in: MISSING FILE README.md", out)
+        self.assertIn("== me/beta\nHook: ok (.github/README.md, line 1)\nGetting started: MISSING FILE README.md", out)
         self.assertEqual(re.findall(r"problems: (\d+)", out), ["0", "1"])
 
     def test_a_quote_on_the_wrong_line_is_a_problem(self):

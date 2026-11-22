@@ -35,7 +35,7 @@ def run(questions):
     return run_json({"title": "Repo review: x", "questions": questions})
 
 
-SHORTS = ["Hook", "Proof", "Way in", "Signal", "Findable", "Current", "Tone"]
+SHORTS = ["Hook", "Proof", "Getting started", "Signal", "Findable", "Current", "Tone"]
 
 
 def questions(*statuses):
@@ -62,7 +62,7 @@ class CountsTest(unittest.TestCase):
         code, out, err = run(questions("pass", "pass", "Flagged", "pass", "pass", "pass", "pass"))
         self.assertNotEqual(code, 0)
         self.assertEqual(out, "")
-        self.assertIn("unknown status in: Way in", err)
+        self.assertIn("unknown status in: Getting started", err)
 
 
 def repo(name, action, feature, *statuses):
@@ -89,13 +89,13 @@ class OverviewCountsTest(unittest.TestCase):
 
     def test_quick_counts_each_question_across_repos(self):
         def q(*st):
-            return [{"short": n, "status": x} for n, x in zip(["Hook", "Findable", "Way in"], st)]
+            return [{"short": n, "status": x} for n, x in zip(["Hook", "Findable", "Getting started"], st)]
         code, out, _ = run_json({"quick": True, "repos": [
             {"name": "o/a", "questions": q("pass", "flagged", "fail")},
             {"name": "o/b", "questions": q("fail", "pass", "fail")},
         ]})
         self.assertEqual((code, out), (0, "2 repos; Hook 1 pass · 1 fail · 0 flagged; "
-                                          "Findable 1 pass · 0 fail · 1 flagged; Way in 0 pass · 2 fail · 0 flagged\n"))
+                                          "Findable 1 pass · 0 fail · 1 flagged; Getting started 0 pass · 2 fail · 0 flagged\n"))
 
     def test_quick_refuses_a_repo_without_its_three_questions(self):
         code, out, err = run_json({"quick": True, "repos": [
@@ -107,7 +107,7 @@ class OverviewCountsTest(unittest.TestCase):
 
     def test_quick_refuses_an_unknown_status(self):
         code, _, err = run_json({"quick": True, "repos": [
-            {"name": "o/a", "questions": [{"short": n, "status": "ok"} for n in ["Hook", "Findable", "Way in"]]},
+            {"name": "o/a", "questions": [{"short": n, "status": "ok"} for n in ["Hook", "Findable", "Getting started"]]},
         ]})
         self.assertNotEqual(code, 0)
         self.assertIn("cannot count o/a", err)

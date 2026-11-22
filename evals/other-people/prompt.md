@@ -64,5 +64,5 @@ Files: `README.md`, `LICENSE`, `package.json`, `src/` (`main.ts`, `board.ts`, `p
 When you're done, end your reply with a JSON code block in this shape: each question's status, the recommended action, the Contributors and Waiting on you entries as the scorecard would list them, and the fix prompt's items with their `question`, `status` and `text`:
 
 ```json
-{"statuses": {"Hook": "", "Findable": "", "Facts": "", "Defensible": "", "Context": "", "Way in": "", "Tone": ""}, "action": "", "contributors": [""], "waiting": [""], "fixItems": [{"question": "", "status": "", "text": ""}]}
+{"statuses": {"Hook": "", "Findable": "", "Facts": "", "Evidence": "", "Jargon": "", "Getting started": "", "Tone": ""}, "action": "", "contributors": [""], "waiting": [""], "fixItems": [{"question": "", "status": "", "text": ""}]}
 ```

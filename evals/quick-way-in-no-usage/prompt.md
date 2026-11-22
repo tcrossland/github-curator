@@ -1,5 +1,5 @@
 ---
-description: A quick review fails Way in for a README with a licence and no word on how to install, run or use the repo.
+description: A quick review fails Getting started for a README with a licence and no word on how to install, run or use the repo.
 tags: [quick]
 max_turns: 15
 ---
@@ -39,5 +39,5 @@ The README clone printed `== README.md`. `README.md`, with line numbers, is the 
 When you're done, end your reply with a JSON code block in this shape, with the quick review's three statuses for the repo and its likely action:
 
 ```json
-{"statuses": {"Hook": "", "Findable": "", "Way in": ""}, "action": ""}
+{"statuses": {"Hook": "", "Findable": "", "Getting started": ""}, "action": ""}
 ```

@@ -76,5 +76,5 @@ license = "MIT"
 When you're done, end your reply with a JSON code block in this shape, with each question's status, the recommended action, and the items before that action (not those before featuring):
 
 ```json
-{"statuses": {"Hook": "", "Findable": "", "Facts": "", "Defensible": "", "Context": "", "Way in": "", "Tone": ""}, "action": "", "before": [{"text": "", "status": ""}]}
+{"statuses": {"Hook": "", "Findable": "", "Facts": "", "Evidence": "", "Jargon": "", "Getting started": "", "Tone": ""}, "action": "", "before": [{"text": "", "status": ""}]}
 ```

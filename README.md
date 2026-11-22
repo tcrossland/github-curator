@@ -41,9 +41,9 @@ It holds five skills, each a set of instructions Claude follows when you run its
   - **Hook**: would someone outside the niche understand what it is, why it's interesting and what it found?
   - **Findable**: is it public, with a description and topics in the words people search for?
   - **Facts**: does every result, status, version, command, link and tag match its source?
-  - **Defensible**: does each strong claim point to the test, report or file that proves it?
-  - **Context**: are the field's terms defined or linked where they first appear?
-  - **Way in**: can a visitor run it, reuse part of it or join in, under a licence that lets them?
+  - **Evidence**: does each strong claim point to the test, report or file that proves it?
+  - **Jargon**: are the field's terms defined or linked where they first appear?
+  - **Getting started**: can a visitor run it, reuse part of it or join in, under a licence that lets them?
   - **Tone**: does it read as finished work that shows the author's judgement, rather than internal notes?
 - [`stargazers`](skills/stargazers/SKILL.md): lists who starred a repo (its URL or `OWNER/REPO`) and when, and picks out the stargazers whose own work is in the same field. With no repo given it covers every public repo of yours that has stars; `since:YYYY-MM-DD` keeps only recent stars, and `all` reads every stargazer, not only the 30 most recent. GitHub lists stargazers only to a repo's owner, so it works on your own repos. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.
 - [`forks`](skills/forks/SKILL.md): lists the forks of a repo (its URL or `OWNER/REPO`) that hold commits of their own, on any branch, what those commits change and who made them, and picks out the ones worth a look, such as a fork that fixes something the repo still gets wrong. With no repo given it covers every public repo of yours that has forks; `all` reads every fork pushed to since it was made, not only the 30 most recent. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.

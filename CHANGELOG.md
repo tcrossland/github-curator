@@ -9,6 +9,8 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - `repo-review`'s hint in Claude Code's autocomplete says what each mode is for: quick is a glance, triage sorts by action, portfolio reviews each in full.
 - `contributions` takes the organisations to count as yours with `orgs:ORG`, since `own` means repos that aren't forks in `triage own`. `own:ORG` still works.
 
+- Three of the seven questions have labels that say what they check: Defensible is now Evidence, Context is Jargon and Way in is Getting started. The questions themselves are unchanged, and a re-run compares with a scorecard that has the old labels question by question.
+
 ## 0.6.0 (2026-11-22)
 
 - A new mode, `repo-review quick`, gives an at-a-glance review of your repos, or of the ones you name: Hook, Findable and Way in for each, from GitHub's search and each README alone, with a likely action and the most important fix, on one page titled "Quick review". It takes seconds a repo where a full review takes minutes, and its calls are provisional. It leaves out forks, archived repos and your profile README repo unless you name them, and ends with the command for a full review of the repos that need one.

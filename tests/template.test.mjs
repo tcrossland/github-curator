@@ -239,7 +239,7 @@ test('triage\'s changes since the last triage start closed, with their count', (
 
 const quickRepo = (name, statuses, extra = {}) => ({
   name, link: `https://github.com/${name}`, visibility: 'public', pinned: false, pushed: '2026-11-01', stars: 2, action: 'keep', fix: 'Add topics.', question: 'Worth featuring?',
-  questions: ['Hook', 'Findable', 'Way in'].map((short, i) => ({ short, status: statuses[i], note: `${short} note`, quotes: [{ text: `${short} line`, source: 'README.md, line 1' }] })),
+  questions: ['Hook', 'Findable', 'Getting started'].map((short, i) => ({ short, status: statuses[i], note: `${short} note`, quotes: [{ text: `${short} line`, source: 'README.md, line 1' }] })),
   ...extra,
 });
 
@@ -251,7 +251,7 @@ test('quick review lists each repo with its three statuses, provisional action a
     timings: [{ step: 'List repos', seconds: 5, calls: 1, searches: 1 }, { step: 'Build', seconds: 3, calls: 0 }],
     footer: 'Provisional.',
   });
-  assert.match(html, /<span class="label">Quick review · provisional<\/span><p class="fix">2 repos · 2 with a fail<\/p><p class="why">Hook: 1 pass, 1 fail, 0 flagged · Findable: 1 pass, 0 fail, 1 flagged · Way in: 1 pass, 1 fail, 0 flagged<\/p>/);
+  assert.match(html, /<span class="label">Quick review · provisional<\/span><p class="fix">2 repos · 2 with a fail<\/p><p class="why">Hook: 1 pass, 1 fail, 0 flagged · Findable: 1 pass, 0 fail, 1 flagged · Getting started: 1 pass, 1 fail, 0 flagged<\/p>/);
   assert.match(html, /<a href="https:\/\/github.com\/me\/a">me\/a<\/a><div class="tsub">public · pinned · 2 stars · pushed 2026-11-01<\/div>/);
   assert.match(html, /<div class="tsub">private · 1 star · pushed 2026-11-01<\/div>/);
   assert.match(html, /<div class="qi"><span class="q fail">Hook · Fail<\/span> <span class="qn">Hook note<\/span><\/div><div class="qi"><span class="q flagged">Findable · Flagged<\/span>/);

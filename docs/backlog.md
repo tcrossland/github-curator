@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Question labels that say what they check](#question-labels-that-say-what-they-check) | 0.7 | Questions | S | todo |
 | [`repo-review` with no arguments](#repo-review-with-no-arguments) | 0.7 | UX | S | todo |
 | [Progress during long runs](#progress-during-long-runs) | 0.7 | UX | S | todo |
 | [The cost of a big run, before it starts](#the-cost-of-a-big-run-before-it-starts) | 0.7 | UX | S | todo |
@@ -38,10 +37,6 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 ## 0.7: names, and how a run feels
 
 Changes to what users type and see, released together rather than one at a time.
-
-### Question labels that say what they check
-
-Hook, Findable, Facts and Tone say what they ask, but Defensible, Context and Way in don't, to a reader who hasn't read the rules. Evidence, Jargon and Getting started would. The template takes each label from the run's `short`, so old scorecards still render, but `counts.py`'s quick-mode check and the eval graders match the names, so they change in the same commit. Done when `SKILL.md`, `quick.md`, the README, `counts.py`, the evals and the tests use the new labels, and the changelog says so.
 
 ### `repo-review` with no arguments
 
@@ -77,13 +72,13 @@ Rules that decide a status or an action, and the evals that guard them.
 
 ### 11. Questions for each audience
 
-The seven questions are written for one user: someone whose repos are a portfolio for potential employers and collaborators, as the top of `repo-review`'s `SKILL.md` says. Hook, Findable, Facts and Way in fit any public repo, but Tone asks whether a repo "will land with a potential employer or collaborator", which misses a maintained library whose readers are deciding whether to depend on it, or a research repo read by others in the field. Defensible and Context matter most where a repo makes claims or sits in a niche field, and pass easily elsewhere, which costs nothing.
+The seven questions are written for one user: someone whose repos are a portfolio for potential employers and collaborators, as the top of `repo-review`'s `SKILL.md` says. Hook, Findable, Facts and Getting started fit any public repo, but Tone asks whether a repo "will land with a potential employer or collaborator", which misses a maintained library whose readers are deciding whether to depend on it, or a research repo read by others in the field. Evidence and Jargon matter most where a repo makes claims or sits in a niche field, and pass easily elsewhere, which costs nothing.
 
 - Tone asks whether the repo will land with the people it's for: the audience the README names, or the one the user sets.
-- An argument, such as `for:employers`, `for:users` or `for:researchers`, sets the audience, with `employers` as the default. It decides what Tone looks for, and how hard Context and Defensible are pressed.
+- An argument, such as `for:employers`, `for:users` or `for:researchers`, sets the audience, with `employers` as the default. It decides what Tone looks for, and how hard Jargon and Evidence are pressed.
 - Tone's shared-work flag stays as it is; tightening it is its own item, under 0.8.
 
-**Done when** `SKILL.md` and `docs/design.md` say how each audience changes Tone, Context and Defensible, the argument is in the hint and the README, and an eval case for each audience shows a call that differs between them.
+**Done when** `SKILL.md` and `docs/design.md` say how each audience changes Tone, Jargon and Evidence, the argument is in the hint and the README, and an eval case for each audience shows a call that differs between them.
 
 ### Tone's shared-work flag varies between runs
 
@@ -91,7 +86,7 @@ The `other-people` eval case missed Tone's flag in one of three runs on Opus 5.5
 
 ### A project's status on the page
 
-After what a repo is, a visitor asks whether it's maintained, experimental or finished. Today that's split between Facts (statuses match their source), Way in (whether it wants contributions) and the checklist before archiving, and no question asks whether the page says it. Fold it into Hook or Way in rather than adding an eighth question, which would change the counts script, the template, quick mode and every eval case. Done when one question's rule asks for it, `docs/design.md` says why there, and an eval case guards it.
+After what a repo is, a visitor asks whether it's maintained, experimental or finished. Today that's split between Facts (statuses match their source), Getting started (whether it wants contributions) and the checklist before archiving, and no question asks whether the page says it. Fold it into Hook or Getting started rather than adding an eighth question, which would change the counts script, the template, quick mode and every eval case. Done when one question's rule asks for it, `docs/design.md` says why there, and an eval case guards it.
 
 ### The user's own star in triage
 
@@ -103,7 +98,7 @@ The review counts other people's commits from `repos/OWNER/REPO/contributors`, w
 
 ### Eval cases that fail with their rule cut
 
-`quick-way-in-no-usage` and `similar-relations` guard the rules that went wrong in quick mode's first live check. On 2026-11-22, one run each with the rule cut from a copy of the plugin: both Difference graders failed, as they should, but the Way in grader and both Mention graders still passed. So those two calls are held by other statements (Step 2's question for Way in; the Archive bullet and the old wording for Mention), or the fixtures are easier than the live case, where the review ran in full and recommended keep. Done when each grader fails with its rule cut, from a fixture closer to the live case (for Mention, a keep review that runs the recommendation), or `docs/design.md` says why a passing cut is acceptable.
+`quick-way-in-no-usage` and `similar-relations` guard the rules that went wrong in quick mode's first live check. On 2026-11-22, one run each with the rule cut from a copy of the plugin: both Difference graders failed, as they should, but the Getting started grader and both Mention graders still passed. So those two calls are held by other statements (Step 2's question for Getting started; the Archive bullet and the old wording for Mention), or the fixtures are easier than the live case, where the review ran in full and recommended keep. Done when each grader fails with its rule cut, from a fixture closer to the live case (for Mention, a keep review that runs the recommendation), or `docs/design.md` says why a passing cut is acceptable.
 
 ### Carry over a triage's reasons
 
@@ -128,7 +123,7 @@ Done when a claude.ai triage reads the pins, and a claude.ai `stargazers` run re
 
 ### Which model for a full review
 
-With `--model sonnet` the eval suite passed as it does on Opus 5.5 at about half the cost a run, but the cases check fixed calls on small fixtures, not the judgement calls a real README needs (Hook, Defensible, Context). Done when full reviews of the same three real repos on Sonnet 5.5 and Opus 5.5 are compared question by question, `docs/design.md` records the result, and the README says which model to pick. Until then, the README's Try it section says which model the skills were tested on (the eval suite has run on Opus 5.5 and Sonnet 5.5, and one claude.ai check on Sonnet 5.5), so a user on another model knows what they're departing from.
+With `--model sonnet` the eval suite passed as it does on Opus 5.5 at about half the cost a run, but the cases check fixed calls on small fixtures, not the judgement calls a real README needs (Hook, Evidence, Jargon). Done when full reviews of the same three real repos on Sonnet 5.5 and Opus 5.5 are compared question by question, `docs/design.md` records the result, and the README says which model to pick. Until then, the README's Try it section says which model the skills were tested on (the eval suite has run on Opus 5.5 and Sonnet 5.5, and one claude.ai check on Sonnet 5.5), so a user on another model knows what they're departing from.
 
 ## Later
 
@@ -136,7 +131,7 @@ Bigger features, in the order to do them.
 
 ### 6. Profile review
 
-The profile page is the first thing a visitor sees. A profile README (the `OWNER/OWNER` repo), the bio, the pins and the featured repos aren't checked together today. On claude.ai it reads the profile page through WebFetch, so it depends on the item on WebFetch of GitHub pages there. `repo-review quick` leaves the profile README repo out for this skill, since Findable and Way in don't apply to it.
+The profile page is the first thing a visitor sees. A profile README (the `OWNER/OWNER` repo), the bio, the pins and the featured repos aren't checked together today. On claude.ai it reads the profile page through WebFetch, so it depends on the item on WebFetch of GitHub pages there. `repo-review quick` leaves the profile README repo out for this skill, since Findable and Getting started don't apply to it.
 
 A new skill, `profile-review`, would:
 - check the bio and the pins, reusing the pin ranking from portfolio mode;
@@ -161,9 +156,9 @@ When the review says publish or feature, draft the announcement: where it fits, 
 
 The review checks the page, not the engineering. A visitor who opens `pyproject.toml` or the CI workflow judges the craft too, and nothing checks it today: the manifest, CI workflow and licence are read only to confirm facts on the page.
 
-Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/a`, each with its evidence, kept apart from the seven questions so it doesn't blur them. Its `todo` items join the fix prompt. It also feeds into Way in, Tone and the feature call.
+Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/a`, each with its evidence, kept apart from the seven questions so it doesn't blur them. Its `todo` items join the fix prompt. It also feeds into Getting started, Tone and the feature call.
 
-- **Common to every repo**: a README with what it is, how to install and run it, and the result; a licence (already checked under Way in, so the panel only refers to that finding); tests, and CI that runs them on every push; a CI badge only when the badge is accurate; tagged releases and a changelog when it's versioned; CONTRIBUTING and issue templates only when it invites contributions. GitHub's community profile (`gh api repos/OWNER/REPO/community/profile`) reports most of the files and a health percentage.
+- **Common to every repo**: a README with what it is, how to install and run it, and the result; a licence (already checked under Getting started, so the panel only refers to that finding); tests, and CI that runs them on every push; a CI badge only when the badge is accurate; tagged releases and a changelog when it's versioned; CONTRIBUTING and issue templates only when it invites contributions. GitHub's community profile (`gh api repos/OWNER/REPO/community/profile`) reports most of the files and a health percentage.
 - **One profile per ecosystem**, detected from the manifest and kept in its own file (`skills/repo-review/practice/python.md` and so on), so a profile can be updated without touching the skill. For Python:
   - `pyproject.toml` with standard project metadata, including `requires-python`;
   - one tool chain used throughout, with a lockfile committed; uv is the default suggestion for an active repo;

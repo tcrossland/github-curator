@@ -281,7 +281,7 @@ details.fold { display: block; }
     return;
   }
   if (d.quick) {
-    var qr = d.repos || [], names = ['Hook', 'Findable', 'Way in'];
+    var qr = d.repos || [], names = ['Hook', 'Findable', 'Getting started'];
     var k = '<header class="meta"><h1>' + esc(d.title) + '</h1><span>' + esc(d.subject) + '</span><span>Checked ' + esc(d.date) + '</span></header>';
     k += changes('Since last quick review', d.changes);
     var failing = qr.filter(function (r) { return (r.questions || []).some(function (x) { return x.status === 'fail'; }); }).length;
@@ -302,7 +302,7 @@ details.fold { display: block; }
              '<td class="qk">' + qs + '</td><td class="act">' + esc(actionName(r.action)) + '</td><td>' + fmt(r.fix) + (r.question ? '<div class="tq">' + fmt(r.question) + '</div>' : '') +
              (ev.length ? '<details class="ev"><summary>Evidence</summary>' + ev.join('') + '</details>' : '') + '</td></tr>';
     };
-    if (qr.length) k += '<div class="ovwrap"><table class="ov"><thead><tr><th>#</th><th>Repo</th><th>Hook · Findable · Way in</th><th>Likely action</th><th>Most important fix</th></tr></thead><tbody>' + qr.map(qrow).join('') + '</tbody></table></div>';
+    if (qr.length) k += '<div class="ovwrap"><table class="ov"><thead><tr><th>#</th><th>Repo</th><th>Hook · Findable · Getting started</th><th>Likely action</th><th>Most important fix</th></tr></thead><tbody>' + qr.map(qrow).join('') + '</tbody></table></div>';
     k += nextBlock('Review them in full');
     k += timings(d.timings);
     if (d.footer) k += '<footer>' + fmt(d.footer) + '</footer>';

@@ -1,5 +1,5 @@
 ---
-description: A README that names a licence no file holds fails Way in, the same way on every run.
+description: A README that names a licence no file holds fails Getting started, the same way on every run.
 tags: [review, repeat]
 runs: 3
 max_turns: 15
@@ -70,5 +70,5 @@ requires-python = ">=3.10"
 When you're done, end your reply with a JSON code block in this shape, with each question's status, the recommended action, and the items before that action (not those before featuring):
 
 ```json
-{"statuses": {"Hook": "", "Findable": "", "Facts": "", "Defensible": "", "Context": "", "Way in": "", "Tone": ""}, "action": "", "before": [{"text": "", "status": ""}]}
+{"statuses": {"Hook": "", "Findable": "", "Facts": "", "Evidence": "", "Jargon": "", "Getting started": "", "Tone": ""}, "action": "", "before": [{"text": "", "status": ""}]}
 ```
