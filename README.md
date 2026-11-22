@@ -21,6 +21,10 @@ It holds five skills, each a set of instructions Claude follows when you run its
   How the modes hand on to each other:
 
   ```mermaid
+  ---
+  config:
+    layout: elk
+  ---
   flowchart LR
       triage["triage<br>every repo, forks included"] -- "next: the repos to review" --> overview
       quick["quick<br>your own repos, three questions"] -- "next: the repos with a fail or flag" --> overview

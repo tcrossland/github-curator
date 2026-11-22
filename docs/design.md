@@ -115,6 +115,10 @@ A claude.ai session's `gh` is bound to the repos attached to it (`docs/github-fa
 In a claude.ai session as checked up to 2026-11-22 (each route with its source and date in `docs/github-facts.md`):
 
 ```mermaid
+---
+config:
+  layout: elk
+---
 flowchart LR
     subgraph vm["the claude.ai session's VM"]
         gh["gh api"]
@@ -149,6 +153,10 @@ The claude.ai GitHub connector isn't one of those routes. In Claude Code it read
 A full review of a repo reads from five places, writes one JSON file, and builds both the page and the reply from it, so the two can't disagree. Each quote is checked against the file it names before the recommendation is made (the run's JSON starts with the questions alone for that check), and a failed check sends the question back to be rewritten.
 
 ```mermaid
+---
+config:
+  layout: elk
+---
 flowchart TD
     subgraph read["Step 1: read"]
         clone["clone --depth 1<br>README, linked files, manifest, CI, licence"]
