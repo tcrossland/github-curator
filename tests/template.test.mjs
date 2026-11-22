@@ -232,6 +232,16 @@ test('triage splits clear deletes from repos to review and lists the commands', 
   assert.doesNotMatch(html, /Since last triage/);
 });
 
+test('each triage row to review copies its own review command, and clear deletes have none', () => {
+  const repo = (name, sure, link) => ({ name, link, visibility: 'public', kind: 'fork', stars: 0, signals: [], action: sure === 'clear' ? 'delete' : 'archive', sure, reason: 'r' });
+  const { html } = render({ triage: true, title: 'Repo triage', subject: '3 repos', date: '2026-11-22',
+    repos: [repo('t/a', 'review', 'https://github.com/t/a'), repo('t/b', 'clear', 'https://github.com/t/b'), repo('t/c', 'review', '#')] });
+  assert.match(html, /<div class="rcmd"><code id="rc-t-0">\/github-curator:repo-review https:\/\/github.com\/t\/a<\/code><button type="button" class="copy" data-copy="rc-t-0" aria-label="Copy the review command for t\/a">Copy<\/button><\/div>/);
+  assert.match(html, /<code id="rc-t-2">\/github-curator:repo-review t\/c<\/code>/);
+  assert.doesNotMatch(html, /repo-review https:\/\/github.com\/t\/b/);
+  assert.equal((html.match(/class="rcmd"/g) || []).length, 2);
+});
+
 test('triage\'s changes since the last triage start closed, with their count', () => {
   const { html } = render({ triage: true, title: 'Repo triage', subject: '0 repos', date: '2026-11-21', repos: [], changes: { since: '2026-11-19', items: ['t/a archived'] } });
   assert.match(html, /<details class="fold changes"><summary><span class="label">Since last triage · 2026-11-19<\/span> <span class="cnt">1 change<\/span><\/summary>/);
@@ -263,6 +273,14 @@ test('quick review lists each repo with its three statuses, provisional action a
   assert.match(html, /Timings · 8 s in all/);
   assert.match(html, /<footer>Provisional\.<\/footer>/);
   assert.doesNotMatch(html, /Since last quick review|class="strip"|class="fixp" aria-label="Fix prompt"/);
+});
+
+test('each quick row with a fail or flag copies its own review command, and a row that passes has none', () => {
+  const { html } = render({ quick: true, title: 'Quick review', subject: '3 repos', date: '2026-11-22',
+    repos: [quickRepo('me/a', ['pass', 'flagged', 'pass']), quickRepo('me/b', ['pass', 'pass', 'pass']), quickRepo('me/c', ['fail', 'pass', 'pass'])] });
+  assert.match(html, /<\/details><div class="rcmd"><code id="rc-q-0">\/github-curator:repo-review https:\/\/github.com\/me\/a<\/code><button type="button" class="copy" data-copy="rc-q-0" aria-label="Copy the review command for me\/a">Copy<\/button><\/div><\/td><\/tr>/);
+  assert.match(html, /<code id="rc-q-2">\/github-curator:repo-review https:\/\/github.com\/me\/c<\/code>/);
+  assert.doesNotMatch(html, /rc-q-1|repo-review https:\/\/github.com\/me\/b/);
 });
 
 test('quick review shows changes since the last one, closed, and no next command when all pass', () => {

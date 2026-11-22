@@ -14,6 +14,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - A review's timings are more often true to each step: Timing now says which work belongs to each step, where runs had put some of it before the step's line.
 - On claude.ai a review no longer asks GitHub for a similar repo's own page, which was refused for every repo not attached to the chat; the search results already hold what the Similar repos panel shows.
 - A portfolio run of more than 10 repos says first what it will take, at about five minutes a repo and on claude.ai one approval each, and offers a quick review of them or a full review of the first 10 instead. A triage on claude.ai says how long attaching its repos will take as well as how many approvals.
+- On the quick review and triage pages, each repo with a fail or flag, or marked for review, has its own review command with a copy button, so you can pick which to review in full rather than take the page's `next` command for ten.
 
 ## 0.6.0 (2026-11-22)
 

@@ -216,6 +216,10 @@ The fix prompt follows the repo's own rules on branches first, and the user's in
 
 The portfolio page carries each repo's fix prompt as its scorecard has it, with a copy button on that repo's row, so acting on it doesn't mean opening every scorecard. Each prompt stays separate, and copies the same text as the scorecard's "All": a fix prompt's edits, branch and checks belong to one repo, and Claude Code runs it in a session in that repo, so one prompt for several repos would have nowhere to run. The page builds the text with the scorecard's own function, so the two can't drift apart.
 
+## One review command per row on quick and triage pages
+
+The quick and triage pages end with one `next` command for up to 10 repos, which is the user's whole next step only if they want every one reviewed in full. Each row with a fail or flag, or marked `review`, also carries its own `/github-curator:repo-review URL` with a copy button, so the user can pick. The page builds it from the row's `link`, falling back to `OWNER/REPO` when the link isn't a GitHub URL, so the run's JSON needs no new field and pages already published get the button on their next run. A row that passes, or a clear delete, has nothing for a full review to settle, so it has none.
+
 ## Arguments are keywords, not placeholders
 
 Several repo URLs with no mode word name no mode. On 2026-11-21 ten URLs given that way ran as ten separate one-draft reviews in subagents, side by side, which `portfolio` exists to avoid. A quick review and a portfolio review are both fair readings, at very different costs (13.5 s a repo against two or three minutes), so the skill asks, offering quick first since it's the cheaper look and names the repos worth the full one. Without anyone to ask it runs quick, the reading that costs least if it's wrong.

@@ -148,6 +148,10 @@ footer { color: var(--muted); font-size: 12.5px; }
 .tsub, .tsig { font: 400 12px/1.4 var(--mono); color: var(--muted); margin-top: 3px; overflow-wrap: anywhere; }
 .tq { font-size: 13px; margin-top: 4px; font-style: italic; }
 .fixp .rerun { margin-left: 0; }
+.rcmd { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.rcmd code { font: 400 12px/1.4 var(--mono); background: var(--quote-bg); color: var(--ink); padding: 4px 7px; border-radius: 4px; user-select: all; overflow-wrap: anywhere; }
+.rcmd .copy { font: 500 12px/1 var(--mono); padding: 6px 10px; border-radius: 4px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; white-space: nowrap; }
+.rcmd .copy:hover, .rcmd .copy:focus-visible { background: var(--accent); color: var(--surface); outline: none; }
 .rec .feat { display: grid; gap: 8px; border-top: 1px solid var(--rule); padding-top: 12px; margin-top: 4px; }
 .rec .fv { font: 600 20px/1.1 var(--display); margin: 0; }
 .rec .fv.yes { color: var(--pass); }
@@ -247,6 +251,11 @@ details.fold { display: block; }
       });
     });
   };
+  // One repo's review command, for a quick or triage row the user picks from rather than taking the whole `next` list.
+  var reviewCmd = function (r, id) {
+    var target = /^https:\/\/github\.com\//.test(r.link || '') ? r.link : r.name;
+    return target ? '<div class="rcmd"><code id="' + id + '">' + esc('/github-curator:repo-review ' + target) + '</code><button type="button" class="copy" data-copy="' + id + '" aria-label="Copy the review command for ' + esc(r.name) + '">Copy</button></div>' : '';
+  };
   var nextBlock = function (label) {
     return d.next ? '<section class="fixp" aria-label="Next"><span class="label">' + label + '</span><div class="rerun"><code id="next-cmd">' + esc(d.next) + '</code><button type="button" class="copy" data-copy="next-cmd">Copy command</button></div>' + (d.nextNote ? '<p class="note">' + fmt(d.nextNote) + '</p>' : '') + '</section>' : '';
   };
@@ -261,7 +270,7 @@ details.fold { display: block; }
       return '<tr><td class="num">' + (i + 1) + '</td><td><a href="' + esc(r.link) + '">' + esc(r.name) + '</a><div class="tsub">' + esc(r.visibility) + ' · ' + esc(r.kind) + (r.pinned ? ' · pinned' : '') +
              (r.stars != null ? ' · ' + esc(r.stars) + (r.stars === 1 ? ' star' : ' stars') : '') + (r.pushed ? ' · pushed ' + esc(r.pushed) : '') + '</div></td>' +
              '<td class="act">' + esc(actionName(r.action)) + '</td><td>' + fmt(r.reason) + (r.question ? '<div class="tq">' + fmt(r.question) + '</div>' : '') +
-             (r.signals && r.signals.length ? '<div class="tsig">' + r.signals.map(fmt).join(' · ') + '</div>' : '') + '</td></tr>';
+             (r.signals && r.signals.length ? '<div class="tsig">' + r.signals.map(fmt).join(' · ') + '</div>' : '') + (r.sure === 'review' ? reviewCmd(r, 'rc-t-' + rs.indexOf(r)) : '') + '</td></tr>';
     };
     var table = function (label, list) {
       return '<h2 class="th2">' + label + ' <span>(' + list.length + ')</span></h2><div class="ovwrap"><table class="ov"><thead><tr><th>#</th><th>Repo</th><th>Action</th><th>Why</th></tr></thead><tbody>' +
@@ -300,7 +309,8 @@ details.fold { display: block; }
       return '<tr><td class="num">' + (i + 1) + '</td><td><a href="' + esc(r.link) + '">' + esc(r.name) + '</a><div class="tsub">' + esc(r.visibility) + (r.pinned ? ' · pinned' : '') +
              (r.stars != null ? ' · ' + esc(r.stars) + (r.stars === 1 ? ' star' : ' stars') : '') + (r.pushed ? ' · pushed ' + esc(r.pushed) : '') + '</div></td>' +
              '<td class="qk">' + qs + '</td><td class="act">' + esc(actionName(r.action)) + '</td><td>' + fmt(r.fix) + (r.question ? '<div class="tq">' + fmt(r.question) + '</div>' : '') +
-             (ev.length ? '<details class="ev"><summary>Evidence</summary>' + ev.join('') + '</details>' : '') + '</td></tr>';
+             (ev.length ? '<details class="ev"><summary>Evidence</summary>' + ev.join('') + '</details>' : '') +
+             ((r.questions || []).some(function (x) { return x.status === 'fail' || x.status === 'flagged'; }) ? reviewCmd(r, 'rc-q-' + i) : '') + '</td></tr>';
     };
     if (qr.length) k += '<div class="ovwrap"><table class="ov"><thead><tr><th>#</th><th>Repo</th><th>Hook · Findable · Getting started</th><th>Likely action</th><th>Most important fix</th></tr></thead><tbody>' + qr.map(qrow).join('') + '</tbody></table></div>';
     k += nextBlock('Review them in full');
