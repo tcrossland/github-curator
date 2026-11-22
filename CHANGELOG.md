@@ -2,7 +2,7 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
-## Unreleased
+## 0.7.0 (2026-11-22)
 
 - `repo-review overview` is now `repo-review portfolio`, after the page it publishes, since it's the costliest mode: a full review of every repo, then a ranking. `overview` still runs it. Triage's and the quick review's `next` commands use the new name.
 - `repo-review` takes a repo as `OWNER/REPO` as well as its URL, as `stargazers` and `forks` already did, in every mode.

@@ -13,6 +13,7 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [Co-authors from commit trailers](#co-authors-from-commit-trailers) | 0.8 | Rule | S | todo |
 | [Eval cases that fail with their rule cut](#eval-cases-that-fail-with-their-rule-cut) | 0.8 | Evals | M | todo |
 | [Carry over a triage's reasons](#carry-over-a-triages-reasons) | 0.8 | Decision | S | todo |
+| [A first run's reply](#a-first-runs-reply) | 0.8 | Check | S | todo |
 | [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [WebFetch of GitHub pages on claude.ai](#webfetch-of-github-pages-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [Which model for a full review](#which-model-for-a-full-review) | One claude.ai check | Check | M | todo |
@@ -25,14 +26,7 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [GitHub's secret scanning on public repos](#githubs-secret-scanning-on-public-repos) | Later | Feature | S | todo |
 | [1. Traffic history](#1-traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
 
-Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
-
-## 0.7: names, and how a run feels
-
-Changes to what users type and see, released together rather than one at a time.
-
-Every item is built, and checked with 0.7.0-dev.1 in Claude Code and on claude.ai. A bare `repo-review` asked which of the three to run, a portfolio run of 24 repos gave its estimate before any review, a re-run's reply started with the since line, and a claude.ai review read its similar repos with no call under `repos/`. On 0.7.0-dev.2, a claude.ai review sent each timing line in a command of its own, with only a `cd` before it, and printed `Get the draft (1 of 7)` right after `start`. On 0.7.0-dev.3, a claude.ai review printed all seven progress lines, `Questions (4 of 7)` before the questions' first command, and read the pins from the profile page with no call through `device_bash`; it sent the `Build` line in the command that finished the run's JSON. Left:
-- a first run's reply has no since line. Every public repo of the user's already has a scorecard, so this needs a repo or draft without one.
+Nothing is left for 0.7.0. Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
 
 ## 0.8: steadier calls
 
@@ -71,6 +65,10 @@ The review counts other people's commits from `repos/OWNER/REPO/contributors`, w
 ### Carry over a triage's reasons
 
 The second triage on claude.ai reused the previous page's reasons and questions word for word where a repo's signals hadn't changed, which the skill neither asks for nor forbids. Decide whether triage should: carrying them over keeps the page stable between runs and saves time, but hides a call that a rule change since would make differently. Done when `triage.md` says which, and `docs/design.md` says why.
+
+### A first run's reply
+
+0.7.0 starts a re-run's reply with what changed since the last run, printed by the counts script from `PREVIOUS.json`. The script prints no since line without one (tested), but no real run has checked that a review with no previous scorecard leaves `PREVIOUS.json` out: every public repo of the user's already had a scorecard when 0.7.0 was checked. Done when a review of a repo or draft with no scorecard, in Claude Code or on claude.ai, replies with the counts line first and no since line.
 
 ## One claude.ai check
 
