@@ -8,8 +8,8 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - `repo-review` takes a repo as `OWNER/REPO` as well as its URL, as `stargazers` and `forks` already did, in every mode.
 - `repo-review`'s hint in Claude Code's autocomplete says what each mode is for: quick is a glance, triage sorts by action, portfolio reviews each in full.
 - `contributions` takes the organisations to count as yours with `orgs:ORG`, since `own` means repos that aren't forks in `triage own`. `own:ORG` still works.
-
 - Three of the seven questions have labels that say what they check: Defensible is now Evidence, Context is Jargon and Way in is Getting started. The questions themselves are unchanged, and a re-run compares with a scorecard that has the old labels question by question.
+- `repo-review` with no arguments asks what to review: the repo in the current folder, when it's in a git clone, a quick review of all your repos, or a triage. When no one can answer, as in a scheduled task, it runs the quick review.
 
 ## 0.6.0 (2026-11-22)
 

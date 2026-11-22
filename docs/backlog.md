@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [`repo-review` with no arguments](#repo-review-with-no-arguments) | 0.7 | UX | S | todo |
 | [Progress during long runs](#progress-during-long-runs) | 0.7 | UX | S | todo |
 | [The cost of a big run, before it starts](#the-cost-of-a-big-run-before-it-starts) | 0.7 | UX | S | todo |
 | [Review one repo from a quick or triage row](#review-one-repo-from-a-quick-or-triage-row) | 0.7 | Pages | S | todo |
@@ -37,10 +36,6 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 ## 0.7: names, and how a run feels
 
 Changes to what users type and see, released together rather than one at a time.
-
-### `repo-review` with no arguments
-
-`SKILL.md` names no case for a bare `/github-curator:repo-review`. It could offer the three ways in: review the repo in the current folder, a quick review of every repo, or a triage. Done when `SKILL.md` names the case and a bare run offers them.
 
 ### Progress during long runs
 

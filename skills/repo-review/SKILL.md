@@ -20,6 +20,13 @@ A repo is given as its URL or as `OWNER/REPO`. A word of that form is a repo unl
 
 Several repos with no mode word name no mode: before anything else, ask the user whether to run a quick review of them all (offered first) or a portfolio review, which reviews each in full, and run the one chosen with those repos. When no one can answer, as in a scheduled task, run the quick review and say why in its footer.
 
+No arguments, or `no-publish` alone, name no draft and no mode: before anything else, ask the user which of these to run, and run the one chosen:
+- a review of the repo in the current folder, offered first and only when that folder is in a git clone (`git rev-parse --show-toplevel` succeeds), naming the repo;
+- a quick review of all their own repos;
+- a triage of every repo they own, forks included.
+
+When no one can answer, run the quick review and say why in its footer.
+
 In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
 
 **In Claude Code.** The steps name claude.ai's tools. In Claude Code, use these in their place:

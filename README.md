@@ -16,6 +16,7 @@ It holds five skills, each a set of instructions Claude follows when you run its
   - `repo-review triage`: a quick first pass over all of an account's repos from the API, which settles the clear deletes and names the repos worth a full review. `triage org:NAME` does the same for an organisation's repos.
   - `repo-review portfolio`: a full review of each repo you name, or of all yours, ranked, with the ones to pin. It was called `overview`, which still works.
   - `repo-review quick`: an at-a-glance review of all your repos, or the ones you name, on three of the questions, from GitHub's search and each README; much faster than a full review, and its calls are provisional.
+  - `repo-review` alone: asks which of these to run, offering the repo in the current folder first when there is one, then quick and triage.
   - `no-publish`, in any mode: saves the page as a file rather than publishing it.
 
   How the modes hand on to each other:
