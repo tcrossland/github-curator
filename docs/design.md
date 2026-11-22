@@ -112,6 +112,25 @@ GraphQL is named once, in Step 1's pins, with where it works and where it's refu
 
 A claude.ai session's `gh` is bound to the repos attached to it (`docs/github-facts.md`): GraphQL, every path not scoped to an attached repo, and compare across forks are refused, while git clones any public repo and issue and repository search answer. In the 0.2.4 test runs that left triage marking no repo clear and stargazers reading no profile. The skills now take routes that work in both places where one exists, rather than one route per place, so a rule tried in Claude Code holds on claude.ai.
 
+In a claude.ai session as checked up to 2026-11-22 (each route with its source and date in `docs/github-facts.md`):
+
+```mermaid
+flowchart LR
+    subgraph vm["the claude.ai session's VM"]
+        gh["gh api"]
+        git["git"]
+        wf["WebFetch"]
+        curl["curl"]
+    end
+    tools["add_repo and list_repos<br>(each asks in Manual mode)"] -. "attach, list" .-> attached
+    gh --> attached["an attached repo's paths<br>repos/OWNER/REPO/..."]
+    gh --> searchok["search/repositories, search/issues, user"]
+    gh --x refused["HTTP 403: GraphQL; user/repos, users/LOGIN,<br>orgs/NAME/repos, user/memberships/orgs;<br>any unattached repo; compare across forks"]
+    git --> clones["any public repo;<br>a private repo once attached"]
+    wf --x gh403["URL_NOT_ON_ALLOWLIST for github.com,<br>unless a search in the chat found the URL"]
+    curl --> rel["betterleaks' release from github.com"]
+```
+
 - **A fork's commits beyond its parent** come from a clone of the fork without trees or files, with every branch and tag of the parent fetched into it, then `git rev-list --count` and `git log` on every branch of the fork against them. The compare API is refused across forks on claude.ai, and lists at most 250 commits anyway. The clone costs the parent's commit history: 24 MB and a few seconds for erlang/otp, through claude.ai's proxy as in Claude Code, and about the same with its 30 branches and 576 tags as with its default branch alone. A clone left from an earlier run is fetched again rather than reused, since a stale count could mark a fork clear.
 - **Every branch counts**, not the default branch alone. The first triages counted from `HEAD`, and 12 forks marked clear on that count turned out to hold the user's commits on other branches (`develop`, `grails-2.5`, a GitHub web edit's `patch-1`), which they found only after deleting them. The parent's tags count as well as its branches, so a fork's copy of an upstream release branch that the parent has since deleted holds nothing beyond it once the release was tagged. Nothing is read from the parent's default branch, so nothing about the parent needs the API, and no branch name goes through the shell, where zsh had read part of one as a modifier.
 - **Whose commits they are** is judged by the author's name, because git carries no logins. The old rule counted a commit with no login as possibly the user's, because GitHub's author filter missed commits made under an email not linked to their account (Triage settles only what loses nothing, above); judging by name keeps that, and the email's domain, never the address, still lets the user recognise a former employer's.
@@ -124,6 +143,36 @@ A claude.ai session's `gh` is bound to the repos attached to it (`docs/github-fa
 - **Stargazers' profiles** come from the profile page by WebFetch when `users/LOGIN` is refused. It's a summary, labelled as one, and gives no latest activity or most-starred repos, so the pinned repos' descriptions stand in for the field. When no profile could be read, the review's list says "Not available" with the reason: "None in the same field" there would report a judgement never made. A repo no one else has starred has one line for both lists, "None: no stargazers besides you", since reviews left to word it themselves wrote three different lines for that case on 2026-11-21.
 
 The claude.ai GitHub connector isn't one of those routes. In Claude Code it reads any public repo as the user, but in a claude.ai chat, the one place a route around attaching would help, only its tools without an `owner` parameter answered (its own profile and search), and `gh` already reaches those there (`docs/github-facts.md`). It also can't see private repos, has none of stargazers, traffic, forks or pins, returns authors' email addresses and can write. So no skill uses it. Worth checking again if its repo tools start answering in a claude.ai chat: it would then read forks' parents and other owners' repos without attaching them.
+
+## How one review flows
+
+A full review of a repo reads from five places, writes one JSON file, and builds both the page and the reply from it, so the two can't disagree. Each quote is checked against the file it names before the recommendation is made (the run's JSON starts with the questions alone for that check), and a failed check sends the question back to be rewritten.
+
+```mermaid
+flowchart TD
+    subgraph read["Step 1: read"]
+        clone["clone --depth 1<br>README, linked files, manifest, CI, licence"]
+        api["gh api repos/OWNER/REPO<br>settings, tags, issues, pull requests,<br>contributors, traffic"]
+        fork["bare clone with the parent's refs<br>a fork's own commits"]
+        similar["repository search and README-only clones"]
+        prev["the previous scorecard"]
+    end
+    clone --> q["Step 2: the seven questions, each with its quotes"]
+    api --> q
+    q --> verify{"verify_run.py<br>each file quote on its line"}
+    verify -- "a quote fails" --> q
+    verify -- "all hold" --> rec["Step 4: recommendation, feature call and verdict"]
+    fork --> rec
+    scan["full clone and betterleaks,<br>before publishing"] --> rec
+    rec --> run[("RUN.json")]
+    api --> out["Outcomes"] --> run
+    similar --> sim["Similar repos"] --> run
+    prev --> cmp["Step 3: changes since the last run"] --> run
+    run --> tpl["Step 5: scorecard-template.html"] --> page["the scorecard artifact,<br>or a file with no-publish"]
+    run --> counts["counts.py"] --> reply["Step 6: the three-line reply"]
+```
+
+Outcomes and Similar repos are context: they reach the page but never a status or the verdict (The seven questions, above).
 
 ## The scorecard page
 

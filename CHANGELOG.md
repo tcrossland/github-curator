@@ -9,6 +9,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - A review of a repo no one else has starred says so in both Stargazers lists, in the same words every time: "None: no stargazers besides you".
 - Before suggesting a history written in the first person, a review checks who made a repo's commits from its Contributors list, which covers the whole history, rather than from its own shallow copy of the repo.
 - A review that recommends making a repo private, or deleting it, no longer ties its most important fix to a question number. For a repo that's already private, make-private means leaving it private for good, and keep means it stays private only until it's ready to publish.
+- The README has a diagram of how `repo-review`'s modes hand on to each other, and which skills feed a scorecard's Outcomes panel.
 - `repo-review` given several repo URLs and no mode asks whether you want a quick review of them all or an overview, rather than reviewing each in full on its own. When no one can answer, as in a scheduled task, it runs the quick review.
 
 ## 0.5.0 (2026-11-21)

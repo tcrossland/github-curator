@@ -18,6 +18,21 @@ It holds five skills, each a set of instructions Claude follows when you run its
   - `repo-review quick`: an at-a-glance review of all your repos, or the ones you name, on three of the questions, from GitHub's search and each README; much faster than a full review, and its calls are provisional.
   - `no-publish`, in any mode: saves the page as a file rather than publishing it.
 
+  How the modes hand on to each other:
+
+  ```mermaid
+  flowchart LR
+      triage["triage<br>every repo, forks included"] -- "next: the repos to review" --> overview
+      quick["quick<br>your own repos, three questions"] -- "next: the repos with a fail or flag" --> overview
+      overview["overview URL ...<br>a full review of each, ranked"] --> review["full review<br>and its scorecard"]
+      single["repo-review URL"] --> review
+      stargazers --> review
+      forks --> review
+      traffic -- "Traffic history page" --> review
+  ```
+
+  Triage and quick review each end with a `next` command that passes the repos worth a full review to `overview`; triage settles the clear deletes on its own. `stargazers`, `forks` and `traffic` feed the scorecard's Outcomes panel.
+
   The seven questions, most important first, each marked pass, fail or flagged:
   - **Hook**: would someone outside the niche understand what it is, why it's interesting and what it found?
   - **Findable**: is it public, with a description and topics in the words people search for?
