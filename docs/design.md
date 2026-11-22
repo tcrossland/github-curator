@@ -20,6 +20,10 @@ A description the review suggests is kept to GitHub's limit of 350 characters (`
 
 There are five actions, one per repo: keep, publish, archive, make-private and delete. The tie-breaker is "prefer the action that loses least": archive over make-private when anyone else has starred, forked or opened an issue, and make-private over delete whenever anything of the user's is in the repo.
 
+A private repo can be kept or made private, and the two used to blur: on 2026-11-21 a make-private review of a private repo read the action as "leave it private", and on 2026-11-22 a quick review, finding no action for a private repo not worth showing, gave keep and asked whether it stays private. So make-private on a private repo means leaving it private for good, and keep means it stays private only until it's ready to publish, which is the difference the user acts on.
+
+For make-private and delete the page isn't worth fixing, so the verdict's fix is the action, or the first thing to do before it, and comes from no question. The verdict used to need a question's number all the same, and the page showed "Most important fix · question N": reviews filled it each by its own reasoning, a make-private review with 6 and a delete review with 1. Now `question` is empty for those, and when everything passes, and the page shows no number.
+
 The checklist before archiving comes from the work done on a real project before it was archived. A finished project archived with a proper account of what it was, why it stopped and what the author would do differently is a stronger portfolio piece than an unexplained abandoned repo.
 
 ## A scanner for secrets before publishing
@@ -148,6 +152,8 @@ The fix prompt follows the repo's own rules on branches first, and the user's in
 The overview carries each repo's fix prompt as its scorecard has it, with a copy button on that repo's row, so acting on an overview doesn't mean opening every scorecard. Each prompt stays separate, and copies the same text as the scorecard's "All": a fix prompt's edits, branch and checks belong to one repo, and Claude Code runs it in a session in that repo, so one prompt for several repos would have nowhere to run. The page builds the text with the scorecard's own function, so the two can't drift apart.
 
 ## Arguments are keywords, not placeholders
+
+Several repo URLs with no mode word name no mode. On 2026-11-21 ten URLs given that way ran as ten separate one-draft reviews in subagents, side by side, which `overview` exists to avoid. A quick review and an overview are both fair readings, at very different costs (13.5 s a repo against two or three minutes), so the skill asks, offering quick first since it's the cheaper look and names the repos worth the full one. Without anyone to ask it runs quick, the reading that costs least if it's wrong.
 
 Each skill reads its arguments as words (`overview`, `triage forks`, `org:NAME`, `since:2026-01-01`, `no-publish`) rather than through Claude Code's positional placeholders (`$0`, `$name`). The modes take lists of any length, and a draft can be pasted text with spaces, so a fixed position for each argument would misread most calls. The `argument-hint` in each skill's frontmatter shows the words in Claude Code's autocomplete.
 

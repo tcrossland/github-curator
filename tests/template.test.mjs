@@ -56,6 +56,14 @@ test('single review shows the recommendation, feature, similar repos and every q
   assert.equal(els['fp-text'].value, 'HEADER\n\nFAIL\n\nBEFORE\n\nFOOTER');
 });
 
+test('the verdict names its question, and none when the fix comes from no question', () => {
+  assert.match(render(review).html, /Most important fix · question 1</);
+  const leave = { ...review, recommendation: { ...review.recommendation, action: 'make-private', before: undefined }, verdict: { question: '', fix: 'Leave it private.', why: 'Not worth showing.' } };
+  const { html } = render(leave);
+  assert.match(html, /<span class="label">Most important fix<\/span>/);
+  assert.doesNotMatch(html, /· question/);
+});
+
 test('a similar repo shows how it relates to the repo under review, with no statuses', () => {
   const item = { ...review.similar.items[0], overlap: 'same', alive: 'maintained', mention: 'alternative', difference: 'Matches on a key column', foundBy: ['`csv-diff`', 'data validation'], borrow: 'A one-line result at the top' };
   const elsewhere = { name: 'Elsewhere', link: 'https://example.org', overlap: 'partial', difference: 'Runs offline', mention: 'named' };

@@ -387,7 +387,7 @@ details.fold { display: block; }
     html += '</section>';
   }
   html += '<section class="verdict' + (n.fail === 0 && n.flagged === 0 ? ' ok' : '') + '" aria-label="Verdict">' +
-          '<span class="label">Most important fix · question ' + esc(d.verdict.question) + '</span>' +
+          '<span class="label">Most important fix' + (d.verdict.question ? ' · question ' + esc(d.verdict.question) : '') + '</span>' +
           '<p class="fix">' + fmt(d.verdict.fix) + '</p>' +
           '<p class="why">' + fmt(d.verdict.why) + '</p>' +
           '<div class="counts">' +
