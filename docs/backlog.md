@@ -7,7 +7,7 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | in progress |
-| 4 | [Quick review](#4-quick-review) | New mode | M | none | todo |
+| 4 | [Quick review](#4-quick-review) | New mode | M | none | in progress |
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
@@ -31,11 +31,13 @@ What's left is **the first run on schedule**: whether the weekly task saves a sn
 
 ## 4. Quick review
 
-A `quick` mode that reads only the API and the README, with no clone, quote checker, stargazers or search for similar repos, and answers the questions those can settle: Hook (the description and the README's opening), Findable (description and topics) and Way in (a licence, and whether the README says how to run it). It gives each repo a row of statuses and signals, not a page of its own, and its results are provisional, as triage's are.
+Full reviews take two or three minutes a repo, so a review of many repos takes a long time, and triage only sorts. The `quick` mode is an at-a-glance review: Hook, Findable and Way in for each repo, from GitHub's repository search and the README alone, with a provisional action and the most important fix, on one "Quick review" page.
 
-Its use is **Similar repos** in a full review: a quick review of each says what it does better than the repo under review (a clearer opening, the topics people search for), where today the panel has only their descriptions. Ranking triage's repos to review was another use, but triage now reads each repo's README opening and licence itself, which covers most of Hook and Way in.
+Alongside it, Similar repos no longer judges the similar repos, which the user doesn't maintain: each gets six answers on how it bears on the user's repo (Overlap, Difference, Alive, Found by, Worth borrowing, Mention).
 
-**Done when** a full review's Similar repos panel gives each similar repo's Hook, Findable and Way in statuses with what it does better than the repo under review, those statuses agree with full reviews of two of them, with each disagreement explained, and the review's timings show what the panel costs.
+Both are in the skill and the template, with the reasons in `docs/design.md`. What's left is **a live check**, in a session started after a build with the change has synced: a `quick` run over the user's repos, then full reviews of two of them to compare against, and one full review to see the Similar repos answers. Whether `archived:false` works on claude.ai is **unverified**.
+
+**Done when** a `quick` run gives every repo the three statuses, those agree with full reviews of two of the same repos, with each disagreement explained, its timings show its cost per repo against a full review's, and a full review's Similar repos panel answers the six questions for each similar repo.
 
 ## 6. Profile review
 

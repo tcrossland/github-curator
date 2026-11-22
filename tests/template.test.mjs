@@ -1,6 +1,6 @@
 // Tests for skills/repo-review/scorecard-template.html: fill it as Step 5 says,
 // run its script against a minimal stand-in for the DOM, and check the markup
-// for each mode (single review, overview, triage).
+// for each mode (single review, overview, triage, quick).
 // Run: node --test tests/*.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -54,6 +54,25 @@ test('single review shows the recommendation, feature, similar repos and every q
   assert.match(html, /5 pass<\/span>.*1 fail<\/span>.*1 flagged<\/span>/);
   assert.match(html, /data-f="before"/);
   assert.equal(els['fp-text'].value, 'HEADER\n\nFAIL\n\nBEFORE\n\nFOOTER');
+});
+
+test('a similar repo shows how it relates to the repo under review, with no statuses', () => {
+  const item = { ...review.similar.items[0], overlap: 'same', alive: 'maintained', mention: 'alternative', difference: 'Matches on a key column', foundBy: ['`csv-diff`', 'data validation'], borrow: 'A one-line result at the top' };
+  const elsewhere = { name: 'Elsewhere', link: 'https://example.org', overlap: 'partial', difference: 'Runs offline', mention: 'named' };
+  const { html } = render({ ...review, similar: { ...review.similar, items: [item, elsewhere] } });
+  assert.match(html, /<span class="tags"><span class="tag">Same job<\/span><span class="tag">Maintained<\/span><span class="tag">Name as an alternative<\/span><\/span>/);
+  assert.match(html, /<span class="rel"><b>This repo adds<\/b> Matches on a key column<\/span>/);
+  assert.match(html, /<span class="rel"><b>Found by<\/b> <code>csv-diff<\/code>, data validation<\/span>/);
+  assert.match(html, /<span class="rel"><b>Worth borrowing<\/b> A one-line result at the top<\/span>/);
+  assert.match(html, /<span class="tag">Overlaps<\/span><span class="tag">Named in the README<\/span><\/span><span class="rel"><b>This repo adds<\/b> Runs offline/);
+  assert.doesNotMatch(html, /class="q (pass|fail|flagged)"/);
+});
+
+test('an archived similar repo gets no Maintained or Quiet tag, since its meta says archived', () => {
+  const item = { ...review.similar.items[0], archived: true, alive: 'archived', overlap: 'adjacent', mention: 'no' };
+  const { html } = render({ ...review, similar: { ...review.similar, items: [item] } });
+  assert.match(html, /pushed 2025-01-01 · archived/);
+  assert.match(html, /<span class="tags"><span class="tag">Neighbouring job<\/span><span class="tag">No need to name<\/span><\/span>/);
 });
 
 test('the fix prompt comes straight after the questions\' strip, before the sections that start closed', () => {
@@ -208,4 +227,43 @@ test('triage splits clear deletes from repos to review and lists the commands', 
 test('triage\'s changes since the last triage start closed, with their count', () => {
   const { html } = render({ triage: true, title: 'Repo triage', subject: '0 repos', date: '2026-11-21', repos: [], changes: { since: '2026-11-19', items: ['t/a archived'] } });
   assert.match(html, /<details class="fold changes"><summary><span class="label">Since last triage · 2026-11-19<\/span> <span class="cnt">1 change<\/span><\/summary>/);
+});
+
+const quickRepo = (name, statuses, extra = {}) => ({
+  name, link: `https://github.com/${name}`, visibility: 'public', pinned: false, pushed: '2026-11-01', stars: 2, action: 'keep', fix: 'Add topics.', question: 'Worth featuring?',
+  questions: ['Hook', 'Findable', 'Way in'].map((short, i) => ({ short, status: statuses[i], note: `${short} note`, quotes: [{ text: `${short} line`, source: 'README.md, line 1' }] })),
+  ...extra,
+});
+
+test('quick review lists each repo with its three statuses, provisional action and fix', () => {
+  const { html } = render({
+    quick: true, title: 'Quick review', subject: '2 repos', date: '2026-11-22',
+    repos: [quickRepo('me/a', ['fail', 'flagged', 'pass'], { pinned: true }), quickRepo('me/b', ['pass', 'pass', 'fail'], { visibility: 'private', stars: 1, action: 'publish' })],
+    next: '/github-curator:repo-review overview https://github.com/me/a', nextNote: 'None left.',
+    timings: [{ step: 'List repos', seconds: 5, calls: 1, searches: 1 }, { step: 'Build', seconds: 3, calls: 0 }],
+    footer: 'Provisional.',
+  });
+  assert.match(html, /<span class="label">Quick review · provisional<\/span><p class="fix">2 repos · 2 with a fail<\/p><p class="why">Hook: 1 pass, 1 fail, 0 flagged · Findable: 1 pass, 0 fail, 1 flagged · Way in: 1 pass, 1 fail, 0 flagged<\/p>/);
+  assert.match(html, /<a href="https:\/\/github.com\/me\/a">me\/a<\/a><div class="tsub">public · pinned · 2 stars · pushed 2026-11-01<\/div>/);
+  assert.match(html, /<div class="tsub">private · 1 star · pushed 2026-11-01<\/div>/);
+  assert.match(html, /<div class="qi"><span class="q fail">Hook · Fail<\/span> <span class="qn">Hook note<\/span><\/div><div class="qi"><span class="q flagged">Findable · Flagged<\/span>/);
+  assert.match(html, /<td class="act">Keep<\/td><td>Add topics\.<div class="tq">Worth featuring\?<\/div><details class="ev"><summary>Evidence<\/summary><blockquote class="fail">Hook line<cite>Hook · README.md, line 1<\/cite><\/blockquote>/);
+  assert.match(html, /<td class="act">Publish<\/td>/);
+  assert.equal((html.match(/<tr><td class="num">/g) || []).length, 2);
+  assert.match(html, /<span class="label">Review them in full<\/span>/);
+  assert.match(html, /<code id="next-cmd">\/github-curator:repo-review overview https:\/\/github.com\/me\/a<\/code>/);
+  assert.match(html, /Timings · 8 s in all/);
+  assert.match(html, /<footer>Provisional\.<\/footer>/);
+  assert.doesNotMatch(html, /Since last quick review|class="strip"|class="fixp" aria-label="Fix prompt"/);
+});
+
+test('quick review shows changes since the last one, closed, and no next command when all pass', () => {
+  const { html } = render({
+    quick: true, title: 'Quick review', subject: '1 repo', date: '2026-11-22',
+    changes: { since: '2026-11-15', items: ['me/a: Findable flagged → pass'] },
+    repos: [quickRepo('me/a', ['pass', 'pass', 'pass'], { fix: 'No change', question: null })],
+  });
+  assert.match(html, /<details class="fold changes"><summary><span class="label">Since last quick review · 2026-11-15<\/span> <span class="cnt">1 change<\/span>/);
+  assert.match(html, /1 repo · 0 with a fail/);
+  assert.doesNotMatch(html, /next-cmd/);
 });

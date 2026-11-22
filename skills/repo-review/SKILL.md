@@ -1,7 +1,7 @@
 ---
 name: "repo-review"
-description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: overview, triage."
-argument-hint: "[repo-url | folder | file] · overview [repo-urls…] · triage [public|private|own|forks|archived|org:NAME] · no-publish"
+description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: overview, triage, quick."
+argument-hint: "[repo-url | folder | file] · overview [repo-urls…] · triage [public|private|own|forks|archived|org:NAME] · quick [repo-urls…] · no-publish"
 ---
 
 # Repo review
@@ -10,10 +10,11 @@ The work product is a public GitHub repo, published as a portfolio piece to attr
 
 For a repo, the review also recommends what to do with it, whether to feature it on the user's profile, and the work worth doing before each. Not every repo should stay as it is: some are finished and should be archived with a proper account of what they were, some aren't worth showing, some private ones are ready to publish, and a few deserve one of the six pinned places on the user's profile. It also finds similar repos, so the review can say what this one adds and where readers who want a maintained tool should go.
 
-There are three ways to run it:
+There are four ways to run it:
 - **One draft**: the arguments are a repo URL, a local clone's folder, a file, a doc link or pasted text. Run Steps 1 to 6.
 - **Overview**: the arguments start with `overview`, optionally followed by repo URLs. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7. Step 7 and how an overview logs its time are in [overview.md](overview.md) beside this file: read it before starting, and only in this mode.
 - **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only, from [triage.md](triage.md) beside this file, read only in this mode: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
+- **Quick**: the arguments start with `quick`, optionally followed by repo URLs. Run Step 9 only, from [quick.md](quick.md) beside this file, read only in this mode: an at-a-glance review of many repos from GitHub's search and each README, answering Hook, Findable and Way in, on one page with a row per repo.
 
 In any mode, `no-publish` as a separate word in the arguments saves each page as a file instead of publishing it: write it to the scratchpad, or a working folder outside any clone, and create or republish no artifact. A previous run is still read for comparison. It's for trying a change to a rule or the template without touching the live page.
 
@@ -271,7 +272,7 @@ Find up to five popular repos that do much the same thing, for any draft whose s
 
 1. Search by the repo's most specific topics, two at a time: `gh api 'search/repositories?q=topic:A+topic:B&sort=stars&per_page=10'`. Skip generic topics such as a language name.
 2. Then search by the words that say what it does, from the description or the README's opening: `gh api 'search/repositories?q=WORD+WORD+in:name,description,topics&sort=stars&per_page=10'`.
-3. Read every description before keeping a result: in both kinds of search the most-starred results are often only loosely related. Keep those that do much the same job, leaving out the repo itself and its forks, and leaving out curated lists, course notes and collections unless this repo is one. Order them most-starred first. Record each one's `full_name`, `html_url`, `stargazers_count`, `pushed_at` (date only), `archived` and `description`, and write one line on how it relates to this repo, from its description and README opening.
+3. Read every description before keeping a result: in both kinds of search the most-starred results are often only loosely related. Keep those that do much the same job, leaving out the repo itself and its forks, and leaving out curated lists, course notes and collections unless this repo is one. Order them most-starred first. Record each one's `full_name`, `html_url`, `stargazers_count`, `pushed_at` (date only), `archived`, `description` and `topics`, and read its README opening.
 4. Add any project the README itself names as related or as an alternative, with its link, even when it isn't on GitHub. GitHub search can't find tools hosted elsewhere.
 
 **A README's opening**, here and in triage, comes from a clone that checks out the README and nothing else, in the working folder, not from the API or WebFetch. A public repo needs no attaching for it on claude.ai:
@@ -285,13 +286,24 @@ It prints the README's path and its first 20 lines, or `no README`. A private re
 
 The search API has a tighter rate limit than the rest; if a search is refused, say so in the panel's `note` and use what was found.
 
+**How each relates.** The user doesn't maintain these repos, so don't judge them: answer, for each, how it bears on the repo under review, from its search result, its README opening and this repo's own files as Step 1 read them. Make no other request.
+- **Overlap**: `same` (the same job), `partial` (part of it, or more besides) or `adjacent` (a neighbouring job). Keep an `adjacent` one only when this repo's README names it.
+- **Difference**: one line on what this repo does that it doesn't, or "nothing clear".
+- **Alive**: `maintained` (pushed in the last year and not archived), `quiet` (not archived, but not pushed in the last year) or `archived`.
+- **Found by**: the topics, and words in its description, that people would search for and this repo lacks, or none.
+- **Worth borrowing**: one thing on its README this repo could adopt, named exactly (a one-line result at the top, a quickstart block, a picture of the output), or none.
+- **Mention**: whether this repo's README should name it: `named` (it already does), `alternative` (as a maintained tool for readers who want one), `earlier` (as earlier work in the same space; say once, in a sentence, which came first), `builds-on` (this repo uses or extends it) or `no`.
+
+For a project the README names that isn't on GitHub, answer Overlap, Difference and Mention (`named`) from the README's own words, and leave the rest out.
+
 Describe each repo from what its own page says. Never say one copied, influenced or was influenced by another, and don't set dates side by side as if they were a race (see House style).
 
 The questions and the recommendation use them:
-- **Hook**: does the opening make clear what this repo adds that the popular ones don't?
-- **Findable**: do the popular ones use topics or words that this repo lacks?
-- **Archive**: the maintained tools that the status and history section points readers to come from this list (those not archived and recently pushed).
-- **Feature**: what visitors will compare it with.
+- **Hook**: does the opening say what this repo adds, the Difference? A Difference of "nothing clear" for a `same` repo is the Hook's hardest test.
+- **Findable**: Found by gives the topics and words to consider adding.
+- **Fixes**: a Worth borrowing item goes into a question's fix only when it fixes that question's fail or flag.
+- **Archive**: the status and history section points readers to the `maintained` repos marked `alternative`, and names those marked `earlier`.
+- **Feature**: what visitors will compare it with; a `same` repo that is `maintained` with a Difference of "nothing clear" counts against featuring.
 
 ## Step 2: run every question
 
@@ -334,7 +346,7 @@ The verdict names the single most important fix. Take the earliest failing quest
    - `rerun`: the command that runs this check again, `/github-curator:repo-review` followed by the repo URL, the local clone's folder path or the file path that was checked (leave it out for pasted text)
    - `changes` (only when there was a previous run): `since` (its date and commit) and `items` (the list from Step 3)
    - `recommendation` (repos only): `action` (`keep`, `publish`, `archive`, `make-private` or `delete`), `why` (the one- or two-sentence reason), `signals` (the short facts it rests on), `confirm` (what the user should confirm, only when the evidence points two ways), `caveat` (what the action costs, from the list above; omit for keep), and `before` (for archive, publish and delete): `title` ("Before archiving", "Before publishing" or "Before deleting") and `items`, a list of `{text, status, note}` with `status` `done`, `todo` or `n/a`, and `feature`: `recommended` (`true` or `false`), `why`, `pinned` (`true`, `false`, or `null` when the pins couldn't be read), `pins` (the current pins, as `owner/name` strings, with the source in `pinsSource`), `replace` (the pin it should replace, when all six places are taken; omit otherwise) and, when recommended, `before` with `title` "Before featuring" and `items` as above
-   - `similar` (any draft whose subject is clear): `asOf` (ISO 8601 date), `note` (optional, such as a refused search), and `items`, a list of `{name, link, stars, pushed, archived, description, relation}`, most-starred first; for a project the README names that isn't on GitHub, give `name`, `link` and `relation` only
+   - `similar` (any draft whose subject is clear): `asOf` (ISO 8601 date), `note` (optional, such as a refused search), and `items`, a list of `{name, link, stars, pushed, archived, description, overlap, difference, alive, foundBy, borrow, mention}`, most-starred first, from How each relates: `foundBy` a list of strings (empty for none), `borrow` omitted for none; for a project the README names that isn't on GitHub, give `name`, `link`, `overlap`, `difference` and `mention` only
    - `verdict`: `question` (the number as a string), `fix`, `why`
    - `questions`: seven objects, in order, each with `short` (the bold label above), `status` (`pass`, `fail` or `flagged`), `question` (the full question text), `finding`, `quotes` (a list of `{text, source}`), and `fix`
    - `outcomes` (repos only): `asOf` (ISO 8601 date), `source` (one line, such as "GitHub API"), `history` (the "Traffic history" page's link, when there is one; omit otherwise), `items` (a list of `{label, value, note}`, with `note` optional, such as "Not available: no push access"), in this order: Stars, Forks, Watchers, Open issues, Open pull requests, Views (14 days), Unique visitors, Clones (14 days), Unique cloners; and `lists` (a list of `{label, entries, empty}` for "Top referrers", "Most-viewed pages", "Stargazers worth a look", "Stargazers", "Forks with commits", "Contributors" and "Waiting on you", each entry a string such as "news.ycombinator.com · 40 views, 31 unique", with an empty list when there are none; `empty` is the line shown in place of an empty list: "None in the last 14 days" for the two traffic lists, "None in the same field" for "Stargazers worth a look" when profiles were read and none is in the field (when no profile could be read, "Not available: " and the reason, such as "Not available: GitHub refused the profile pages"), "Only you" for "Contributors", "None: no fork has commits of its own" for "Forks with commits" when there are forks (when none could be read, "Not available: " and the reason), and "None" for "Stargazers", "Forks with commits" with no forks, and "Waiting on you"). A "Stargazers worth a look" entry is "`LOGIN` · the one line from the `stargazers` skill"; a "Stargazers" entry is "DATE STARRED · `LOGIN` · name, company, location (whichever the profile has) · N followers · active DATE (or no recent activity, or activity not available)", with " · profile page summary" at the end of an entry read from the profile page, oldest first, opening with "N earlier stargazers not listed" when only the 30 most recent were read; a "Forks with commits" entry is "`OWNER/REPO` · N commits (on BRANCH, when not only the default) · by NAMES · last DATE · what they change", with " · worth a look: " and the reason when the `forks` skill picked it, most recently pushed first, ending with "N more not read" when the limit of 30 left some out; a "Contributors" entry is "`LOGIN` · N commits · last DATE", or "NAME (no linked account) · N commits · last DATE", most commits first, from `people.py`; a "Waiting on you" entry is "#N issue (or pull request) · `LOGIN` · opened DATE, N days ago · you replied DATE (or no reply from you) · TITLE", oldest first
@@ -350,7 +362,7 @@ The verdict names the single most important fix. Take the earliest failing quest
 Reply in exactly three lines (two when there is no recommendation), and nothing else:
 1. The recommendation: the action and whether to feature it, with the reason, in one sentence, and the number of `todo` items before them when there are any.
 2. The verdict: the most important fix, in one sentence.
-3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the overview's JSON.
+3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the overview's JSON, and Step 9 on the quick review's.
 
 ```python
 import json, sys
@@ -364,7 +376,18 @@ def counts(name, items):
         sys.exit(f"cannot count {name}: {len(items)} questions, expected 7; unknown status in: {', '.join(odd) or 'none'}")
     return f"{got.count('pass')} pass · {got.count('fail')} fail · {got.count('flagged')} flagged"
 
-if d.get('overview'):
+if d.get('quick'):
+    names = ['Hook', 'Findable', 'Way in']
+    for r in d['repos']:
+        qs = r.get('questions') or []
+        if [q.get('short') for q in qs] != names or any(q.get('status') not in statuses for q in qs):
+            sys.exit(f"cannot count {r.get('name')}: expected Hook, Findable and Way in, in that order, each pass, fail or flagged")
+    parts = []
+    for i, n in enumerate(names):
+        got = [r['questions'][i]['status'] for r in d['repos']]
+        parts.append(f"{n} {got.count('pass')} pass · {got.count('fail')} fail · {got.count('flagged')} flagged")
+    print(f"{len(d['repos'])} repos; " + '; '.join(parts))
+elif d.get('overview'):
     print('; '.join(f"{r['name']}: {r['action']}{' (featured)' if r.get('feature') else ''}, "
                     + counts(r['name'], list(enumerate(r['statuses'], 1))) for r in d['repos']))
 else:

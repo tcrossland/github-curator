@@ -87,6 +87,31 @@ class OverviewCountsTest(unittest.TestCase):
         self.assertEqual(out, "")
         self.assertIn("cannot count o/b: 7 questions, expected 7; unknown status in: 4", err)
 
+    def test_quick_counts_each_question_across_repos(self):
+        def q(*st):
+            return [{"short": n, "status": x} for n, x in zip(["Hook", "Findable", "Way in"], st)]
+        code, out, _ = run_json({"quick": True, "repos": [
+            {"name": "o/a", "questions": q("pass", "flagged", "fail")},
+            {"name": "o/b", "questions": q("fail", "pass", "fail")},
+        ]})
+        self.assertEqual((code, out), (0, "2 repos; Hook 1 pass · 1 fail · 0 flagged; "
+                                          "Findable 1 pass · 0 fail · 1 flagged; Way in 0 pass · 2 fail · 0 flagged\n"))
+
+    def test_quick_refuses_a_repo_without_its_three_questions(self):
+        code, out, err = run_json({"quick": True, "repos": [
+            {"name": "o/a", "questions": [{"short": "Hook", "status": "pass"}, {"short": "Findable", "status": "pass"}]},
+        ]})
+        self.assertNotEqual(code, 0)
+        self.assertEqual(out, "")
+        self.assertIn("cannot count o/a", err)
+
+    def test_quick_refuses_an_unknown_status(self):
+        code, _, err = run_json({"quick": True, "repos": [
+            {"name": "o/a", "questions": [{"short": n, "status": "ok"} for n in ["Hook", "Findable", "Way in"]]},
+        ]})
+        self.assertNotEqual(code, 0)
+        self.assertIn("cannot count o/a", err)
+
 
 if __name__ == "__main__":
     unittest.main()
