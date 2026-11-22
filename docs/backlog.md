@@ -31,12 +31,10 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 
 Changes to what users type and see, released together rather than one at a time.
 
-Every item is built. What only a real run can show is left for one check with a dev build before the release, in Claude Code and on claude.ai:
-- a bare `repo-review` asks which of the three to run;
-- a review's timing rows put each step's work under its own line, and the progress lines show no cost in them;
-- a portfolio run of more than 10 repos gives its estimate before the first review;
-- a claude.ai review makes no call under `repos/` for a similar repo;
-- a re-run's reply starts with the since line, and a first run's doesn't.
+Every item is built, and checked with 0.7.0-dev.1 in Claude Code and on claude.ai. A bare `repo-review` asked which of the three to run, a portfolio run of 24 repos gave its estimate before any review, a re-run's reply started with the since line, and a claude.ai review read its similar repos with no call under `repos/`. Left for the next dev build, on claude.ai:
+- a review prints all seven progress lines, the first right after `start`;
+- each timing line goes in a command of its own, with nothing but a `cd` before it;
+- a first run's reply has no since line.
 
 ## 0.8: steadier calls
 
