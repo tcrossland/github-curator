@@ -155,7 +155,7 @@ Leave the recommendation and the feature call out for pasted text, a file, or a 
 
 ## Timing
 
-Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `portfolio-timings.log`, `triage-timings.log` or `quick-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`, in a command of its own: send it as soon as the step's work is done, and write none of the next step's work into the same command.
+Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `portfolio-timings.log`, `triage-timings.log` or `quick-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`, in a command of its own: send it as soon as the step's work is done, and write none of the next step's work into the same command. The command holds the `printf` line alone, never joined by `&&`, `;` or a newline to a step's work, such as writing the comparison list or the run's JSON.
 
 ```sh
 printf '%s\t%s\t%s\n' 'NAME' "$(date -u +%s)" "$(r=$(gh api rate_limit --jq '"\(.resources.core.used)\t\(.resources.core.reset)"' 2>/dev/null) && printf %s "$r")" >> "LOG"
@@ -168,8 +168,16 @@ Reading `rate_limit` costs no request, and `core.used` counts nearly every REST 
 
 The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
 
-Log a line only for a step that ran. The steps, in order (portfolio, triage and quick name theirs in their own files):
-- **One draft**: `Get the draft` (Step 1 up to the outcomes), `Outcomes`, `Similar repos`, `Questions` (Step 2), `Compare` (Step 3), `Verify and recommend` (Step 4, which starts the run's JSON with the questions) and `Build` (adding the rest of the JSON in Step 5).
+Log a line only for a step that ran. The steps, in order (portfolio, triage and quick name theirs in their own files), with the work each holds, are, for **one draft**:
+1. `Get the draft`: Step 1 up to Outcomes, House style and The previous run included, so look for the previous scorecard before this line.
+2. `Outcomes`: Outcomes.
+3. `Similar repos`: Similar repos.
+4. `Questions`: Step 2, all seven answered, each with its status, note and quotes. Send the line once the answers are written, not before starting them. The run's JSON isn't started yet.
+5. `Compare`: Step 3's list, written in full before the line is sent.
+6. `Verify and recommend`: Step 4: starting the run's JSON with the questions, the quote check with `verify_run.py`, the recount of numbers, the recommendation and the verdict. None of it starts until the `Compare` line, or the `Questions` line on a first run, is sent.
+7. `Build`: Step 5's JSON beyond the questions. None of it is written before the `Verify and recommend` line.
+
+**Progress.** As each step starts, right after the line that closes the step before it (or `start`), write one line of plain text to the user, not a command, naming the step as its timing line will and its place in the mode's list: `Questions (4 of 7)`. A step that won't run gets no line, and the others keep their numbers. Write nothing else between steps that the user would read as progress, so there's one line a step.
 
 The page needs its timings before the template is filled, so for every page, in this order: finish the JSON, append the `Build` line, turn the log into rows with the script below (`python3 timings.py LOG`), add `searches` to the rows that made any, put the rows in the JSON as `timings`, then fill the template. Filling and publishing come after the last line, so the page doesn't time them.
 

@@ -6,12 +6,10 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Progress during long runs](#progress-during-long-runs) | 0.7 | UX | S | todo |
 | [The cost of a big run, before it starts](#the-cost-of-a-big-run-before-it-starts) | 0.7 | UX | S | todo |
 | [Review one repo from a quick or triage row](#review-one-repo-from-a-quick-or-triage-row) | 0.7 | Pages | S | todo |
 | [What changed, in the reply](#what-changed-in-the-reply) | 0.7 | Reply | S | todo |
 | [Similar repos calls `repos/OWNER/REPO`](#similar-repos-calls-reposownerrepo) | 0.7 | Fix | S | todo |
-| [Work logged in the wrong step](#work-logged-in-the-wrong-step) | 0.7 | Fix | S | todo |
 | [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
 | [Tone's shared-work flag varies between runs](#tones-shared-work-flag-varies-between-runs) | 0.8 | Rule | S | todo |
 | [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
@@ -37,10 +35,6 @@ Nothing is left for 0.6.0. Sizes: S is an hour or two, M is a session, L is seve
 
 Changes to what users type and see, released together rather than one at a time.
 
-### Progress during long runs
-
-A full review takes two to five minutes and a portfolio run of ten repos about half an hour, with only tool calls to watch. Each step already logs a timing line; the run could also print one short line as each step or repo starts ("Step 2 of 6: the questions", "Repo 3 of 10: OWNER/REPO"). Done when every mode prints one, and only one, line per step or repo, and the timings show it costs nothing measurable.
-
 ### The cost of a big run, before it starts
 
 Before a portfolio run or triage of more than about ten repos, say what it will take ("12 repos, about 35 minutes; on claude.ai, 12 approvals to attach them"), from the per-repo times in `docs/design.md`, and offer `quick` instead. Done when `portfolio.md` and `triage.md` say when and how to estimate, and a run past the threshold gives the estimate before its first step.
@@ -56,10 +50,6 @@ Step 3 lists what changed since the last run, but Step 6's reply leaves it out, 
 ### Similar repos calls `repos/OWNER/REPO`
 
 On 2026-11-22 two claude.ai reviews, on 0.6.0-dev.2 and dev.3, called `repos/OWNER/REPO` for a similar repo, which Similar repos doesn't ask for, and each was refused with HTTP 403 (`GitHub access to this repository is not enabled for this session`); both went on from the search results. Done when Similar repos says the search results hold every field it needs and to call nothing under `repos/` for a similar repo, and a claude.ai review after the change makes no such call.
-
-### Work logged in the wrong step
-
-In three of the eight reviews of 2026-11-21, run as subagents, work landed before the line of the step it belongs to, although each step's line had a command of its own. One started the run's JSON and ran `verify_run.py` before the `Questions` line; two looked for the previous scorecard after the `Get the draft` line; one wrote Step 5's JSON before the `Verify and recommend` line, leaving 4 s for `Build`. It recurred on 2026-11-21 in two reviews on 0.4.0: one logged `Questions` before writing the questions, and a subagent appended its `Compare` line in the same command that wrote the comparison list, which Timing forbids. Done when Timing says which step each of these belongs to, and a review run after the change shows none of them.
 
 ## 0.8: steadier calls
 

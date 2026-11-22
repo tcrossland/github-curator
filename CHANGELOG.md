@@ -10,6 +10,8 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 - `contributions` takes the organisations to count as yours with `orgs:ORG`, since `own` means repos that aren't forks in `triage own`. `own:ORG` still works.
 - Three of the seven questions have labels that say what they check: Defensible is now Evidence, Context is Jargon and Way in is Getting started. The questions themselves are unchanged, and a re-run compares with a scorecard that has the old labels question by question.
 - `repo-review` with no arguments asks what to review: the repo in the current folder, when it's in a git clone, a quick review of all your repos, or a triage. When no one can answer, as in a scheduled task, it runs the quick review.
+- A review prints one line as each step starts, such as `Questions (4 of 7)`, and a portfolio run one as each repo starts, such as `Repo 3 of 10: OWNER/REPO`, so a long run shows where it is.
+- A review's timings are more often true to each step: Timing now says which work belongs to each step, where runs had put some of it before the step's line.
 
 ## 0.6.0 (2026-11-22)
 
