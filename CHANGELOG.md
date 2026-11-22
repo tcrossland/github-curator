@@ -4,7 +4,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
-- A new mode, `repo-review quick`, gives an at-a-glance review of your repos, or of the ones you name: Hook, Findable and Way in for each, from GitHub's search and its README alone, with a provisional action and the most important fix, on one page titled "Quick review". It's much faster than a full review, leaves out forks and archived repos unless named, and ends with the command for a full review of the repos that need one.
+- A new mode, `repo-review quick`, gives an at-a-glance review of your repos, or of the ones you name: Hook, Findable and Way in for each, from GitHub's search and its README alone, with a provisional action and the most important fix, on one page titled "Quick review". It's much faster than a full review, leaves out forks, archived repos and your profile README repo unless named, and ends with the command for a full review of the repos that need one.
 - A review's Similar repos panel says how each similar repo relates to yours rather than describing it in one line: whether it does the same job, what yours adds, whether it's maintained, the topics it's found by that yours lacks, one thing worth borrowing, and whether your README should name it.
 
 ## 0.5.0 (2026-11-21)

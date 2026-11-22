@@ -7,7 +7,6 @@ Ideas for the plugin, in the order to do them. Each says why it's worth doing an
 | # | Item | Kind | Size | Depends on | Status |
 |---|---|---|---|---|---|
 | 1 | [Traffic history](#1-traffic-history) | New skill and scheduled task | M | none | in progress |
-| 4 | [Quick review](#4-quick-review) | New mode | M | none | in progress |
 | 6 | [Profile review](#6-profile-review) | New skill | M | none | todo |
 | 10 | [Launch drafts](#10-launch-drafts) | New skill | M | 1 helps | todo |
 | 5 | [Benchmark against good practice](#5-benchmark-against-good-practice) | Scorecard panel | L | none | todo |
@@ -28,16 +27,6 @@ The review's Outcomes panel links to the page.
 What's left is **the first run on schedule**: whether the weekly task saves a snapshot when nobody starts it. If it doesn't, the fallback is a scheduled task in the Claude Code desktop app.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task on its schedule.
-
-## 4. Quick review
-
-Full reviews take two or three minutes a repo, so a review of many repos takes a long time, and triage only sorts. The `quick` mode is an at-a-glance review: Hook, Findable and Way in for each repo, from GitHub's repository search and the README alone, with a provisional action and the most important fix, on one "Quick review" page.
-
-Alongside it, Similar repos no longer judges the similar repos, which the user doesn't maintain: each gets six answers on how it bears on the user's repo (Overlap, Difference, Alive, Found by, Worth borrowing, Mention).
-
-Both are in the skill and the template, with the reasons in `docs/design.md`. What's left is **a live check**, in a session started after a build with the change has synced: a `quick` run over the user's repos, then full reviews of two of them to compare against, and one full review to see the Similar repos answers. Whether `archived:false` works on claude.ai is **unverified**.
-
-**Done when** a `quick` run gives every repo the three statuses, those agree with full reviews of two of the same repos, with each disagreement explained, its timings show its cost per repo against a full review's, and a full review's Similar repos panel answers the six questions for each similar repo.
 
 ## 6. Profile review
 
@@ -101,40 +90,3 @@ Each is done when the change is made and the tests pass, unless it says otherwis
 - **Work logged in the wrong step**: in three of the eight reviews of 2026-11-21, run as subagents, work landed before the line of the step it belongs to, although each step's line had a command of its own. One started the run's JSON and ran `verify_run.py` before the `Questions` line; two looked for the previous scorecard after the `Get the draft` line; one wrote Step 5's JSON before the `Verify and recommend` line, leaving 4 s for `Build`. It recurred on 2026-11-21 in two reviews on 0.4.0: one logged `Questions` before writing the questions, and a subagent appended its `Compare` line in the same command that wrote the comparison list, which Timing forbids. Done when Timing says which step each of these belongs to, and a review run after the change shows none of them.
 - **The user's own star in triage**: triage reads `stargazers_count` as interest from others, but the count includes the user's own star. On 2026-11-21 triage gave one repo "A finished prototype with a star" as its reason to archive, and that star was the user's own, given the day the repo was created. Triage never lists stargazers today (`triage.md`), so telling them apart changes that rule: one stargazers call for each repo with only a few stars would do it, and `stargazers` already leaves the user's own star out. Done when triage leaves the user's own star out of its signals and reasons, `docs/design.md` says why, and the timings show what it costs.
 - **Check the Claude Code tool list**: 0.2.14 added a list near the top of `repo-review`'s `SKILL.md` saying what Claude Code uses in place of each claude.ai tool, and what a run does with no artifact tool. In the desktop app, the triage of 2026-11-21 followed the list: it found the previous page with the Artifact tool and republished to it. Whether Claude Code outside the desktop app has an artifact tool is **unverified**. Done when a `claude -p` session's tool list is recorded in `docs/github-facts.md`, and the list's last line matches it.
-
-## Done
-
-What finished items found that open items still use.
-
-### 2. Timing
-
-Item 4 measures against these figures. Every page's Timings section gives each step's seconds and GitHub calls, logged as `docs/design.md` describes. The times include Claude's own work between tool calls, which can't be told apart from waiting on GitHub.
-
-**Figures**, all in Claude Code:
-- Timed by hand in the 0.2.4 test runs, before the log: a review of spacy-annotator about 310 s, an overview of two repos about 236 s, triage 105 s and stargazers 31 s.
-- One review logged on 0.2.5: 228 s, slowest the seven questions (89 s).
-- A cold overview of stat-arb-from-scratch and claude-code-methodology on 0.2.8, on 2026-11-20, in a fresh session with `no-publish`: 341 s. The overview's rows give 171 s and 134 s for the two reviews and 36 s for its own page. Two earlier overviews that day don't count: one ran its reviews interleaved, and a re-run on 0.2.7 reused judgements made earlier in its session, giving 52 s and 44 s per repo. Set against that re-run, about 120 s and 90 s of each cold review was judging.
-
-The cold reviews' rows, as seconds, counted calls and searches:
-
-| Step | stat-arb-from-scratch | claude-code-methodology |
-|---|---|---|
-| Get the draft | 35 s, 3 calls | 51 s, 3 calls |
-| Outcomes | 4 s, 3 calls | 5 s, 3 calls |
-| Similar repos | 21 s, 0 calls, 5 searches | 18 s, 0 calls, 4 searches |
-| Questions | 50 s, 1 call | 21 s, not read |
-| Compare | 19 s, 0 calls | 35 s, not read |
-| Verify and recommend | 33 s, 1 call | 1 s, not read |
-| Build | 8 s, 0 calls | 1 s, 0 calls |
-| Total | 170 s, 8 calls | 132 s, 6 calls |
-
-Each review also made 4 traffic requests and read the pins through GraphQL, none of which `core.used` counts. GitHub's share is small: Outcomes took 4 or 5 s, and the searches about 20 s.
-
-Two things limit how far the rows can be read:
-- **Step boundaries.** A step's line is stamped when the command that writes it runs, so whatever Claude thinks and writes before that command counts to the step it closes. Where one command wrote a step's line and then did the next step's work, that work went to the earlier step: claude-code-methodology's Compare (35 s) includes writing the whole page's JSON, which leaves 1 s each for Verify and recommend and for Build. So the split between neighbouring steps is uncertain by tens of seconds, while each review's total holds. Since 0.2.10 each step's line has a command of its own.
-- **Unread calls.** Three of claude-code-methodology's rows have no call count because the rate limit's reads were inconsistent. On 0.2.9 only the two rows either side of the stray read would lack one. Its total of 6 comes from its first and last lines.
-
-**Slowest steps, as candidates to speed up**:
-- **Review: the seven questions.** 89 s in the 0.2.5 review and 50 s in stat-arb-from-scratch's, the slowest step in both, and judging is most of the gap between the cold and the warm overview. Item 4's quick review answers three of the questions from the API and the README alone.
-- **Review: getting the draft.** 35 s and 51 s, the slowest step in claude-code-methodology's review. Besides the clone and the files, it reads the previous scorecard, whose whole page comes back through the artifact read (this run's saved scorecards are about 46 KB each) for the one JSON block that Step 3 compares with. Whether the read can return less is **unverified**.
-- **Overview: the reviews.** The first review, 171 s, is its slowest row, and the reviews take 305 of its 341 s. An overview gets faster only as a review does, or, for many repos, through item 4.

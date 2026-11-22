@@ -270,9 +270,9 @@ print(json.dumps({'commits': len(rows), 'user': own, 'others': others}, indent=1
 
 Find up to five popular repos that do much the same thing, for any draft whose subject is clear (private repos and pasted drafts included). Like the outcomes, they get no pass or fail.
 
-1. Search by the repo's most specific topics, two at a time: `gh api 'search/repositories?q=topic:A+topic:B&sort=stars&per_page=10'`. Skip generic topics such as a language name.
+1. Search by the repo's most specific topics, two at a time: `gh api 'search/repositories?q=topic:A+topic:B&sort=stars&per_page=10'`. Skip generic topics such as a language name. When the repo has no specific topics, skip this search: never make topics up.
 2. Then search by the words that say what it does, from the description or the README's opening: `gh api 'search/repositories?q=WORD+WORD+in:name,description,topics&sort=stars&per_page=10'`.
-3. Read every description before keeping a result: in both kinds of search the most-starred results are often only loosely related. Keep those that do much the same job, leaving out the repo itself and its forks, and leaving out curated lists, course notes and collections unless this repo is one. Order them most-starred first. Record each one's `full_name`, `html_url`, `stargazers_count`, `pushed_at` (date only), `archived`, `description` and `topics`, and read its README opening.
+3. Read every description before keeping a result: in both kinds of search the most-starred results are often only loosely related. Keep those that do much the same job, leaving out the repo itself and its forks, and leaving out curated lists, course notes and collections unless this repo is one. Order them most-starred first. Record each one's `full_name`, `html_url`, `stargazers_count`, `created_at` and `pushed_at` (dates only), `archived`, `description` and `topics`, and read its README opening.
 4. Add any project the README itself names as related or as an alternative, with its link, even when it isn't on GitHub. GitHub search can't find tools hosted elsewhere.
 
 **A README's opening**, here and in triage, comes from a clone that checks out the README and nothing else, in the working folder, not from the API or WebFetch. A public repo needs no attaching for it on claude.ai:
@@ -288,11 +288,11 @@ The search API has a tighter rate limit than the rest; if a search is refused, s
 
 **How each relates.** The user doesn't maintain these repos, so don't judge them: answer, for each, how it bears on the repo under review, from its search result, its README opening and this repo's own files as Step 1 read them. Make no other request.
 - **Overlap**: `same` (the same job), `partial` (part of it, or more besides) or `adjacent` (a neighbouring job). Keep an `adjacent` one only when this repo's README names it.
-- **Difference**: one line on what this repo does that it doesn't, or "nothing clear".
+- **Difference**: one line on what this repo does that the other doesn't, said of this repo alone ("Counts every trial against a deflated Sharpe ratio"), or "nothing clear". Never remark on the other repo's README, results or quality, and never list what this repo lacks: those are not what it adds.
 - **Alive**: `maintained` (pushed in the last year and not archived), `quiet` (not archived, but not pushed in the last year) or `archived`.
-- **Found by**: the topics, and words in its description, that people would search for and this repo lacks, or none.
+- **Found by**: the topics, and words in its description, that people would search for and that appear nowhere in this repo's description, topics or README opening, or none.
 - **Worth borrowing**: one thing on its README this repo could adopt, named exactly (a one-line result at the top, a quickstart block, a picture of the output), or none.
-- **Mention**: whether this repo's README should name it: `named` (it already does), `alternative` (as a maintained tool for readers who want one), `earlier` (as earlier work in the same space; say once, in a sentence, which came first), `builds-on` (this repo uses or extends it) or `no`.
+- **Mention**: whether this repo's README should name it, from how the two relate, whatever the recommended action. The first that fits: `named` (the README already names it), `builds-on` (this repo uses or extends it), `alternative` (it's `maintained` and its Overlap is `same` or `partial`: a tool for readers who want one), `earlier` (it does the `same` job and was created before this repo; say once, in a sentence, which came first), or `no`.
 
 For a project the README names that isn't on GitHub, answer Overlap, Difference and Mention (`named`) from the README's own words, and leave the rest out.
 
