@@ -4,7 +4,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
-- On claude.ai, a review and `stargazers` say before they fetch a GitHub page that a prompt to approve it is coming, and that Always allow for this website covers the rest of the chat. `stargazers` tries a page GitHub rate-limited once more after 30 seconds before it stops reading profiles, and says when the fetch wasn't approved.
+- On claude.ai, a review and `stargazers` say before they fetch a GitHub page that a prompt to approve it is coming, and that choosing Always allow for this website, when a prompt offers it, covers the rest of the chat. `stargazers` pauses between profile pages, tries a page GitHub rate-limited once more after 30 seconds, and skips a page refused twice rather than stop, stopping only after three in a row; it says when the fetch wasn't approved.
 - When a review can't read your pins at all, it goes without them rather than take an older scorecard's list, and the Pinned step before featuring shows Check rather than To do.
 - Getting started counts a table of the project's stages, with earlier ones done and the current one under way, as saying the project's status.
 - Facts no longer flags a repo for links the session can't open, such as other repos on claude.ai; the finding says which links weren't checked.
