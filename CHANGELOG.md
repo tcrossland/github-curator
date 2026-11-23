@@ -2,7 +2,7 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
-## Unreleased
+## 0.8.0 (2026-11-23)
 
 - On claude.ai, triage and `stargazers` attach repos in whatever mode the chat is in, rather than asking you to switch to Manual mode first, which took one approval per repo. They ask for Manual mode only if Auto mode refuses an attach, and then only for that repo.
 - On claude.ai, a review and `stargazers` say before they fetch a GitHub page that a prompt to approve it is coming, and that choosing Always allow for this website, when a prompt offers it, covers the rest of the chat. `stargazers` pauses between profile pages, tries a page GitHub rate-limited once more after 30 seconds, and skips a page refused twice rather than stop, stopping only after three in a row; it says when the fetch wasn't approved.
