@@ -4,6 +4,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- In Claude Code, where the artifact listing can stop at your 50 most recently updated artifacts, a review that finds no previous page there says in its footer that an older one may exist. `traffic` asks for the Traffic history page's link rather than start a second page, and a scheduled run that can't ask keeps the snapshot as a file instead.
 - Triage writes every repo's reason and question anew on each run, taking only the forks' parents from the last triage, so a rule change since shows in its calls rather than being hidden behind last run's words.
 - Triage counts only other people's stars: a repo you starred yourself shows it ("3 stars, one yours"), and your own star no longer counts as interest in its reasons or keeps a fork from a clear delete. It reads your stars once, at one call per 100 repos you've starred. On claude.ai, where that list may be refused, a single star it can't place says "possibly yours".
 - Getting started asks whether the page says the project's status, maintained, experimental or finished, and is flagged when nothing says it, with a fix that adds the line for you to confirm. Commit dates and version numbers don't count, and an archived repo's banner does. Tone for `for:users` no longer asks the same thing. The quick review leaves it out.
