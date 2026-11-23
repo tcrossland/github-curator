@@ -298,3 +298,16 @@ test('quick review shows changes since the last one, closed, and no next command
   assert.match(html, /1 repo · 0 with a fail/);
   assert.doesNotMatch(html, /next-cmd/);
 });
+
+test('a pin the profile page summary may have left out shows as unknown, in the feature call and in rows', () => {
+  const feature = { recommended: true, why: 'Best evidence.', pinned: 'unknown', pins: ['owner/a', 'owner/b', 'owner/c', 'owner/d'], pinsSource: 'profile page summary, may not be complete' };
+  const { html } = render({ ...review, recommendation: { ...review.recommendation, feature } });
+  assert.match(html, /class="fv yes">Yes <span>· pin unknown<\/span>/);
+  assert.match(html, /<b>Pins read \(4, may be incomplete\):<\/b> owner\/a/);
+  assert.doesNotMatch(html, /not pinned now|Pinned now \(/);
+  const quick = render({ quick: true, title: 'Quick review', subject: '1 repo', date: '2026-11-23', repos: [quickRepo('me/a', ['pass', 'pass', 'pass'], { pinned: 'unknown' })] });
+  assert.match(quick.html, /<div class="tsub">public · pin unknown · 2 stars/);
+  const triage = render({ triage: true, title: 'Repo triage', subject: '1 repo', date: '2026-11-23',
+    repos: [{ name: 't/a', link: '#', visibility: 'public', kind: 'fork', pinned: 'unknown', stars: 0, signals: [], action: 'archive', sure: 'review', reason: 'r' }] });
+  assert.match(triage.html, /public · fork · pin unknown/);
+});

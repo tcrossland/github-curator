@@ -209,6 +209,7 @@ details.fold { display: block; }
 <script>
 (function () {
   var d = JSON.parse(document.getElementById('data').textContent);
+  var pinMark = function (p) { return p === true ? ' · pinned' : p === 'unknown' ? ' · pin unknown' : ''; };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
   var fmt = function (s) { return esc(s).replace(/`([^`]+)`/g, function (m, c) { return '<code>' + c + '</code>'; }); };
   var label = { pass: 'Pass', fail: 'Fail', flagged: 'Flagged' };
@@ -267,7 +268,7 @@ details.fold { display: block; }
     t += '<section class="verdict ok" aria-label="Summary"><span class="label">Triage</span><p class="fix">' + clr.length + ' clear ' + (clr.length === 1 ? 'delete' : 'deletes') + ' · ' + rev.length + ' to review</p>' +
          '<p class="why">' + Object.keys(tally).map(function (k) { return tally[k] + ' likely ' + esc(actionName(k).toLowerCase()); }).join(' · ') + '</p></section>';
     var row = function (r, i) {
-      return '<tr><td class="num">' + (i + 1) + '</td><td><a href="' + esc(r.link) + '">' + esc(r.name) + '</a><div class="tsub">' + esc(r.visibility) + ' · ' + esc(r.kind) + (r.pinned ? ' · pinned' : '') +
+      return '<tr><td class="num">' + (i + 1) + '</td><td><a href="' + esc(r.link) + '">' + esc(r.name) + '</a><div class="tsub">' + esc(r.visibility) + ' · ' + esc(r.kind) + pinMark(r.pinned) +
              (r.stars != null ? ' · ' + esc(r.stars) + (r.stars === 1 ? ' star' : ' stars') : '') + (r.pushed ? ' · pushed ' + esc(r.pushed) : '') + '</div></td>' +
              '<td class="act">' + esc(actionName(r.action)) + '</td><td>' + fmt(r.reason) + (r.question ? '<div class="tq">' + fmt(r.question) + '</div>' : '') +
              (r.signals && r.signals.length ? '<div class="tsig">' + r.signals.map(fmt).join(' · ') + '</div>' : '') + (r.sure === 'review' ? reviewCmd(r, 'rc-t-' + rs.indexOf(r)) : '') + '</td></tr>';
@@ -306,7 +307,7 @@ details.fold { display: block; }
       }).join('');
       var ev = [];
       (r.questions || []).forEach(function (x) { (x.quotes || []).forEach(function (y) { ev.push('<blockquote class="' + esc(x.status) + '">' + esc(y.text) + '<cite>' + esc(x.short) + ' · ' + fmt(y.source) + '</cite></blockquote>'); }); });
-      return '<tr><td class="num">' + (i + 1) + '</td><td><a href="' + esc(r.link) + '">' + esc(r.name) + '</a><div class="tsub">' + esc(r.visibility) + (r.pinned ? ' · pinned' : '') +
+      return '<tr><td class="num">' + (i + 1) + '</td><td><a href="' + esc(r.link) + '">' + esc(r.name) + '</a><div class="tsub">' + esc(r.visibility) + pinMark(r.pinned) +
              (r.stars != null ? ' · ' + esc(r.stars) + (r.stars === 1 ? ' star' : ' stars') : '') + (r.pushed ? ' · pushed ' + esc(r.pushed) : '') + '</div></td>' +
              '<td class="qk">' + qs + '</td><td class="act">' + esc(actionName(r.action)) + '</td><td>' + fmt(r.fix) + (r.question ? '<div class="tq">' + fmt(r.question) + '</div>' : '') +
              (ev.length ? '<details class="ev"><summary>Evidence</summary>' + ev.join('') + '</details>' : '') +
@@ -388,11 +389,11 @@ details.fold { display: block; }
     html += checklist(rec.before);
     var f = rec.feature;
     if (f) {
-      var pinned = f.pinned === true ? 'pinned now' : f.pinned === false ? 'not pinned now' : 'pins not read';
+      var pinned = f.pinned === true ? 'pinned now' : f.pinned === false ? 'not pinned now' : f.pinned === 'unknown' ? 'pin unknown' : 'pins not read';
       html += '<div class="feat"><span class="label">Feature on profile</span><p class="fv ' + (f.recommended ? 'yes' : 'no') + '">' + (f.recommended ? 'Yes' : 'No') + ' <span>· ' + pinned + '</span></p>' +
               '<p class="why">' + fmt(f.why) + '</p>';
       if (f.replace) html += '<p class="note"><b>Replaces:</b> ' + fmt(f.replace) + '</p>';
-      if (f.pins && f.pins.length) html += '<p class="note"><b>Pinned now (' + f.pins.length + ' of 6):</b> ' + f.pins.map(fmt).join(', ') + (f.pinsSource ? ' <i>(' + fmt(f.pinsSource) + ')</i>' : '') + '</p>';
+      if (f.pins && f.pins.length) html += '<p class="note"><b>' + (f.pinned === 'unknown' ? 'Pins read (' + f.pins.length + ', may be incomplete)' : 'Pinned now (' + f.pins.length + ' of 6)') + ':</b> ' + f.pins.map(fmt).join(', ') + (f.pinsSource ? ' <i>(' + fmt(f.pinsSource) + ')</i>' : '') + '</p>';
       html += checklist(f.before) + '</div>';
     }
     html += '</section>';

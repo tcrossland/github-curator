@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Pins the profile page leaves out](#pins-the-profile-page-leaves-out) | Next | Rule | S | todo |
 | [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [WebFetch of GitHub pages on claude.ai](#webfetch-of-github-pages-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [Which model for a full review](#which-model-for-a-full-review) | One claude.ai check | Check | M | todo |
@@ -21,12 +20,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
 
-## Next
-
-### Pins the profile page leaves out
-
-On claude.ai, Step 1 reads the pins from WebFetch's summary of the profile page, labelled "may not be complete". On 2026-11-23 that summary named 4 of the user's 6 pins, so a review of a pinned repo called it "not pinned now", listed "Pinned now (4 of 6)" and asked the user to confirm (`docs/github-facts.md`). Done when a repo missing from a summary that names fewer than six pins is shown as "pin unknown" rather than "not pinned", the feature call and its list say to check the profile, and a case guards it.
-
 ## One claude.ai check
 
 Each needs a claude.ai chat to settle; one prompt can gather evidence for all three.
@@ -39,7 +32,7 @@ In Manual mode each `add_repo` call needs an approval, so attaching N repos take
 
 WebFetch of a `github.com` page is refused with `URL_NOT_ON_ALLOWLIST` unless a web search in the chat found the URL first (seen 2026-11-21). Two steps rely on it there:
 
-- **Pins**: `repo-review` Step 1, and triage through it, read the pins from the profile page when GraphQL is refused, as it is in a claude.ai session's own shell. A web search for the user's own `github.com/OWNER`, used only to fetch that page, may be enough, but in a quick review on 2026-11-22 the chat searched for "github.com tcrossland" after the refusal and said the results held only other users' profiles (the chat's account, **unverified**), so the pins weren't read. Later that day, in a review on 0.6.0-dev.3, a chat said it read the pins from the profile page after GraphQL was refused, labelled "profile page summary, may not be complete", and reported no refusal (the chat's account, **unverified**: how it reached the page wasn't shown). Whether a search can be made to find the user's own profile is the first thing to settle. On 2026-11-23, on 0.8.0-dev.1, a fetch of the profile page with no search before it wasn't refused, but the pins it gave left out two of six (see [Pins the profile page leaves out](#pins-the-profile-page-leaves-out)).
+- **Pins**: `repo-review` Step 1, and triage through it, read the pins from the profile page when GraphQL is refused, as it is in a claude.ai session's own shell. A web search for the user's own `github.com/OWNER`, used only to fetch that page, may be enough, but in a quick review on 2026-11-22 the chat searched for "github.com tcrossland" after the refusal and said the results held only other users' profiles (the chat's account, **unverified**), so the pins weren't read. Later that day, in a review on 0.6.0-dev.3, a chat said it read the pins from the profile page after GraphQL was refused, labelled "profile page summary, may not be complete", and reported no refusal (the chat's account, **unverified**: how it reached the page wasn't shown). Whether a search can be made to find the user's own profile is the first thing to settle. On 2026-11-23, on 0.8.0-dev.1, a fetch of the profile page with no search before it wasn't refused, but the pins it gave left out two of six, so a repo missing from such a summary now has an unknown pin.
 - **Stargazers' profiles**: `users/LOGIN` is refused too, so `stargazers` reads no profile and its lists say "Not available" with the reason. The skill forbids searching the web for a stargazer, so the choice is whether a search for the exact profile URL, used only to fetch that page, fits the rule, or whether the README says stargazers' profiles need Claude Code. The same run fetched 12 profiles at once, where the skill says one at a time. The 0.8.0-dev.1 check didn't reach this: the stargazers call needed the repo attached with push access, and the prompt attached with read.
 
 Done when a claude.ai triage reads the pins, and a claude.ai `stargazers` run reads profiles or the README says they need Claude Code.
