@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
 | [The user's own star in triage](#the-users-own-star-in-triage) | 0.8 | Rule | S | todo |
 | [Carry over a triage's reasons](#carry-over-a-triages-reasons) | 0.8 | Decision | S | todo |
 | [Eval cases that fail with their rule cut](#eval-cases-that-fail-with-their-rule-cut) | 0.8 | Evals | M | todo |
@@ -30,10 +29,6 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 Rules that decide a status or an action, and the evals that guard them.
 
 The order puts each change before the ones that build on it. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
-
-### A project's status on the page
-
-After what a repo is, a visitor asks whether it's maintained, experimental or finished. Today that's split between Facts (statuses match their source), Getting started (whether it wants contributions) and the checklist before archiving, and no question asks whether the page says it. Fold it into Hook or Getting started rather than adding an eighth question, which would change the counts script, the template, quick mode and every eval case. Done when one question's rule asks for it, `docs/design.md` says why there, and an eval case guards it.
 
 ### The user's own star in triage
 
