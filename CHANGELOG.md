@@ -4,6 +4,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- The README says which model to pick: Opus 5.5 for a review you'll act on, with Sonnet 5.5 making most of the same calls at about half the usage.
 - On claude.ai, where the pins come from a summary of your profile page that can leave some out, a repo the summary doesn't name shows as "pin unknown" rather than "not pinned now", and the feature call asks you to check your profile. The scorecard lists the pins it read as "may be incomplete".
 - In Claude Code, where the artifact listing can stop at your 50 most recently updated artifacts, a review that finds no previous page there says in its footer that an older one may exist. `traffic` asks for the Traffic history page's link rather than start a second page, and a scheduled run that can't ask keeps the snapshot as a file instead.
 - Triage writes every repo's reason and question anew on each run, taking only the forks' parents from the last triage, so a rule change since shows in its calls rather than being hidden behind last run's words.

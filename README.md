@@ -69,6 +69,8 @@ It runs in a claude.ai chat or in Claude Code. In Claude Code it reads GitHub wi
 
    It publishes the scorecard to a page in your claude.ai account and replies in three lines: what to do with the repo, the most important fix, and how many of the seven questions pass, fail or are flagged. On an account with many repos, start with `/github-curator:repo-review triage`.
 
+The skills are tested on Opus 5.5 and Sonnet 5.5. Sonnet uses about half as much and makes most of the same calls, but in a full review run side by side, Opus kept closer to the rules, so pick Opus 5.5 for a review you'll act on.
+
 ## Install and update
 
 To update, upload the new release's zip the same way; claude.ai asks you to confirm before it replaces the version you have. A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version.

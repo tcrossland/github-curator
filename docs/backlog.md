@@ -8,7 +8,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 |---|---|---|---|---|
 | [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [WebFetch of GitHub pages on claude.ai](#webfetch-of-github-pages-on-claudeai) | One claude.ai check | claude.ai | S | todo |
-| [Which model for a full review](#which-model-for-a-full-review) | One claude.ai check | Check | M | todo |
 | [6. Profile review](#6-profile-review) | Later | New skill | M | todo |
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
 | [10. Launch drafts](#10-launch-drafts) | Later | New skill | M | todo |
@@ -22,7 +21,7 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 ## One claude.ai check
 
-Each needs a claude.ai chat to settle; one prompt can gather evidence for all three.
+Each needs a claude.ai chat to settle; one prompt can gather evidence for both.
 
 ### Fewer approvals on claude.ai
 
@@ -36,10 +35,6 @@ WebFetch of a `github.com` page is refused with `URL_NOT_ON_ALLOWLIST` unless a 
 - **Stargazers' profiles**: `users/LOGIN` is refused too, so `stargazers` reads no profile and its lists say "Not available" with the reason. The skill forbids searching the web for a stargazer, so the choice is whether a search for the exact profile URL, used only to fetch that page, fits the rule, or whether the README says stargazers' profiles need Claude Code. The same run fetched 12 profiles at once, where the skill says one at a time. The 0.8.0-dev.1 check didn't reach this: the stargazers call needed the repo attached with push access, and the prompt attached with read.
 
 Done when a claude.ai triage reads the pins, and a claude.ai `stargazers` run reads profiles or the README says they need Claude Code.
-
-### Which model for a full review
-
-With `--model sonnet` the eval suite passed as it does on Opus 5.5 at about half the cost a run, but the cases check fixed calls on small fixtures, not the judgement calls a real README needs (Hook, Evidence, Jargon). Done when full reviews of the same three real repos on Sonnet 5.5 and Opus 5.5 are compared question by question, `docs/design.md` records the result, and the README says which model to pick. Until then, the README's Try it section says which model the skills were tested on (the eval suite has run on Opus 5.5 and Sonnet 5.5, and one claude.ai check on Sonnet 5.5), so a user on another model knows what they're departing from.
 
 ## Later
 
