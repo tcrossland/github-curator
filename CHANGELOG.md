@@ -5,6 +5,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 ## Unreleased
 
 - A review's Contributors list counts the people named as co-authors in commits' `Co-authored-by` trailers, as GitHub's own Contributors sidebar does, and Tone's check on credit counts their work as shared. Coding assistants such as Claude and Copilot, and bots, are left out.
+- Tone's check on credit says when it applies: the README claims something as yours, in the first person or under your name, and someone else's commits made a share of it. Tone is then flagged every time, never passed or failed for credit alone, where runs on the same repo had sometimes left it unflagged.
 
 ## 0.7.0 (2026-11-22)
 

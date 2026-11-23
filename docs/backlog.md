@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Tone's shared-work flag varies between runs](#tones-shared-work-flag-varies-between-runs) | 0.8 | Rule | S | todo |
 | [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
 | [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
 | [The user's own star in triage](#the-users-own-star-in-triage) | 0.8 | Rule | S | todo |
@@ -31,11 +30,7 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 Rules that decide a status or an action, and the evals that guard them.
 
-The order puts each change before the ones that build on it. Tone's credit flag is settled before the audiences rewrite the rest of Tone. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
-
-### Tone's shared-work flag varies between runs
-
-The `other-people` eval case missed Tone's flag in one of three runs on Opus 5.5 (2026-11-21) and in one of three on Sonnet 5.5 (2026-11-22), the only miss in either suite. A rule that leaves too much to judgement shows up as runs that disagree (`docs/design.md`, Behaviour evals). Done when Tone's rule says plainly when shared work presented as the user's alone is flagged, and the case passes three runs out of three on both models.
+The order puts each change before the ones that build on it. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
 
 ### 11. Questions for each audience
 
@@ -43,7 +38,7 @@ The seven questions are written for one user: someone whose repos are a portfoli
 
 - Tone asks whether the repo will land with the people it's for: the audience the README names, or the one the user sets.
 - An argument, such as `for:employers`, `for:users` or `for:researchers`, sets the audience, with `employers` as the default. It decides what Tone looks for, and how hard Jargon and Evidence are pressed.
-- Tone's shared-work flag stays as it is; tightening it is its own item, under 0.8.
+- Tone's credit rule stays as it is: it already says when it flags, and the `other-people` case guards it.
 
 **Done when** `SKILL.md` and `docs/design.md` say how each audience changes Tone, Jargon and Evidence, the argument is in the hint and the README, and an eval case for each audience shows a call that differs between them.
 
