@@ -36,7 +36,8 @@ The behaviour evals in `evals/` check the skills' calls on known cases, offline,
 - A change to a rule: only the cases whose graders name it, once each, without the runs without the plugin (`--case NAME --runs 1 --ablation none`). A case tagged `repeat` keeps its own runs: leave out `--runs`. If no case guards the rule, say so in the commit.
 - A rewrite or move of text in a `SKILL.md` that every case reads: every case, `--runs 1 --ablation none`.
 - Before cutting a release: every case once, without the runs without the plugin (`scripts/evals.sh --runs 1 --ablation none -j 4`), then `way-in-unheld-licence` three times (`--case way-in-unheld-licence --ablation none`), since its call is the one that varied between runs.
-- The full suite, three runs of each case with and without the plugin (`scripts/evals.sh -j 4`): when a case is added, to show it measures the skill, and before each release once someone other than the user installs the plugin.
+- A new case: that case alone, three runs with and without the plugin (`scripts/evals.sh --case NAME -j 4`), to show it measures the skill.
+- The full suite, three runs of each case with and without the plugin (`scripts/evals.sh -j 4`): before each release once someone other than the user installs the plugin.
 - Nothing else needs them: the template, tests, scripts, docs, and fields copied as they are.
 
 Runs go one at a time unless given `-j N` (up to 8), which `scripts/evals.sh` passes on: the full suite took 43 minutes one at a time, so run it with `-j 4`. On Opus 5.5 the full suite of 12 cases cost about $26 and took 25 minutes with `-j 4` (2026-11-23), and every case once about $6. The runs share one rate limit.
