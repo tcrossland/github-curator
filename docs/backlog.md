@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Carry over a triage's reasons](#carry-over-a-triages-reasons) | 0.8 | Decision | S | todo |
 | [Eval cases that fail with their rule cut](#eval-cases-that-fail-with-their-rule-cut) | 0.8 | Evals | M | todo |
 | [A first run's reply](#a-first-runs-reply) | 0.8 | Check | S | todo |
 | [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | One claude.ai check | claude.ai | S | todo |
@@ -28,10 +27,6 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 Rules that decide a status or an action, and the evals that guard them.
 
 The order puts each change before the ones that build on it. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
-
-### Carry over a triage's reasons
-
-The second triage on claude.ai reused the previous page's reasons and questions word for word where a repo's signals hadn't changed, which the skill neither asks for nor forbids. Decide whether triage should: carrying them over keeps the page stable between runs and saves time, but hides a call that a rule change since would make differently. Done when `triage.md` says which, and `docs/design.md` says why.
 
 ### Eval cases that fail with their rule cut
 
