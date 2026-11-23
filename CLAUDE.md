@@ -39,7 +39,7 @@ The behaviour evals in `evals/` check the skills' calls on known cases, offline,
 - The full suite, three runs of each case with and without the plugin (`scripts/evals.sh -j 4`): when a case is added, to show it measures the skill, and before each release once someone other than the user installs the plugin.
 - Nothing else needs them: the template, tests, scripts, docs, and fields copied as they are.
 
-Runs go one at a time unless given `-j N` (up to 8), which `scripts/evals.sh` passes on: the full suite took 43 minutes one at a time, so run it with `-j 4`. On Opus 5.5 the full suite of 7 cases cost about $13 and every case once about $3. The runs share one rate limit.
+Runs go one at a time unless given `-j N` (up to 8), which `scripts/evals.sh` passes on: the full suite took 43 minutes one at a time, so run it with `-j 4`. On Opus 5.5 the full suite of 12 cases cost about $26 and took 25 minutes with `-j 4` (2026-11-23), and every case once about $6. The runs share one rate limit.
 
 ## Releasing
 
