@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | Next | Rule | S | todo |
 | [6. Profile review](#6-profile-review) | Later | New skill | M | todo |
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
 | [10. Launch drafts](#10-launch-drafts) | Later | New skill | M | todo |
@@ -17,12 +16,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [1. Traffic history](#1-traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
-
-## Next
-
-### Fewer approvals on claude.ai
-
-In Manual mode each `add_repo` call needs an approval, so attaching N repos takes N (`docs/github-facts.md`). Auto mode attached without a prompt in the 0.6.0-dev.3 check, but its check refused `add_repo` in some earlier chats, which is why attaching goes through Manual mode (`docs/design.md`). Trying Auto first and asking for Manual only after a refusal would save most approvals. Done when a claude.ai check shows how often Auto refuses, and the Attaching rule follows from it. The 0.8.0-dev.1 check on 2026-11-23 asked for read access by mistake, which attaches nothing on a public repo, so it measured nothing; the one push attach in that chat, made by `repo-review`, went through in Auto mode with no prompt. On 2026-11-23, on 0.8.0-dev.2, an Auto-mode chat attached five repos with push access, no refusals, after a request giving permission for each. With the 74 of 2026-11-21, Auto's only refusals are from 2026-11-20, so the Attaching rule can try Auto first and ask for Manual only after a refusal. Switching to Manual doesn't help WebFetch either: a link not from the conversation asks for approval in either mode (`docs/github-facts.md`). Done when `triage.md`, `portfolio.md` and `stargazers` attach in the chat's mode and suggest Manual only after a refusal.
 
 ## Later
 

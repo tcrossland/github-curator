@@ -22,7 +22,7 @@ With no repo given, run over every public repo the user owns that has stars, lis
 
 ## Step 1: list the stargazers
 
-On claude.ai, the API answers for a repo only once it's attached: attach each repo first with `add_repo` and `access: "push"` (a review has already attached its repo), asking the user once for permission for all of them and suggesting they switch the chat to Manual mode, so each attach waits for their approval. Don't clone them. If a repo can't be attached, say so in one line and go on to the next.
+On claude.ai, the API answers for a repo only once it's attached: attach each repo first with `add_repo` and `access: "push"` (a review has already attached its repo), asking the user once for permission for all of them, in whatever mode the chat is in. If Auto mode's check refuses an attach, ask them once to switch the chat to Manual mode, where each call waits for their approval instead, and try that repo once more. Don't clone them. If a repo can't be attached, say so in one line and go on to the next.
 
 First read the repo with `gh api repos/OWNER/REPO --jq '{full_name, private, stargazers_count}'`, and use its `full_name` from here on, since the name given may differ in case or be an old one. If the call returns 404, stop and say in one line that the repo doesn't exist or isn't visible to the user. If it's private, stop and say so in one line: only people with access can star a private repo, so there are no stargazers to list yet.
 
