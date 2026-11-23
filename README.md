@@ -18,6 +18,7 @@ It holds five skills, each a set of instructions Claude follows when you run its
   - `repo-review quick`: an at-a-glance review of all your repos, or the ones you name, on three of the questions, from GitHub's search and each README; much faster than a full review, and its calls are provisional.
   - `repo-review` alone: asks which of these to run, offering the repo in the current folder first when there is one, then quick and triage.
   - `no-publish`, in any mode: saves the page as a file rather than publishing it.
+  - `for:users` or `for:researchers`, in a full review or a portfolio: judges the repo for people deciding whether to depend on it, or for others in its field, rather than for potential employers and collaborators, the default (`for:employers`). It changes what Tone, Jargon and Evidence look for, and the scorecard says which readers it used.
 
   How the modes hand on to each other:
 
@@ -43,9 +44,9 @@ It holds five skills, each a set of instructions Claude follows when you run its
   - **Findable**: is it public, with a description and topics in the words people search for?
   - **Facts**: does every result, status, version, command, link and tag match its source?
   - **Evidence**: does each strong claim point to the test, report or file that proves it?
-  - **Jargon**: are the field's terms defined or linked where they first appear?
+  - **Jargon**: are the field's terms defined or linked where they first appear, for the readers it's for?
   - **Getting started**: can a visitor run it, reuse part of it or join in, under a licence that lets them?
-  - **Tone**: does it read as finished work that shows the author's judgement, rather than internal notes?
+  - **Tone**: will it land with its readers? For employers, does it read as finished work that shows the author's judgement, rather than internal notes; for users, can they rely on it; for researchers, does it read as a contribution to the field?
 - [`stargazers`](skills/stargazers/SKILL.md): lists who starred a repo (its URL or `OWNER/REPO`) and when, and picks out the stargazers whose own work is in the same field. With no repo given it covers every public repo of yours that has stars; `since:YYYY-MM-DD` keeps only recent stars, and `all` reads every stargazer, not only the 30 most recent. GitHub lists stargazers only to a repo's owner, so it works on your own repos. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.
 - [`forks`](skills/forks/SKILL.md): lists the forks of a repo (its URL or `OWNER/REPO`) that hold commits of their own, on any branch, what those commits change and who made them, and picks out the ones worth a look, such as a fork that fixes something the repo still gets wrong. With no repo given it covers every public repo of yours that has forks; `all` reads every fork pushed to since it was made, not only the 30 most recent. The repo review runs its Steps 1 to 3 for the scorecard's Outcomes panel.
 - [`contributions`](skills/contributions/SKILL.md): lists your merged pull requests to repos you don't own, in three groups: your own organisations' (counted; `orgs:ORG` adds one it misses), your employers' (listed apart, once you name them with `employers:OWNER`) and other people's projects, one row per repo with its stars, the dates and what you did. Pull requests to private repos are counted, never named.

@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
 | [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
 | [The user's own star in triage](#the-users-own-star-in-triage) | 0.8 | Rule | S | todo |
 | [Carry over a triage's reasons](#carry-over-a-triages-reasons) | 0.8 | Decision | S | todo |
@@ -31,16 +30,6 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 Rules that decide a status or an action, and the evals that guard them.
 
 The order puts each change before the ones that build on it. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
-
-### 11. Questions for each audience
-
-The seven questions are written for one user: someone whose repos are a portfolio for potential employers and collaborators, as the top of `repo-review`'s `SKILL.md` says. Hook, Findable, Facts and Getting started fit any public repo, but Tone asks whether a repo "will land with a potential employer or collaborator", which misses a maintained library whose readers are deciding whether to depend on it, or a research repo read by others in the field. Evidence and Jargon matter most where a repo makes claims or sits in a niche field, and pass easily elsewhere, which costs nothing.
-
-- Tone asks whether the repo will land with the people it's for: the audience the README names, or the one the user sets.
-- An argument, such as `for:employers`, `for:users` or `for:researchers`, sets the audience, with `employers` as the default. It decides what Tone looks for, and how hard Jargon and Evidence are pressed.
-- Tone's credit rule stays as it is: it already says when it flags, and the `other-people` case guards it.
-
-**Done when** `SKILL.md` and `docs/design.md` say how each audience changes Tone, Jargon and Evidence, the argument is in the hint and the README, and an eval case for each audience shows a call that differs between them.
 
 ### A project's status on the page
 

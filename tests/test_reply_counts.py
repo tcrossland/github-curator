@@ -84,6 +84,14 @@ class SinceLineTest(unittest.TestCase):
         self.assertEqual((code, out), (0, "Since 2026-11-21: Hook fail → pass; Getting started pass → flagged; action archive → keep\n"
                                           "6 pass · 0 fail · 1 flagged\n"))
 
+    def test_a_change_of_audience_comes_first_and_a_run_without_one_used_employers(self):
+        now = {**review("2026-11-22", "keep", *["pass"] * 6, "flagged"), "audience": "users"}
+        code, out, _ = run_json(now, review("2026-11-21", "keep", *["pass"] * 7))
+        self.assertEqual(out.splitlines()[0], "Since 2026-11-21: audience employers → users; Tone pass → flagged")
+        same = {**review("2026-11-21", "keep", *["pass"] * 7), "audience": "employers"}
+        code, out, _ = run_json(review("2026-11-22", "keep", *["pass"] * 7), same)
+        self.assertEqual(out.splitlines()[0], "Since 2026-11-21: no status or action changed")
+
     def test_a_rerun_with_nothing_moved_says_so(self):
         code, out, _ = run_json(review("2026-11-22", "keep", *["pass"] * 7), review("2026-11-21", "keep", *["pass"] * 7))
         self.assertEqual(out.splitlines()[0], "Since 2026-11-21: no status or action changed")

@@ -56,6 +56,11 @@ test('single review shows the recommendation, feature, similar repos and every q
   assert.equal(els['fp-text'].value, 'HEADER\n\nFAIL\n\nBEFORE\n\nFOOTER');
 });
 
+test('a review shows the audience it used, and none when the run gives none', () => {
+  assert.match(render({ ...review, audience: 'researchers' }).html, /<span>owner\/demo at abc123<\/span><span>For researchers<\/span>/);
+  assert.doesNotMatch(render(review).html, /<span>For /);
+});
+
 test('the verdict names its question, and none when the fix comes from no question', () => {
   assert.match(render(review).html, /Most important fix · question 1</);
   const leave = { ...review, recommendation: { ...review.recommendation, action: 'make-private', before: undefined }, verdict: { question: '', fix: 'Leave it private.', why: 'Not worth showing.' } };

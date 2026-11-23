@@ -4,6 +4,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- `repo-review` takes `for:users` or `for:researchers` in a full review or a portfolio, to judge a repo for people deciding whether to depend on it, or for others in its field, rather than for potential employers and collaborators, still the default. It changes what Tone, Jargon and Evidence look for: for users, whether it says its status, what it supports and where to get help, with the field's standard terms taken as known; for researchers, how it relates to earlier work and how to cite it, with every result reproducible. The scorecard says which readers a review used, and a re-run's reply names a change of readers first.
 - A review's Contributors list counts the people named as co-authors in commits' `Co-authored-by` trailers, as GitHub's own Contributors sidebar does, and Tone's check on credit counts their work as shared. Coding assistants such as Claude and Copilot, and bots, are left out.
 - Tone's check on credit says when it applies: the README claims something as yours, in the first person or under your name, and someone else's commits made a share of it. Tone is then flagged every time, never passed or failed for credit alone, where runs on the same repo had sometimes left it unflagged.
 

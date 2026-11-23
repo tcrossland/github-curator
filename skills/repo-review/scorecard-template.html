@@ -361,6 +361,7 @@ details.fold { display: block; }
   d.questions.forEach(function (q) { n[q.status]++; });
   var html = '';
   html += '<header class="meta"><h1>' + esc(d.title) + '</h1><span>' + esc(d.subject) + '</span>' +
+          (d.audience ? '<span>For ' + esc(d.audience) + '</span>' : '') +
           (d.link ? '<a href="' + esc(d.link) + '">' + esc(d.linkText || d.link) + '</a>' : '') +
           '<span>Checked ' + esc(d.date) + '</span>' +
           (d.rerun ? '<span class="rerun"><code id="rerun-cmd">' + esc(d.rerun) + '</code><button type="button" id="rerun-btn">Copy re-run command</button></span>' : '') +

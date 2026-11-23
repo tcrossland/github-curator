@@ -1,12 +1,12 @@
 ---
 name: "repo-review"
 description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: quick, triage, portfolio."
-argument-hint: "[repo | folder | file] · quick [repos…]: a glance · triage [public|private|own|forks|archived|org:NAME]: sort by action · portfolio [repos…]: full review of each · no-publish"
+argument-hint: "[repo | folder | file] [for:employers|users|researchers] · quick [repos…]: a glance · triage [public|private|own|forks|archived|org:NAME]: sort by action · portfolio [repos…]: full review of each · no-publish"
 ---
 
 # Repo review
 
-The work product is a public GitHub repo, published as a portfolio piece to attract potential employers and collaborators. A great one draws traffic, stars and a community. These usually go wrong by being so niche that few people find them or see why they matter. Use this review on any draft, whoever wrote it: the user, Claude, or both together.
+The work product is a public GitHub repo. By default it's a portfolio piece, published to attract potential employers and collaborators; `for:` names other readers (The audience, below). A great one draws traffic, stars and a community. These usually go wrong by being so niche that few people find them or see why they matter. Use this review on any draft, whoever wrote it: the user, Claude, or both together.
 
 For a repo, the review also recommends what to do with it, whether to feature it on the user's profile, and the work worth doing before each. Not every repo should stay as it is: some are finished and should be archived with a proper account of what they were, some aren't worth showing, some private ones are ready to publish, and a few deserve one of the six pinned places on the user's profile. It also finds similar repos, so the review can say what this one adds and where readers who want a maintained tool should go.
 
@@ -15,6 +15,8 @@ There are four ways to run it:
 - **Portfolio**: the arguments start with `portfolio`, or `overview`, its old name, optionally followed by repos. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7. Step 7 and how a portfolio run logs its time are in [portfolio.md](portfolio.md) beside this file: read it before starting, and only in this mode.
 - **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only, from [triage.md](triage.md) beside this file, read only in this mode: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
 - **Quick**: the arguments start with `quick`, optionally followed by repos. Run Step 9 only, from [quick.md](quick.md) beside this file, read only in this mode: an at-a-glance review of many repos from GitHub's search and each README, answering Hook, Findable and Getting started, on one page with a row per repo.
+
+`for:employers`, `for:users` or `for:researchers`, as a separate word in the arguments, names the readers the review judges the draft for, in a one-draft review and in portfolio mode (The audience, below). Quick mode and triage don't run the questions it changes, so they ignore it. Any other `for:` value: ask which of the three was meant; when no one can answer, use employers and say why in the footer.
 
 A repo is given as its URL or as `OWNER/REPO`. A word of that form is a repo unless it names a folder or file that exists in the working folder.
 
@@ -45,9 +47,9 @@ Run all seven, in this order. Question 1 matters most.
 2. **Findable.** Is the repo set up so people can find and share it: public, with a description and topics in the words people search for?
 3. **Facts.** Does every fact on the page (results, statuses, versions, commands, links, tags) match the file, report or setting it comes from?
 4. **Evidence.** Could the author defend every strong claim on the page if a sceptical reader challenged it, and does the page point to the test, report or file that proves it?
-5. **Jargon.** Are the field's terms and yardsticks defined or linked where they first appear, so a capable engineer from outside the field can follow?
+5. **Jargon.** Are the field's terms and yardsticks defined or linked where they first appear, so the readers it's for can follow (for employers, the default, a capable engineer from outside the field)?
 6. **Getting started.** Can a visitor do something with it (run it, reuse a piece of it or join in), and does the page tell them how?
-7. **Tone.** Will it land with a potential employer or collaborator? Does it read as finished work that shows the author's judgement and what they learned, rather than internal notes?
+7. **Tone.** Will it land with the readers it's for (The audience, below)? For employers, the default: does it read as finished work that shows the author's judgement and what they learned, rather than internal notes?
 
 Statuses:
 - **pass**: the draft meets the question.
@@ -57,6 +59,23 @@ Statuses:
 **Private repos** are checked as they would read once public: the review is there to say whether they're worth publishing and what to do first, and making one public is the user's call. On a private repo, flag Findable rather than failing it when visibility is its only gap, and still check the description and topics as they would read once public.
 
 Don't add numbers, thresholds or rules beyond these questions.
+
+### The audience
+
+The readers a review judges the draft for come from `for:` in the arguments, and are employers without it. The review never infers them from the README. The audience changes three questions; the other four, and the recommendation, read the same for every audience. On the page, question 7's `question` text is the one for the audience used.
+
+- **employers** (the default): people deciding whether to hire or work with the user.
+  - Tone: Will it land with a potential employer or collaborator? Does it read as finished work that shows the author's judgement and what they learned, rather than internal notes?
+  - Jargon: every term and yardstick of the field is defined or linked where it first appears, so a capable engineer from outside the field can follow.
+  - Evidence: every strong claim is backed, as question 4 asks.
+- **users**: people deciding whether to use the repo or depend on it.
+  - Tone: Will it land with someone deciding whether to rely on it? Does it say what it's for and what it isn't, whether it's maintained, experimental or finished, which versions or platforms it supports, and where to ask for help, rather than reading as a learning project or internal notes? The author's story and lessons are welcome but don't meet this.
+  - Jargon: a practitioner of the field who would use the repo knows the field's standard terms, so those pass undefined; the repo's own terms, options and settings must be defined where they first appear.
+  - Evidence: pressed hardest on the claims a user would rely on: speed, accuracy, compatibility, stability, "production-ready". Each needs the test, benchmark or CI run that shows it, with the versions it ran on.
+- **researchers**: others in the field, reading the repo as research.
+  - Tone: Will it land with researchers in the field? Does it read as a contribution: the question it answers, the method, how it relates to earlier work (named and linked), its limits, and how to cite it?
+  - Jargon: the field's standard terms pass undefined; the repo's own coinages, and any term used differently from the field's usual sense, must be defined where they first appear.
+  - Evidence: every result needs the data, code and steps that reproduce it, and a claim of novelty, or of beating earlier work, needs the comparison that shows it.
 
 ## The recommendation
 
@@ -349,7 +368,7 @@ Checking tone (question 7) includes credit. Tone is flagged when both hold: the 
 
 ## Step 3: compare with the previous run
 
-If Step 1 found a previous run, write a short list of what changed since it, matching its questions to this run's by their order, since a run before 0.7 calls questions 4 to 6 Defensible, Context and Way in: the commit (old → new, with what merged, in a few words), each question whose status moved (old → new, and why in one clause), the fixes that landed, the failing or flagged questions that are unchanged, a change of recommended action or feature call (old → new, and why), work-before items that are now done, similar repos that are new to the list, and any stargazers who are new since the previous run's Stargazers list (by login). If nothing changed, say so in one item. Leave this out on a first run.
+If Step 1 found a previous run, write a short list of what changed since it, matching its questions to this run's by their order, since a run before 0.7 calls questions 4 to 6 Defensible, Context and Way in: the commit (old → new, with what merged, in a few words), each question whose status moved (old → new, and why in one clause), the fixes that landed, the failing or flagged questions that are unchanged, a change of audience (old → new; a run with no `audience` used employers), first, since the statuses of Tone, Jargon and Evidence can move for that reason alone, a change of recommended action or feature call (old → new, and why), work-before items that are now done, similar repos that are new to the list, and any stargazers who are new since the previous run's Stargazers list (by login). If nothing changed, say so in one item. Leave this out on a first run.
 
 ## Step 4: verify, then recommend and pick the verdict
 
@@ -369,7 +388,8 @@ The verdict names the single most important fix. Take the earliest failing quest
    - `subject`: what was checked, including the commit or version
    - `link`, `linkText`: the repo URL and its owner/name (omit both for pasted text)
    - `date`: ISO 8601
-   - `rerun`: the command that runs this check again, `/github-curator:repo-review` followed by the repo URL, the local clone's folder path or the file path that was checked (leave it out for pasted text)
+   - `audience`: `employers`, `users` or `researchers`, the one this review used
+   - `rerun`: the command that runs this check again, `/github-curator:repo-review` followed by the repo URL, the local clone's folder path or the file path that was checked, then `for:` and the audience when it isn't employers (leave it out for pasted text)
    - `changes` (only when there was a previous run): `since` (its date and commit) and `items` (the list from Step 3)
    - `recommendation` (repos only): `action` (`keep`, `publish`, `archive`, `make-private` or `delete`), `why` (the one- or two-sentence reason), `signals` (the short facts it rests on), `confirm` (what the user should confirm, only when the evidence points two ways), `caveat` (what the action costs, from the list above; omit for keep), and `before` (for archive, publish and delete): `title` ("Before archiving", "Before publishing" or "Before deleting") and `items`, a list of `{text, status, note}` with `status` `done`, `todo` or `n/a`, and `feature`: `recommended` (`true` or `false`), `why`, `pinned` (`true`, `false`, or `null` when the pins couldn't be read), `pins` (the current pins, as `owner/name` strings, with the source in `pinsSource`), `replace` (the pin it should replace, when all six places are taken; omit otherwise) and, when recommended, `before` with `title` "Before featuring" and `items` as above
    - `similar` (any draft whose subject is clear): `asOf` (ISO 8601 date), `note` (optional, such as a refused search), and `items`, a list of `{name, link, stars, pushed, archived, description, overlap, difference, alive, foundBy, borrow, mention}`, most-starred first, from How each relates: `foundBy` a list of strings (empty for none), `borrow` omitted for none; for a project the README names that isn't on GitHub, give `name`, `link`, `overlap`, `difference` and `mention` only
@@ -386,7 +406,7 @@ The verdict names the single most important fix. Take the earliest failing quest
 ## Step 6: reply
 
 Reply in exactly three lines (two when there is no recommendation), and nothing else, after one more line first on a re-run:
-0. On a re-run (Step 1 found a previous run), what changed since it, exactly as the script below prints it first when given the previous run's JSON too (`python3 counts.py RUN.json PREVIOUS.json`): `Since 2026-11-21: Hook fail → pass; action archive → keep`. Leave it out on a first run.
+0. On a re-run (Step 1 found a previous run), what changed since it, exactly as the script below prints it first when given the previous run's JSON too (`python3 counts.py RUN.json PREVIOUS.json`): `Since 2026-11-21: Hook fail → pass; action archive → keep`, with `audience employers → users` first when the audience changed. Leave it out on a first run.
 1. The recommendation: the action and whether to feature it, with the reason, in one sentence, and the number of `todo` items before them when there are any.
 2. The verdict: the most important fix, in one sentence.
 3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the portfolio page's JSON, and Step 9 on the quick review's.
@@ -428,6 +448,9 @@ else:
         else:
             # By order, not label: a run before 0.7 names questions 4 to 6 differently.
             moved = [f"{q['short']} {o} → {q['status']}" for q, o in zip(d['questions'], old) if o != q['status']]
+            u, v = p.get('audience') or 'employers', d.get('audience') or 'employers'
+            if u != v:
+                moved.insert(0, f"audience {u} → {v}")
             a, b = (p.get('recommendation') or {}).get('action'), (d.get('recommendation') or {}).get('action')
             if a and b and a != b:
                 moved.append(f"action {a} → {b}")
