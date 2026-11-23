@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## Unreleased
+
+- A review's Contributors list counts the people named as co-authors in commits' `Co-authored-by` trailers, as GitHub's own Contributors sidebar does, and Tone's check on credit counts their work as shared. Coding assistants such as Claude and Copilot, and bots, are left out.
+
 ## 0.7.0 (2026-11-22)
 
 - `repo-review overview` is now `repo-review portfolio`, after the page it publishes, since it's the costliest mode: a full review of every repo, then a ranking. `overview` still runs it. Triage's and the quick review's `next` commands use the new name.

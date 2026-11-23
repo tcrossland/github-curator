@@ -19,7 +19,7 @@ Tags: `v1.3.0` (latest). Checked at commit `5d81f0a`. Pinned on my profile: `oct
 `people.py commits.tsv octo-dev` (Contributors):
 
 ```json
-{"commits": 37, "user": 6, "others": [{"who": "kasia-dev", "login": true, "commits": 31, "last": "2026-06-02"}]}
+{"commits": 37, "user": 6, "others": [{"who": "kasia-dev", "login": true, "commits": 31, "coauthored": 0, "last": "2026-06-02"}]}
 ```
 
 `git log --format='%an %s' -- src/engine/` lists 14 commits, all by kasia-dev, from "Add Stockfish WASM worker" to "Show the engine's best line under the board".

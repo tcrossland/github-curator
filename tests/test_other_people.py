@@ -62,18 +62,44 @@ class CommandTest(unittest.TestCase):
             env = {**os.environ, "PATH": f"{bindir}:/usr/bin:/bin"}
             return subprocess.run(["sh", "-c", command], env=env, cwd=cwd, capture_output=True, text=True, check=True).stdout
 
-    def test_commits_list_login_name_and_date_never_the_email(self):
+    def commits(self, pages):
         command = line("commits?per_page=100").replace("OWNER/REPO", "me/demo")
-        commit = lambda login, name, date: {"author": {"login": login} if login else None,
-                                            "commit": {"author": {"name": name, "email": "x@example.com", "date": date}}}
-        pages = [[commit("me", "Me Myself", "2024-01-02T10:00:00Z"), commit(None, "Me Myself", "2015-03-04T10:00:00Z")],
-                 [commit("helper", "Helper Person", "2020-06-07T10:00:00Z")]]
         with tempfile.TemporaryDirectory() as work:
             self.run_command(command, "api --paginate repos/me/demo/commits?per_page=100", pages, work)
-            text = (Path(work) / "commits.tsv").read_text()
+            return (Path(work) / "commits.tsv").read_text()
+
+    @staticmethod
+    def commit(login, name, date, message="Change something"):
+        return {"author": {"login": login} if login else None,
+                "commit": {"author": {"name": name, "email": "x@example.com", "date": date}, "message": message}}
+
+    def test_commits_list_login_name_and_date_never_the_email(self):
+        c = self.commit
+        text = self.commits([[c("me", "Me Myself", "2024-01-02T10:00:00Z"), c(None, "Me Myself", "2015-03-04T10:00:00Z")],
+                             [c("helper", "Helper Person", "2020-06-07T10:00:00Z")]])
         self.assertEqual([l.split("\t") for l in text.splitlines()],
                          [["me", "Me Myself", "2024-01-02"], ["", "Me Myself", "2015-03-04"], ["helper", "Helper Person", "2020-06-07"]])
         self.assertNotIn("example.com", text)
+
+    def test_co_authors_from_trailers_with_their_login_from_a_no_reply_address_never_the_email(self):
+        message = ("Add the parser\n\nCo-authored-by: Pair Person <1234+pairp@users.noreply.github.com>\n"
+                   "co-authored-by:  Old Friend  <friend@example.org>\n"
+                   "Co-Authored-By: Legacy User <legacyu@users.noreply.github.com>")
+        text = self.commits([[self.commit("me", "Me Myself", "2024-01-02T10:00:00Z", message)]])
+        self.assertEqual([l.split("\t") for l in text.splitlines()],
+                         [["me", "Me Myself", "2024-01-02"], ["pairp", "Pair Person", "2024-01-02", "co"],
+                          ["", "Old Friend", "2024-01-02", "co"], ["legacyu", "Legacy User", "2024-01-02", "co"]])
+        self.assertNotIn("example.org", text)
+        self.assertNotIn("noreply", text)
+
+    def test_coding_assistants_and_bots_are_not_co_authors(self):
+        message = "\n".join(["Fix it", ""] + [f"Co-authored-by: {t}" for t in [
+            "Claude Opus 5.5 <noreply@anthropic.com>", "Cursor Agent <cursoragent@cursor.com>",
+            "aider (deepseek/deepseek-v4-flash) <aider@aider.chat>", "Codex <codex@openai.com>",
+            "Copilot <223556219+Copilot@users.noreply.github.com>",
+            "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>"]])
+        text = self.commits([[self.commit("me", "Me Myself", "2024-01-02T10:00:00Z", message)]])
+        self.assertEqual(text.splitlines(), ["me\tMe Myself\t2024-01-02"])
 
     def test_waiting_on_you_lists_only_other_people_s_issues_and_pull_requests_with_their_age(self):
         command = line("issues?state=open").replace("OWNER/REPO", "me/demo").replace('"OWNER"', '"me"')
@@ -123,14 +149,27 @@ class PeopleTest(unittest.TestCase):
                          ("", "nightly job", "2025-01-01"), ("", "Nightly Job", "2025-02-01"), ("", "nightly job", "2024-12-01")], "me")
         self.assertEqual(d["user"], 1)
         self.assertEqual(d["others"], [
-            {"who": "nightly job", "login": False, "commits": 3, "last": "2025-02-01"},
-            {"who": "helper", "login": True, "commits": 2, "last": "2021-01-01"},
-            {"who": "Old Colleague", "login": False, "commits": 1, "last": "2014-05-05"},
+            {"who": "nightly job", "login": False, "commits": 3, "coauthored": 0, "last": "2025-02-01"},
+            {"who": "helper", "login": True, "commits": 2, "coauthored": 0, "last": "2021-01-01"},
+            {"who": "Old Colleague", "login": False, "commits": 1, "coauthored": 0, "last": "2014-05-05"},
         ])
 
     def test_a_name_seen_only_without_a_login_is_someone_else(self):
         d = self.people([("me", "Me Myself", "2024-01-02"), ("", "Someone Else", "2019-09-09")], "me")
         self.assertEqual([p["who"] for p in d["others"]], ["Someone Else"])
+
+    def test_co_authored_commits_count_apart_from_the_author_s(self):
+        d = self.people([("me", "Me Myself", "2024-01-02"), ("me", "Me Myself", "2024-02-02"),
+                         ("pairp", "Pair Person", "2024-01-02", "co"), ("pairp", "Pair Person", "2024-02-02", "co"),
+                         ("helper", "Helper Person", "2023-05-05"),
+                         ("", "Helper Person", "2024-02-02", "co"), ("", "Old Friend", "2022-01-01", "co"),
+                         ("", "Me Myself", "2024-03-03", "co"), ("me", "Me Myself", "2024-03-04", "co")], "me")
+        self.assertEqual((d["commits"], d["user"]), (3, 2))
+        self.assertEqual(d["others"], [
+            {"who": "helper", "login": True, "commits": 1, "coauthored": 1, "last": "2024-02-02"},
+            {"who": "pairp", "login": True, "commits": 0, "coauthored": 2, "last": "2024-02-02"},
+            {"who": "Old Friend", "login": False, "commits": 0, "coauthored": 1, "last": "2022-01-01"},
+        ])
 
 
 if __name__ == "__main__":

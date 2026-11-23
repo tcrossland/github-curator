@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Co-authors from commit trailers](#co-authors-from-commit-trailers) | 0.8 | Rule | S | in progress |
 | [Tone's shared-work flag varies between runs](#tones-shared-work-flag-varies-between-runs) | 0.8 | Rule | S | todo |
 | [11. Questions for each audience](#11-questions-for-each-audience) | 0.8 | Review rules | M | todo |
 | [A project's status on the page](#a-projects-status-on-the-page) | 0.8 | Rule | S | todo |
@@ -32,11 +31,7 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 Rules that decide a status or an action, and the evals that guard them.
 
-The order puts each change before the ones that build on it. Who counts as a co-author decides whose work Tone's credit flag looks for, and that flag is settled before the audiences rewrite the rest of Tone. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
-
-### Co-authors from commit trailers
-
-The review counts other people's commits from `repos/OWNER/REPO/contributors`, which counts commit authors only. For this repo it gave one contributor while GitHub's Contributors sidebar showed two, the second being Claude, named only in `Co-Authored-By` trailers, so the sidebar seems to count trailers (inferred from the counts, **unverified**). A repo whose human co-authors appear only in trailers would then look like solo work to Tone. Done when the inference is checked, and the review reads co-authors from the trailers (leaving out Claude and other tools) or `docs/design.md` says why not.
+The order puts each change before the ones that build on it. Tone's credit flag is settled before the audiences rewrite the rest of Tone. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
 
 ### Tone's shared-work flag varies between runs
 
