@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [A first run's reply](#a-first-runs-reply) | 0.8 | Check | S | todo |
 | [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [WebFetch of GitHub pages on claude.ai](#webfetch-of-github-pages-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [Which model for a full review](#which-model-for-a-full-review) | One claude.ai check | Check | M | todo |
@@ -20,16 +19,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [1. Traffic history](#1-traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
-
-## 0.8: steadier calls
-
-Rules that decide a status or an action, and the evals that guard them.
-
-The order puts each change before the ones that build on it. The first run's reply is checked last, on a run of the finished rules.
-
-### A first run's reply
-
-0.7.0 starts a re-run's reply with what changed since the last run, printed by the counts script from `PREVIOUS.json`. The script prints no since line without one (tested), but no real run has checked that a review with no previous scorecard leaves `PREVIOUS.json` out: every public repo of the user's already had a scorecard when 0.7.0 was checked. Done when a review of a repo or draft with no scorecard, in Claude Code or on claude.ai, replies with the counts line first and no since line.
 
 ## One claude.ai check
 
