@@ -66,6 +66,8 @@ Triage reads the API alone, so it can't judge a page. It calls a repo `clear` on
 
 A fork with commits beyond its parent is never clear. A real run showed why: a fork looked like it held nothing of the user's, because GitHub's author filter found none of their commits, yet it held six commits they had made under an email not linked to their account.
 
+Stars count only when someone else gave them. `stargazers_count` includes the owner's own star, and on 2026-11-21 triage gave one repo "A finished prototype with a star" as its reason to archive, when the star was the user's own, given the day the repo was created. Triage reads which of the account's repos the user starred from one listing of their stars, `user/starred`, rather than one stargazers call per starred repo: it costs one call per 100 repos the user has starred, a single call for an account with 57, against one call per starred repo, and `stargazers` already leaves the user's star out the same way. A star matters to the calls only when it's the only one: two or more always include someone else's. So where the listing is refused, as `user/` paths are on claude.ai, triage reads the stargazers of an attached repo with one star, and for an unattached one says the star is possibly the user's: it still keeps the repo from a clear delete, the direction that loses nothing, but isn't a reason on its own.
+
 ## Similar repos
 
 They show what a repo adds, which topics it lacks, and where to point readers of an archived repo. They are described only from what their own pages say, never as copying or influencing one another, the same rule as the `stargazers` skill. GitHub search can't find tools hosted elsewhere, so projects the README names are added by hand.

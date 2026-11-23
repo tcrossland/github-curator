@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [The user's own star in triage](#the-users-own-star-in-triage) | 0.8 | Rule | S | todo |
 | [Carry over a triage's reasons](#carry-over-a-triages-reasons) | 0.8 | Decision | S | todo |
 | [Eval cases that fail with their rule cut](#eval-cases-that-fail-with-their-rule-cut) | 0.8 | Evals | M | todo |
 | [A first run's reply](#a-first-runs-reply) | 0.8 | Check | S | todo |
@@ -28,11 +27,7 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 Rules that decide a status or an action, and the evals that guard them.
 
-The order puts each change before the ones that build on it. The two triage items change `triage.md` together. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
-
-### The user's own star in triage
-
-Triage reads `stargazers_count` as interest from others, but the count includes the user's own star. On 2026-11-21 triage gave one repo "A finished prototype with a star" as its reason to archive, and that star was the user's own, given the day the repo was created. Triage never lists stargazers today (`triage.md`), so telling them apart changes that rule: one stargazers call for each repo with only a few stars would do it, and `stargazers` already leaves the user's own star out. Done when triage leaves the user's own star out of its signals and reasons, `docs/design.md` says why, and the timings show what it costs.
+The order puts each change before the ones that build on it. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
 
 ### Carry over a triage's reasons
 

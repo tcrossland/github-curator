@@ -251,8 +251,10 @@ class SearchTest(unittest.TestCase):
             stand_in_gh(bindir, expected_args, pages)
             env = {**os.environ, "PATH": f"{bindir}:/usr/bin:/bin"}
             out = subprocess.run(["sh", "-c", command], cwd=cwd, env=env, capture_output=True, text=True, check=True)
-            written = Path(cwd) / "prs.tsv"
-            return written.read_text() if written.exists() else out.stdout
+            for name in ("prs.tsv", "starred.txt"):
+                if (Path(cwd) / name).exists():
+                    return (Path(cwd) / name).read_text()
+            return out.stdout
 
     def test_one_search_lists_every_pull_request_to_other_people_s_repos(self):
         command = line(TRIAGE, "-user:OWNER").replace("OWNER", "octo-dev")
@@ -267,6 +269,13 @@ class SearchTest(unittest.TestCase):
             ["other/tool", "open", "", "Fix typo"],
             ["picker-org/datepicker", "closed", "", "Closed unmerged"],
         ])
+
+    def test_triage_lists_the_user_s_own_starred_repos_from_every_page(self):
+        command = line(TRIAGE, "user/starred").replace("OWNER", "octo-dev")
+        repo = lambda owner, name: {"full_name": f"{owner}/{name}", "owner": {"login": owner}}
+        pages = [[repo("someone", "lib"), repo("octo-dev", "a")], [repo("octo-dev", "b"), repo("octo-devs", "c")]]
+        out = self.run_line(command, "api --paginate user/starred?per_page=100", pages)
+        self.assertEqual(out.splitlines(), ["octo-dev/a", "octo-dev/b"])
 
     def test_stargazers_lists_the_starred_repos_from_search_on_claude_ai(self):
         found = re.findall(r"`(gh api --paginate 'search/repositories\?q=user:LOGIN[^`]*)`", STARGAZERS.read_text(encoding="utf-8"))
