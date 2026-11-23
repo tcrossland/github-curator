@@ -1,12 +1,12 @@
 ---
-description: Similar repos say what the user's repo adds without judging the others, and Mention follows from how the repos relate.
+description: In a keep review, Similar repos say what the user's repo adds without judging the others, and Mention follows from how the repos relate, not from the action.
 tags: [review]
 max_turns: 15
 ---
 
 Review my GitHub repo https://github.com/octo-dev/pairtrade-lab with the repo-review skill, with `no-publish`. My GitHub login is `octo-dev`.
 
-This is an offline test of the skill's rules. There is no shell, network or artifact tool here, so don't run `gh`, `git`, WebFetch or the quote checker, and don't publish or save a page or keep a timing log. Run only Step 1's reading of the repo and Similar repos, from what's below; skip the outcomes, the seven questions, the recommendation and the previous run. Everything the API, the searches and the README clones would give is below; anything not given is unavailable. Today is 2026-11-22.
+This is an offline test of the skill's rules. There is no shell, network or artifact tool here, so don't run `gh`, `git`, WebFetch or the quote checker, and don't publish or save a page or keep a timing log. Run only Step 1's reading of the repo, Similar repos and the recommendation, from what's below; skip the outcomes, the seven questions and the previous run. The seven questions found nothing that bears on the action: the repo is the user's own work, still worked on, and its README says it's maintained. Everything the API, the searches and the README clones would give is below; anything not given is unavailable. Today is 2026-11-22.
 
 `gh api repos/octo-dev/pairtrade-lab`:
 
@@ -14,7 +14,7 @@ This is an offline test of the skill's rules. There is no shell, network or arti
 {"full_name": "octo-dev/pairtrade-lab", "private": false, "fork": false, "archived": false, "created_at": "2025-02-14T09:12:40Z", "pushed_at": "2026-09-30T18:03:11Z", "description": "Pairs trading on US equities, with costs, counting every parameter tried against a deflated Sharpe ratio", "topics": ["pairs-trading", "backtesting", "deflated-sharpe-ratio"], "license": {"spdx_id": "MIT"}, "stargazers_count": 4}
 ```
 
-`README.md` lines 1 to 9 (the README names no other project anywhere):
+`README.md` lines 1 to 11 (the README names no other project anywhere):
 
 ~~~markdown
 1  # pairtrade-lab
@@ -26,6 +26,8 @@ This is an offline test of the skill's rules. There is no shell, network or arti
 7  - Picks pairs by cointegration on a formation window, then trades them on the next window, with no look-ahead.
 8  - Charges commission, spread and borrow on every trade.
 9  - Logs every configuration tried, so the deflated Sharpe ratio counts them all.
+10
+11 I maintain it and add a pair universe every few months.
 ~~~
 
 The topic search, `search/repositories?q=topic:pairs-trading+topic:backtesting&sort=stars&per_page=10`, and the word search, `search/repositories?q=pairs+trading+in:name,description,topics&sort=stars&per_page=10`, together found these two that do the same job (the rest were lists and course notes):
@@ -55,8 +57,8 @@ Archived. The results below were never checked against trading costs and shouldn
 | Sharpe ratio | 2.4 |
 ~~~
 
-When you're done, end your reply with a JSON code block in this shape, one object per similar repo, keys in this order:
+When you're done, end your reply with a JSON code block in this shape: the recommended action, then one object per similar repo, keys in this order:
 
 ```json
-{"similar": [{"name": "", "overlap": "", "alive": "", "mention": "", "difference": ""}]}
+{"action": "", "similar": [{"name": "", "overlap": "", "alive": "", "mention": "", "difference": ""}]}
 ```

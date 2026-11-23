@@ -31,9 +31,11 @@ The README clone printed `== README.md`. `README.md`, with line numbers, is the 
 10
 11 It reprojects the GeoTIFF to Web Mercator, then writes one PNG per tile in the `z/x/y.png` layout every slippy-map library reads. Empty tiles are skipped, which keeps a regional map to a few thousand files.
 12
-13 ## Licence
+13 The zoom range, resampling and output format are set in `tilegen.toml`; `docs/options.md` lists every setting.
 14
-15 MIT. See `LICENSE`.
+15 ## Licence
+16
+17 MIT. See `LICENSE`.
 ~~~
 
 When you're done, end your reply with a JSON code block in this shape, with the quick review's three statuses for the repo and its likely action:

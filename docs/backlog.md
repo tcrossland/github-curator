@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Eval cases that fail with their rule cut](#eval-cases-that-fail-with-their-rule-cut) | 0.8 | Evals | M | todo |
 | [A first run's reply](#a-first-runs-reply) | 0.8 | Check | S | todo |
 | [Fewer approvals on claude.ai](#fewer-approvals-on-claudeai) | One claude.ai check | claude.ai | S | todo |
 | [WebFetch of GitHub pages on claude.ai](#webfetch-of-github-pages-on-claudeai) | One claude.ai check | claude.ai | S | todo |
@@ -26,11 +25,7 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 Rules that decide a status or an action, and the evals that guard them.
 
-The order puts each change before the ones that build on it. The eval cut checks come after the rule changes, so they test the rules as 0.8 leaves them, and the first run's reply is checked last, on a run of the finished rules.
-
-### Eval cases that fail with their rule cut
-
-`quick-way-in-no-usage` and `similar-relations` guard the rules that went wrong in quick mode's first live check. On 2026-11-22, one run each with the rule cut from a copy of the plugin: both Difference graders failed, as they should, but the Getting started grader and both Mention graders still passed. So those two calls are held by other statements (Step 2's question for Getting started; the Archive bullet and the old wording for Mention), or the fixtures are easier than the live case, where the review ran in full and recommended keep. Done when each grader fails with its rule cut, from a fixture closer to the live case (for Mention, a keep review that runs the recommendation), or `docs/design.md` says why a passing cut is acceptable.
+The order puts each change before the ones that build on it. The first run's reply is checked last, on a run of the finished rules.
 
 ### A first run's reply
 
