@@ -311,3 +311,11 @@ test('a pin the profile page summary may have left out shows as unknown, in the 
     repos: [{ name: 't/a', link: '#', visibility: 'public', kind: 'fork', pinned: 'unknown', stars: 0, signals: [], action: 'archive', sure: 'review', reason: 'r' }] });
   assert.match(triage.html, /public · fork · pin unknown/);
 });
+
+test('a Pinned item the review couldn\'t settle shows as Check and is counted apart from To do', () => {
+  const feature = { recommended: true, why: 'Best evidence.', pinned: null, before: { title: 'Before featuring', items: [{ text: 'Pinned', status: 'check', note: 'The pins couldn\'t be read' }, { text: 'Licence', status: 'done' }] } };
+  const { html } = render({ ...review, recommendation: { ...review.recommendation, feature } });
+  assert.match(html, /class="fv yes">Yes <span>· pins not read<\/span>/);
+  assert.match(html, /<span class="st check">Check<\/span><span class="it">Pinned<span>The pins couldn't be read<\/span>/);
+  assert.match(html, /1 check · 1 done/);
+});

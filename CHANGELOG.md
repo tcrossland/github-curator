@@ -4,6 +4,9 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 
 ## Unreleased
 
+- When a review can't read your pins at all, it goes without them rather than take an older scorecard's list, and the Pinned step before featuring shows Check rather than To do.
+- Getting started counts a table of the project's stages, with earlier ones done and the current one under way, as saying the project's status.
+- Facts no longer flags a repo for links the session can't open, such as other repos on claude.ai; the finding says which links weren't checked.
 - The README says which model to pick: Opus 5.5 for a review you'll act on, with Sonnet 5.5 making most of the same calls at about half the usage.
 - On claude.ai, where the pins come from a summary of your profile page that can leave some out, a repo the summary doesn't name shows as "pin unknown" rather than "not pinned now", and the feature call asks you to check your profile. The scorecard lists the pins it read as "may be incomplete".
 - In Claude Code, where the artifact listing can stop at your 50 most recently updated artifacts, a review that finds no previous page there says in its footer that an older one may exist. `traffic` asks for the Traffic history page's link rather than start a second page, and a scheduled run that can't ask keeps the snapshot as a file instead.

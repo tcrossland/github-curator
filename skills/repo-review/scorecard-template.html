@@ -140,6 +140,7 @@ footer { color: var(--muted); font-size: 12.5px; }
 .rec .st { font: 500 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; padding: 5px 0; border-radius: 999px; text-align: center; background: var(--quote-bg); color: var(--muted); }
 .rec .st.done { background: var(--pass-bg); color: var(--pass); }
 .rec .st.todo { background: var(--flag-bg); color: var(--flag); }
+.rec .st.check { background: var(--quote-bg); color: var(--flag); }
 .rec .it span { display: block; font-size: 12.5px; color: var(--muted); }
 .ov .act { font: 500 12px/1.2 var(--mono); white-space: nowrap; }
 .ov td.num { color: var(--muted); }
@@ -375,10 +376,10 @@ details.fold { display: block; }
     if (rec.signals && rec.signals.length) html += fold('sig', '<span class="ct">Signals</span> <span class="cnt">' + rec.signals.length + '</span>', '<ul class="signals">' + rec.signals.map(function (s) { return '<li>' + fmt(s) + '</li>'; }).join('') + '</ul>');
     if (rec.confirm) html += '<p class="note"><b>Confirm:</b> ' + fmt(rec.confirm) + '</p>';
     if (rec.caveat) html += '<p class="note"><b>What it costs:</b> ' + fmt(rec.caveat) + '</p>';
-    var st = { done: 'Done', todo: 'To do', 'n/a': 'N/A' };
+    var st = { done: 'Done', todo: 'To do', check: 'Check', 'n/a': 'N/A' };
     var checklist = function (b) {
       if (!b || !b.items || !b.items.length) return '';
-      var tally = ['todo', 'done', 'n/a'].map(function (s) {
+      var tally = ['todo', 'check', 'done', 'n/a'].map(function (s) {
         var k = b.items.filter(function (x) { return x.status === s; }).length;
         return k ? k + ' ' + st[s].toLowerCase() : '';
       }).filter(Boolean).join(' · ');
