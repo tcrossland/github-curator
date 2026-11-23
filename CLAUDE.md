@@ -35,7 +35,7 @@ The behaviour evals in `evals/` check the skills' calls on known cases, offline,
 
 - A change to a rule: only the cases whose graders name it, once each, without the runs without the plugin (`--case NAME --runs 1 --ablation none`). A case tagged `repeat` keeps its own runs: leave out `--runs`. If no case guards the rule, say so in the commit.
 - A rewrite or move of text in a `SKILL.md` that every case reads: every case, `--runs 1 --ablation none`.
-- Before cutting a release: every case once, without the runs without the plugin (`scripts/evals.sh --runs 1 --ablation none -j 4`), then `way-in-unheld-licence` three times (`--case way-in-unheld-licence --ablation none`), since its call is the one that varied between runs.
+- Before cutting a release: each case whose graders name a rule changed since the last release, and any case not yet run on the release's text, once without the runs without the plugin (`--case NAME --runs 1 --ablation none`), then `way-in-unheld-licence` three times (`--case way-in-unheld-licence --ablation none`), since its call is the one that varied between runs. Say in the release commit which cases were left out and why.
 - A new case: that case alone, three runs with and without the plugin (`scripts/evals.sh --case NAME -j 4`), to show it measures the skill.
 - The full suite, three runs of each case with and without the plugin (`scripts/evals.sh -j 4`): before each release once someone other than the user installs the plugin.
 - Nothing else needs them: the template, tests, scripts, docs, and fields copied as they are.
