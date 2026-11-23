@@ -14,9 +14,9 @@ The signals below need each repo's listing fields. `user/repos` gives them; `lis
 
 `stargazers_count` counts the user's own star too, so read once which of the repos the user starred, in the `List repos` step, with the organisation's name for `OWNER` in an organisation's triage:
 ```sh
-gh api --paginate 'user/starred?per_page=100' --jq '.[] | select(.owner.login == "OWNER") | .full_name' > starred.txt
+gh api --paginate 'user/starred?per_page=100' --jq '.[] | select(.owner.login == "OWNER") | .full_name' > starred.txt || { rm -f starred.txt; echo 'user/starred refused'; }
 ```
-It takes one call per 100 repos the user has starred, whoever owns them. On claude.ai `user/` paths are refused; when this one is, read the stargazers of each attached repo with exactly one star (`gh api 'repos/OWNER/REPO/stargazers?per_page=1' --jq '.[].login'`), and leave the rest unknown.
+It takes one call per 100 repos the user has starred, whoever owns them. When a page is refused, `gh` writes the error where the list would go, so the line removes the file and prints `user/starred refused`. On claude.ai `user/` paths are refused; when this one is, and there's no `starred.txt`, read the stargazers of each attached repo with exactly one star (`gh api 'repos/OWNER/REPO/stargazers?per_page=1' --jq '.[].login'`), and leave the rest unknown.
 
 **The previous triage.** Look for the previous page now, as set out under The triage page, and read its `repos`. A fork's parent doesn't change, so each fork's `parent` there is used again rather than read anew. Nothing else on it is carried over: write every repo's signals, action, reason and question from this run's listing and these rules, even where nothing about the repo has changed, and use the previous page only for the parents and for the comparison under The triage page.
 
@@ -46,7 +46,7 @@ From the listing, for each repo: `private`, `fork`, `archived`, `pushed_at`, `st
   Each line is a pull request: the repo it went to, its state, the date it was merged (empty when it wasn't) and its title. Take each fork's from the lines for its parent. Search returns at most 1000 results, so if `prs.tsv` has 1000 lines, say in the footer that a fork's pull requests may be missing. If `gh` stops with an error, a page was refused: say so in the footer, and use the lines it wrote. Count the searches for the `Forks` row.
 - **Each repo of the user's own**: the first lines of its README, read as in Similar repos, and whether it says the project is unmaintained or archived. Skip it for an empty repo (`size` 0). When `license` is null, add the signal "no licence"; when its `spdx_id` is `NOASSERTION`, add "licence not recognised by GitHub". A fork's licence is its parent's, so leave it out for forks.
 
-- **Stars**: other people's stars are `stargazers_count`, less one when the repo is in `starred.txt`: write "3 stars, one yours" or "1 star, yours", and "no stars" for none. Where the rules below ask whether anyone else has starred a repo, and in every reason, use other people's stars only. When whose a single star is couldn't be read, write "1 star, possibly yours": count it as someone else's for a clear delete, which then doesn't apply, but never give it as a reason on its own.
+- **Stars**: other people's stars are `stargazers_count`, less one when the repo is in `starred.txt`: write "3 stars, one yours" or "1 star, yours", and "no stars" for none. Where the rules below ask whether anyone else has starred a repo, and in every reason, use other people's stars only. When it couldn't be read who gave a repo's single star, write "1 star, possibly yours": count it as someone else's for a clear delete, which then doesn't apply, but never give it as a reason on its own.
 
 Write each repo's signals as short facts, as in The recommendation.
 

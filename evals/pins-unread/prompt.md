@@ -48,4 +48,4 @@ Files: `README.md`, `LICENSE`, `pyproject.toml`, `tzshift/__init__.py`, `tzshift
 25 MIT, see [LICENSE](LICENSE).
 ~~~
 
-When you're done, end your reply with a JSON code block holding the scorecard's `recommendation.feature`, with its `recommended`, `why`, `pinned`, `pins`, `pinsSource` and, when recommended, `before`.
+When you're done, end your reply with a JSON code block holding the scorecard's `recommendation.feature`, with its `recommended`, `why`, `pinned`, `pins` (an empty list when none were read), `pinsSource` and, when recommended, `before`.

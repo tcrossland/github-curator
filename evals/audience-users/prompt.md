@@ -1,5 +1,5 @@
 ---
-description: "With `for:users`, the same repo passes Jargon, since a practitioner knows the field's terms, and Tone isn't met, since nothing says its status, what it supports or where to get help."
+description: "With `for:users`, the same repo passes Jargon, since a practitioner knows the field's terms, and Tone isn't met, since nothing says what it supports or where to get help."
 tags: [review, audience]
 max_turns: 15
 ---

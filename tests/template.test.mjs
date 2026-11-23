@@ -312,6 +312,18 @@ test('a pin the profile page summary may have left out shows as unknown, in the 
   assert.match(triage.html, /public · fork · pin unknown/);
 });
 
+test('fewer than six pins from the profile page summary are never shown as the whole list', () => {
+  const source = 'profile page summary, may not be complete';
+  const feature = { recommended: false, why: 'Thin.', pinned: true, pins: ['owner/a', 'owner/b', 'owner/c', 'owner/d'], pinsSource: source };
+  const { html } = render({ ...review, recommendation: { ...review.recommendation, feature } });
+  assert.match(html, /<b>Pins read \(4, may be incomplete\):<\/b> owner\/a/);
+  assert.doesNotMatch(html, /Pinned now \(/);
+  const overview = render({ overview: true, title: 'Portfolio overview', subject: '1 repo', date: '2026-11-23', verdict: { fix: 'x', why: 'y' },
+    pins: { current: ['owner/a', 'owner/b'], recommended: ['owner/a'], source, why: 'Keep a.' }, repos: [] });
+  assert.match(overview.html, /<h3>Pins read, may be incomplete<\/h3>/);
+  assert.doesNotMatch(overview.html, /<h3>Pinned now<\/h3>/);
+});
+
 test('a Pinned item the review couldn\'t settle shows as Check and is counted apart from To do', () => {
   const feature = { recommended: true, why: 'Best evidence.', pinned: null, before: { title: 'Before featuring', items: [{ text: 'Pinned', status: 'check', note: 'The pins couldn\'t be read' }, { text: 'Licence', status: 'done' }] } };
   const { html } = render({ ...review, recommendation: { ...review.recommendation, feature } });

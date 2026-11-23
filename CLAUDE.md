@@ -4,7 +4,7 @@ A Claude plugin with five skills, `repo-review`, `stargazers`, `forks`, `contrib
 
 ## Where things are
 
-- `skills/`: what ships. `repo-review/SKILL.md`, with the overview, triage and quick steps in `overview.md`, `triage.md` and `quick.md` beside it, the quote checker `verify_run.py` and `scorecard-template.html`, which renders all four modes; `stargazers/SKILL.md`; `forks/SKILL.md`; `contributions/SKILL.md`; and `traffic/SKILL.md`, with the snapshot script `traffic.py` and the page `traffic-page.html`, which reads the snapshots from its own database.
+- `skills/`: what ships. `repo-review/SKILL.md`, with the portfolio, triage and quick steps in `portfolio.md`, `triage.md` and `quick.md` beside it, the quote checker `verify_run.py` and `scorecard-template.html`, which renders all four modes; `stargazers/SKILL.md`; `forks/SKILL.md`; `contributions/SKILL.md`; and `traffic/SKILL.md`, with the snapshot script `traffic.py` and the page `traffic-page.html`, which reads the snapshots from its own database.
 - `docs/README.md`: notes for working on the plugin. The README at the root ships in the zip, so it links nothing outside it.
 - `docs/design.md`: why the skills work the way they do. Read it before changing a rule.
 - `docs/github-facts.md`: every behaviour of GitHub or Claude the skills rely on, with its source and the date it was checked.

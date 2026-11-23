@@ -20,7 +20,7 @@ The repository search for my repos (`search/repositories?q=user:octo-dev+fork:tr
 {"total_count": 1, "items": [{"full_name": "octo-dev/vue-range-slider", "html_url": "https://github.com/octo-dev/vue-range-slider", "private": false, "fork": true, "archived": false, "pushed_at": "2019-04-11T09:12:44Z", "stargazers_count": 0, "forks_count": 0, "open_issues_count": 0, "description": "A range slider component for Vue", "topics": [], "size": 412, "default_branch": "master", "license": {"spdx_id": "MIT"}}]}
 ```
 
-There is no previous triage page, so the fork's parent isn't known. I've switched this chat to Manual mode and agreed to the fork being attached, but `add_repo` with push access was refused: `Permission for this action was denied`. So `gh api repos/octo-dev/vue-range-slider` gives HTTP 403: `GitHub access to this repository is not enabled for this session. Use add_repo to request access`.
+There is no previous triage page, so the fork's parent isn't known. I agreed to the fork being attached, and `add_repo` with push access was refused in Auto mode: `Permission for this action was denied`. When asked, I switched the chat to Manual mode and approved the retry, and it was refused again with the same message. So `gh api repos/octo-dev/vue-range-slider` gives HTTP 403: `GitHub access to this repository is not enabled for this session. Use add_repo to request access`.
 
 The search for my pull requests (`search/issues?q=author:octo-dev+type:pr+-user:octo-dev`) gives none.
 

@@ -228,7 +228,7 @@ class ReadmeTest(unittest.TestCase):
         self.assertEqual(out.stdout, "")
 
 
-def stand_in_gh(bindir, expected_args, pages):
+def stand_in_gh(bindir, expected_args, pages, refuse=False):
     files = []
     for i, page in enumerate(pages):
         f = Path(bindir) / f"page{i}.json"
@@ -240,17 +240,20 @@ def stand_in_gh(bindir, expected_args, pages):
     gh.write_text(
         "#!/bin/sh\n"
         f'[ "{got}" = "{expected_args} --jq" ] || {{ echo "unexpected: $*" >&2; exit 2; }}\n'
-        f'for p in {" ".join(files)}; do "{shutil.which("jq")}" -r "${n + 2}" "$p" || exit 1; done\n')
+        + ('echo \'{"message":"Resource not accessible by integration","status":"403"}\'; exit 1\n' if refuse else
+           f'for p in {" ".join(files)}; do "{shutil.which("jq")}" -r "${n + 2}" "$p" || exit 1; done\n'))
     gh.chmod(0o755)
 
 
 @unittest.skipUnless(shutil.which("jq"), "jq is needed to stand in for gh's --jq")
 class SearchTest(unittest.TestCase):
-    def run_line(self, command, expected_args, pages):
+    def run_line(self, command, expected_args, pages, refuse=False, files=None):
         with tempfile.TemporaryDirectory() as bindir, tempfile.TemporaryDirectory() as cwd:
-            stand_in_gh(bindir, expected_args, pages)
+            stand_in_gh(bindir, expected_args, pages, refuse)
             env = {**os.environ, "PATH": f"{bindir}:/usr/bin:/bin"}
             out = subprocess.run(["sh", "-c", command], cwd=cwd, env=env, capture_output=True, text=True, check=True)
+            if files is not None:
+                files.extend(sorted(f.name for f in Path(cwd).iterdir()))
             for name in ("prs.tsv", "starred.txt"):
                 if (Path(cwd) / name).exists():
                     return (Path(cwd) / name).read_text()
@@ -276,6 +279,13 @@ class SearchTest(unittest.TestCase):
         pages = [[repo("someone", "lib"), repo("octo-dev", "a")], [repo("octo-dev", "b"), repo("octo-devs", "c")]]
         out = self.run_line(command, "api --paginate user/starred?per_page=100", pages)
         self.assertEqual(out.splitlines(), ["octo-dev/a", "octo-dev/b"])
+
+    def test_a_refused_starred_listing_leaves_no_file_and_says_so(self):
+        command = line(TRIAGE, "user/starred").replace("OWNER", "octo-dev")
+        files = []
+        out = self.run_line(command, "api --paginate user/starred?per_page=100", [], refuse=True, files=files)
+        self.assertEqual(files, [])
+        self.assertEqual(out.strip(), "user/starred refused")
 
     def test_stargazers_lists_the_starred_repos_from_search_on_claude_ai(self):
         found = re.findall(r"`(gh api --paginate 'search/repositories\?q=user:LOGIN[^`]*)`", STARGAZERS.read_text(encoding="utf-8"))

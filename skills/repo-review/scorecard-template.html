@@ -210,6 +210,8 @@ details.fold { display: block; }
 <script>
 (function () {
   var d = JSON.parse(document.getElementById('data').textContent);
+  // A profile page summary can leave pins out, so fewer than six from it isn't the whole list.
+  var partialPins = function (pins, source) { return !!pins && pins.length < 6 && /may not be complete/i.test(source || ''); };
   var pinMark = function (p) { return p === true ? ' · pinned' : p === 'unknown' ? ' · pin unknown' : ''; };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
   var fmt = function (s) { return esc(s).replace(/`([^`]+)`/g, function (m, c) { return '<code>' + c + '</code>'; }); };
@@ -326,9 +328,10 @@ details.fold { display: block; }
     var h = '<header class="meta"><h1>' + esc(d.title) + '</h1><span>' + esc(d.subject) + '</span><span>Checked ' + esc(d.date) + '</span></header>';
     h += '<section class="verdict" aria-label="Verdict"><span class="label">Needs attention first</span><p class="fix">' + fmt(d.verdict.fix) + '</p><p class="why">' + fmt(d.verdict.why) + '</p></section>';
     if (d.pins) {
+      var nowLabel = partialPins(d.pins.current, d.pins.source) ? 'Pins read, may be incomplete' : 'Pinned now';
       var pl = function (a) { return a && a.length ? '<ol>' + a.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ol>' : '<p class="note">None</p>'; };
       h += '<section class="pins" aria-label="Pins"><span class="label">Profile pins · up to 6</span>' + (d.pins.why ? '<p class="why">' + fmt(d.pins.why) + '</p>' : '') +
-           '<div class="cols"><div><h3>Pinned now</h3>' + pl(d.pins.current) + '</div><div><h3>Recommended</h3>' + pl(d.pins.recommended) + '</div></div>' +
+           '<div class="cols"><div><h3>' + nowLabel + '</h3>' + pl(d.pins.current) + '</div><div><h3>Recommended</h3>' + pl(d.pins.recommended) + '</div></div>' +
            (d.pins.source ? '<p class="note">' + fmt(d.pins.source) + '</p>' : '') + '</section>';
     }
     var hasFp = function (r) { return r.fixPrompt && r.fixPrompt.items && r.fixPrompt.items.length; };
@@ -394,7 +397,7 @@ details.fold { display: block; }
       html += '<div class="feat"><span class="label">Feature on profile</span><p class="fv ' + (f.recommended ? 'yes' : 'no') + '">' + (f.recommended ? 'Yes' : 'No') + ' <span>· ' + pinned + '</span></p>' +
               '<p class="why">' + fmt(f.why) + '</p>';
       if (f.replace) html += '<p class="note"><b>Replaces:</b> ' + fmt(f.replace) + '</p>';
-      if (f.pins && f.pins.length) html += '<p class="note"><b>' + (f.pinned === 'unknown' ? 'Pins read (' + f.pins.length + ', may be incomplete)' : 'Pinned now (' + f.pins.length + ' of 6)') + ':</b> ' + f.pins.map(fmt).join(', ') + (f.pinsSource ? ' <i>(' + fmt(f.pinsSource) + ')</i>' : '') + '</p>';
+      if (f.pins && f.pins.length) html += '<p class="note"><b>' + (f.pinned === 'unknown' || partialPins(f.pins, f.pinsSource) ? 'Pins read (' + f.pins.length + ', may be incomplete)' : 'Pinned now (' + f.pins.length + ' of 6)') + ':</b> ' + f.pins.map(fmt).join(', ') + (f.pinsSource ? ' <i>(' + fmt(f.pinsSource) + ')</i>' : '') + '</p>';
       html += checklist(f.before) + '</div>';
     }
     html += '</section>';
