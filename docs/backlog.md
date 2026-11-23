@@ -116,6 +116,6 @@ A claude.ai chat attached all 74 public repos in Auto mode and created the weekl
 
 The review's Outcomes panel links to the page.
 
-What's left is **the first run on schedule**: whether the weekly task saves a snapshot when nobody starts it. If it doesn't, the fallback is a scheduled task in the Claude Code desktop app.
+The first run on schedule saved a snapshot on its own at 06:26 UTC on 2026-11-23, of 15 of the 17 public repos the account now has: `github-curator` and the profile README repo weren't attached to the chat that created the task, and a run can't attach them. What's left is attaching those two in a chat and running `traffic schedule` again, so the next run covers every public repo.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task on its schedule.
