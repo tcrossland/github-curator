@@ -7,7 +7,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
 | [6. Profile review](#6-profile-review) | 0.9.0 | Mode | M | in progress |
-| [GitHub's secret scanning on public repos](#githubs-secret-scanning-on-public-repos) | 0.9.0 | Feature | S | todo |
 | [Reviews side by side](#reviews-side-by-side) | 0.10.0 | Rule | M | todo |
 | [Author identities](#author-identities) | 0.10.0 | Feature | S | todo |
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
@@ -25,15 +24,13 @@ The next two releases, in the order to do them. An item's Release is the version
 
 The profile page is the first thing a visitor sees, and nothing checked the bio, the pins and the profile README together. `repo-review profile` now does, from `skills/repo-review/profile.md`: it answers Introduction, Pins and Facts, recommends which repos to pin and drop from the feature calls on the user's scorecards and portfolio page, and drafts a plain profile README and bio. `docs/design.md` says why it's a mode and why it ranks from reviews already run.
 
-What's left is a run on a real profile, in Claude Code and on claude.ai. On claude.ai it reads the bio from `user`, whose bio there is **unverified**, and the pins from the profile page summary, which can leave some out (`docs/github-facts.md`). No eval case guards it yet.
+A run in Claude Code on 2026-11-24, on a real profile, met both points below. Its pins all kept their places, each with a reason, so a recommendation to pin or drop hasn't been seen on a real profile yet. What's left is the same run on claude.ai, where it reads the bio from `user`, whose bio there is **unverified**, and the pins from the profile page summary, which can leave some out (`docs/github-facts.md`). No eval case guards it yet.
+
+The run raised two questions for the rules, not yet settled. It took an employer from the bio, which the `contributions` rules don't do: `user.json` already holds `company`, which could be passed as an employer and said in the footer. And it quoted the six pins as one line it labelled "summarised, not a verbatim line"; `profile.md` could ask for one pin name per quote.
 
 **Done when**, for a real profile, it produces:
 - a pins recommendation that names what to pin and what to drop, with a reason for each;
 - a draft profile README that links every recommended pin, and would read well to a visitor who has never heard of the user.
-
-### GitHub's secret scanning on public repos
-
-GitHub's own secret scanning is free on public repos but off until the owner turns it on: with it off, `repos/OWNER/REPO/secret-scanning/alerts` gives HTTP 404 "Secret scanning is disabled on this repository" (seen 2026-11-21, **unverified** as a rule until it's in `docs/github-facts.md` with its source). Start by recording that, and the answer for a repo with scanning on, which was seen on 2026-11-23. For a public repo the review recommends keeping or archiving, it could read the alerts, and recommend turning scanning and push protection on when they're off. It can't replace betterleaks before publishing: GitHub's docs give secret scanning on user-owned private repos only on its enterprise plans, and on a public repo it runs only once the code is out. The GitHub MCP's `run_secret_scanning` scans snippets or diffs rather than history, and sends them to GitHub, which is why a hosted scanner was ruled out before. Done when the facts are recorded with their sources, the review reads the alerts for a public repo and recommends turning scanning on when it's off, and a test covers the 404.
 
 ### Reviews side by side
 

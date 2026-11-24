@@ -26,7 +26,7 @@ Typing `/reload-plugins` in a Claude Code session applies plugin updates, but wh
 
 ## Tests
 
-The tests run the skills' code as it stands (the quote checker and quick mode's quote check, the timing script, the reply counts, the review's Contributors and Waiting on you, its secrets scan, the profile review's commands, `stargazers`' repo listings, `forks`' listing and git commands, `contributions`' searches and grouping script, and `traffic`'s repo listings and snapshot script), check that every relative link in a shipped file points to a file the zip holds, and render the scorecard template's five modes:
+The tests run the skills' code as it stands (the quote checker and quick mode's quote check, the timing script, the reply counts, the review's Contributors and Waiting on you, its secrets scan and check of GitHub's secret scanning, the profile review's commands, `stargazers`' repo listings, `forks`' listing and git commands, `contributions`' searches and grouping script, and `traffic`'s repo listings and snapshot script), check that every relative link in a shipped file points to a file the zip holds, and render the scorecard template's five modes:
 
 ```sh
 python3 -m unittest discover tests

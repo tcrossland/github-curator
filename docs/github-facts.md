@@ -178,6 +178,18 @@ Checked with the release archives of betterleaks 1.10.1 and 2.0.0-rc.9 for macOS
 | Both exit 1 when they find anything, unless `--exit-code` says otherwise. With `--exit-code 0`, a scan with findings exits 0 and a missing repo exits 1 (v1) or 80 (v2). | Seen | 2026-11-20 |
 | A claude.ai session doesn't have betterleaks (`command not found`, exit 127), but may download it: in Auto mode, `curl -fsSLO` of `betterleaks_1.10.1_linux_x64.tar.gz` and `checksums.txt` from the v1.10.1 release on github.com exited 0, `sha256sum -c` gave `OK`, the extracted binary's `version` printed `1.10.1`, and `betterleaks git` over a full clone of a small public repo, with the review's v1 flags, exited 0 (`no leaks found`, report `[]`). The VM is `x86_64`. On 2026-11-22, in a review of an attached private repo on 0.6.0-dev.2, the skill's own fetch printed `OK` and `1.10.1`, and the scan over the repo's full clone exited 0 (`no leaks found`, 3.08 MB in 532 ms). | Seen, in a browser | 2026-11-22 |
 
+## GitHub's secret scanning
+
+| Fact | Source | Checked |
+|---|---|---|
+| Secret scanning alerts are free on public repos, and the owner turns them on: on a repo the user owns, under Settings > Advanced Security, with Secret Protection. Push protection is its own field in `security_and_analysis` (`secret_scanning_push_protection`). | [About secret scanning](https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning), [Enabling secret scanning](https://docs.github.com/en/code-security/secret-scanning/enabling-secret-scanning-features/enabling-secret-scanning-for-your-repository), [Get a repository](https://docs.github.com/en/rest/repos/repos#get-a-repository) | 2026-11-24 |
+| On a user-owned private repo, the docs give secret scanning only on GitHub Enterprise Cloud with Enterprise Managed Users. | About secret scanning | 2026-11-24 |
+| `repos/OWNER/REPO` includes `security_and_analysis` only for the repo's admins. Seen: two of the user's public repos gave it, one with `secret_scanning` and push protection `enabled`, one with both `disabled`; another owner's public repo, and a private repo of the user's, gave none. | Get a repository; seen | 2026-11-24 |
+| `repos/OWNER/REPO/secret-scanning/alerts` needs an admin, with the `repo`, `security_events` or (for public repos) `public_repo` scope. With scanning on it answered HTTP 200 with a list (`[]` with no alerts). With it off it answered HTTP 404 "Secret scanning is disabled on this repository.", on public repos and a private one alike. On another owner's public repo it answered HTTP 404 "Not Found". The docs also list 503. | [List secret scanning alerts for a repository](https://docs.github.com/en/rest/secret-scanning/secret-scanning#list-secret-scanning-alerts-for-a-repository); seen, first on 2026-11-21 | 2026-11-24 |
+| Whether secret scanning can be turned on for a repo that's already archived is **unverified**: the enabling page doesn't say. | Enabling secret scanning | 2026-11-24 |
+| Whether an alert's JSON carries the secret's value is **unverified**, since no alert was seen. The check prints only the fields it names, so it wouldn't print one. | Not checked | 2026-11-24 |
+| Whether `security_and_analysis` and the alerts route answer on claude.ai is **unverified**. | Not checked | 2026-11-24 |
+
 ## Claude plugins and skills
 
 | Fact | Source | Checked |

@@ -56,6 +56,15 @@ Reading `git log` for secrets is weak over a long history, so the check before p
 - **No install on the user's computer.** The review doesn't install software there. Without betterleaks it searches the history as before, marks the item `todo` and says the scan didn't run, so a missing scan never passes silently.
 - **A fetch on claude.ai.** There the clone is in the session's own VM, which has no betterleaks but may download it, and which nothing else uses. So the review fetches the release it was checked with (1.10.1, the stable one) into a folder of its own there, and runs it only if it matches the release's `checksums.txt`. The checksums come from the same release, so they catch a broken or swapped download, not a release tampered with at its source; the release's sigstore bundle isn't checked. The fetch refuses to run outside Linux, so it can't land on the user's Mac. Raise the pinned version only after checking the new release's flags and report.
 
+## GitHub's secret scanning for public repos
+
+GitHub scans a public repo for secrets for free, but only once the owner turns it on, and few do. So a public repo the review recommends keeping or archiving gets an item saying whether it's on, with push protection, and listing any alert open. It doesn't replace betterleaks before publishing: GitHub offers it on a user's private repos only on an enterprise plan, and on a public repo it runs only once the code is out. The GitHub MCP's `run_secret_scanning` was ruled out for the same reason as a hosted scanner: it sends what it scans to GitHub, and scans snippets rather than history.
+
+- **For keep, only when there's work.** A kept repo has no list before an action, and an item that says scanning is on would be noise on every scorecard. So keep gets a list, "While keeping it", only when scanning is off or an alert is open. Archive lists it always, as it does every item.
+- **Read, never changed.** The review could turn scanning on through `security_and_analysis`, but it only recommends: turning it on and closing an alert are the user's, and stay out of the fix prompt.
+- **Unread is `check`, not `todo`.** GitHub shows the settings only to the repo's admins. A review that can't read them doesn't know they're off, so it says to check, as it does for a pin it can't read.
+- **No secret's value.** The command prints each alert's number, kind, date and link, and nothing else, so a value can't reach a page that's published or pasted elsewhere.
+
 ## Feature is separate from the action
 
 Featuring (pinning on the profile) is a yes or no alongside the action, not a sixth action, because the two combine: an archived project can still be one of the best pieces on a profile. Pinning is a step towards featuring, not a decision of its own. A profile shows at most six pins, so featuring is a choice made across all of the user's repos, which is why portfolio mode ranks the pins.

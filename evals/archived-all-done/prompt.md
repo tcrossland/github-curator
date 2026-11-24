@@ -11,10 +11,10 @@ This is an offline test of the skill's rules. There is no shell, network or arti
 `gh api repos/octo-dev/tidewatch`:
 
 ```json
-{"full_name": "octo-dev/tidewatch", "private": false, "visibility": "public", "fork": false, "archived": true, "pushed_at": "2024-02-03T11:20:45Z", "description": "Tide predictions from harmonic constituents, in Python (archived, 2019 to 2023)", "topics": ["tides", "tide-prediction", "harmonic-analysis", "oceanography", "python"], "homepage": null, "has_issues": true, "license": {"spdx_id": "MIT"}, "default_branch": "main", "stargazers_count": 14, "forks_count": 2, "subscribers_count": 3, "open_issues_count": 0}
+{"full_name": "octo-dev/tidewatch", "private": false, "visibility": "public", "fork": false, "archived": true, "pushed_at": "2024-02-03T11:20:45Z", "description": "Tide predictions from harmonic constituents, in Python (archived, 2019 to 2023)", "topics": ["tides", "tide-prediction", "harmonic-analysis", "oceanography", "python"], "homepage": null, "has_issues": true, "license": {"spdx_id": "MIT"}, "default_branch": "main", "stargazers_count": 14, "forks_count": 2, "subscribers_count": 3, "open_issues_count": 0, "security_and_analysis": {"secret_scanning": {"status": "enabled"}, "secret_scanning_push_protection": {"status": "enabled"}}}
 ```
 
-Open issues: 0. Open pull requests: 0. Tags: `v1.2.0` (latest). Commits: all 212 by `octo-dev`. Checked at commit `9b7d03e`. Pinned on my profile: `octo-dev/tidewatch`, `octo-dev/ledgerlint`.
+Open issues: 0. Open pull requests: 0. Open secret scanning alerts: none. Tags: `v1.2.0` (latest). Commits: all 212 by `octo-dev`. Checked at commit `9b7d03e`. Pinned on my profile: `octo-dev/tidewatch`, `octo-dev/ledgerlint`.
 
 Files: `README.md`, `LICENSE`, `pyproject.toml`, `tidewatch/__init__.py`, `tidewatch/constituents.py`, `tidewatch/predict.py`, `tidewatch/cli.py`, `tests/test_predict.py`, `tests/make_series.py`. The constituent speeds in `tidewatch/constituents.py` are computed from astronomical formulae in the code, and the tests use synthetic series that `tests/make_series.py` generates. No file is copied from another project, and there is no data or model file.
 
