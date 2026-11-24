@@ -71,6 +71,8 @@ Write the run as JSON and publish it from the same template as Step 5 (or save i
 - `timings`: the rows from the triage log, as set out under Timing, with `searches` on `List repos` and `Forks` when they searched
 - `footer`: which repos were included and how they were chosen, the pins' source, what was attached, and that triage reads only the API and git, so every `review` action is provisional
 
+Append the `Build` line, add `timings`, then fill the template as in Step 5.
+
 Never run the commands, and never archive, delete or change the visibility of anything during triage.
 
 Reply in two lines: the counts (`N clear deletes · N to review`, with the provisional actions among those to review, such as `4 likely archive`), then the first three repos to review, with the question for each.

@@ -19,4 +19,6 @@ After each repo's scorecard is published (or saved, with `no-publish`), publish 
 - `timings`: the rows from the portfolio run's log, one per repo, then `Build`, as set out under Timing
 - `footer`: which repos were included and how they were chosen
 
+Append the `Build` line, add `timings`, then fill the template as in Step 5.
+
 Reply in three lines: the repo that needs attention first with its fix; the recommended pins, in order; then one `name: ACTION (featured), N pass · N fail · N flagged` entry per repo, with "(featured)" only when its feature call is yes, separated by semicolons. Take that third line exactly as the counts script in Step 6 prints it from the page's JSON (`python3 counts.py PORTFOLIO.json`), not counted by hand; if it prints `cannot count`, fix that repo's `statuses` and rebuild the page first.

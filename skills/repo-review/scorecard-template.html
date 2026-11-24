@@ -286,7 +286,10 @@ details.fold { display: block; }
   var draftSection = function (dr) {
     if (!dr) return '';
     var s = '<section class="fixp" aria-label="Drafts"><span class="label">Drafts, for you to paste</span>';
-    if (dr.bio) s += '<h3 class="dh">Bio</h3><div class="rerun"><code id="draft-bio">' + esc(dr.bio) + '</code><button type="button" class="copy" data-copy="draft-bio">Copy bio</button></div>' + (dr.bioNote ? '<p class="note">' + fmt(dr.bioNote) + '</p>' : '');
+    // A bio that passes is "No change": nothing to paste, so no copy button.
+    if (dr.bio) s += '<h3 class="dh">Bio</h3>' + (/^no change\.?$/i.test(String(dr.bio).trim()) ? '<p>No change</p>' :
+                     '<div class="rerun"><code id="draft-bio">' + esc(dr.bio) + '</code><button type="button" class="copy" data-copy="draft-bio">Copy bio</button></div>') +
+                     (dr.bioNote ? '<p class="note">' + fmt(dr.bioNote) + '</p>' : '');
     if (dr.readme) s += '<h3 class="dh">Profile README</h3>' + (dr.where ? '<p class="note">' + fmt(dr.where) + '</p>' : '') +
                         '<div class="bar"><button type="button" class="copy" data-copy="draft-readme">Copy README</button></div><textarea id="draft-readme" readonly aria-label="Draft profile README">' + esc(dr.readme) + '</textarea>' +
                         (dr.readmeNote ? '<p class="note">' + fmt(dr.readmeNote) + '</p>' : '');

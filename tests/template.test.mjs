@@ -369,6 +369,13 @@ test('a profile review without drafts, contributions or a next command leaves th
   assert.match(html, /Profile pins · up to 6/);
 });
 
+test('a bio that needs no change is shown without a copy button', () => {
+  const { html } = render({ ...profile, draft: { ...profile.draft, bio: 'No change', bioNote: 'The bio passes Introduction.' } });
+  assert.match(html, /<h3 class="dh">Bio<\/h3><p>No change<\/p><p class="note">The bio passes Introduction\.<\/p>/);
+  assert.doesNotMatch(html, /draft-bio/);
+  assert.match(html, /data-copy="draft-readme"/);
+});
+
 test('a single review shows no profile sections, even with pins in its data', () => {
   assert.doesNotMatch(render({ ...review, pins: profile.pins }).html, /Profile pins · up to 6/);
 });

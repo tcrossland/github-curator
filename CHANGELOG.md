@@ -5,6 +5,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 ## Unreleased
 
 - `repo-review profile` reviews your own GitHub profile: whether the bio and the profile README say who you are and what you work on, whether your pins are the repos your full reviews say to feature, and whether every repo and link the README names is still public and live. It recommends which repos to pin and which to drop, each with its reason, from your existing scorecards and portfolio page rather than new reviews, and drafts a plain profile README and a bio of at most 160 characters for you to paste. With no reviews to rank from, it gives the `portfolio` command for the repos it would need. It pins nothing and changes neither the bio nor the README.
+- The portfolio and triage pages are published with their titles. A portfolio page could come out titled "__TITLE__", so the next portfolio run didn't find it to republish.
 
 ## 0.8.0 (2026-11-23)
 
