@@ -161,6 +161,22 @@ class OverviewCountsTest(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertIn("cannot count o/a", err)
 
+    def test_profile_counts_its_three_questions(self):
+        qs = [{"short": s, "status": st, "quotes": []} for s, st in zip(["Introduction", "Pins", "Facts"], ["pass", "fail", "flagged"])]
+        code, out, _ = run_json({"profile": True, "questions": qs})
+        self.assertEqual((code, out), (0, "1 pass · 1 fail · 1 flagged\n"))
+
+    def test_profile_refuses_seven_questions(self):
+        code, out, err = run_json({"profile": True, "questions": questions(*["pass"] * 7)})
+        self.assertNotEqual(code, 0)
+        self.assertEqual(out, "")
+        self.assertIn("7 questions, expected 3", err)
+
+    def test_profile_rerun_names_what_moved(self):
+        qs = lambda *st: [{"short": s, "status": x, "quotes": []} for s, x in zip(["Introduction", "Pins", "Facts"], st)]
+        code, out, _ = run_json({"profile": True, "questions": qs("pass", "pass", "flagged")},
+                                {"profile": True, "date": "2026-11-21", "questions": qs("flagged", "pass", "flagged")})
+        self.assertEqual((code, out), (0, "Since 2026-11-21: Introduction flagged → pass\n2 pass · 0 fail · 1 flagged\n"))
 
 if __name__ == "__main__":
     unittest.main()

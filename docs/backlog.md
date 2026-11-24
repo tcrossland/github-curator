@@ -6,7 +6,7 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [6. Profile review](#6-profile-review) | 0.9.0 | New skill | M | todo |
+| [6. Profile review](#6-profile-review) | 0.9.0 | Mode | M | in progress |
 | [GitHub's secret scanning on public repos](#githubs-secret-scanning-on-public-repos) | 0.9.0 | Feature | S | todo |
 | [Reviews side by side](#reviews-side-by-side) | 0.10.0 | Rule | M | todo |
 | [Author identities](#author-identities) | 0.10.0 | Feature | S | todo |
@@ -23,12 +23,9 @@ The next two releases, in the order to do them. An item's Release is the version
 
 ### 6. Profile review
 
-The profile page is the first thing a visitor sees. A profile README (the `OWNER/OWNER` repo), the bio, the pins and the featured repos aren't checked together today. On claude.ai it reads the profile page through WebFetch, which gives a summary of the page rather than the page. The summary can leave out pins (`docs/design.md`), so the skill says when the pins it read may be incomplete, as the review does. Whether the summary gives the bio when a profile has one is **unverified** (`docs/github-facts.md`), so check that before relying on it there. `repo-review quick` leaves the profile README repo out for this skill, since Findable and Getting started don't apply to it.
+The profile page is the first thing a visitor sees, and nothing checked the bio, the pins and the profile README together. `repo-review profile` now does, from `skills/repo-review/profile.md`: it answers Introduction, Pins and Facts, recommends which repos to pin and drop from the feature calls on the user's scorecards and portfolio page, and drafts a plain profile README and bio. `docs/design.md` says why it's a mode and why it ranks from reviews already run.
 
-A new skill, `profile-review`, would:
-- check the bio and the pins, reusing the pin ranking from portfolio mode;
-- draft a short profile README in the house style that introduces the featured repos, and names the contributions to other people's projects worth mentioning, from the `contributions` skill;
-- publish a scorecard like the repo review's.
+What's left is a run on a real profile, in Claude Code and on claude.ai. On claude.ai it reads the bio from `user`, whose bio there is **unverified**, and the pins from the profile page summary, which can leave some out (`docs/github-facts.md`). No eval case guards it yet.
 
 **Done when**, for a real profile, it produces:
 - a pins recommendation that names what to pin and what to drop, with a reason for each;

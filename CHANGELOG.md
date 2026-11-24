@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## Unreleased
+
+- `repo-review profile` reviews your own GitHub profile: whether the bio and the profile README say who you are and what you work on, whether your pins are the repos your full reviews say to feature, and whether every repo and link the README names is still public and live. It recommends which repos to pin and which to drop, each with its reason, from your existing scorecards and portfolio page rather than new reviews, and drafts a plain profile README and a bio of at most 160 characters for you to paste. With no reviews to rank from, it gives the `portfolio` command for the repos it would need. It pins nothing and changes neither the bio nor the README.
+
 ## 0.8.0 (2026-11-23)
 
 - On claude.ai, triage and `stargazers` attach repos in whatever mode the chat is in, rather than asking you to switch to Manual mode first, which took one approval per repo. They ask for Manual mode only if Auto mode refuses an attach, and then only for that repo.

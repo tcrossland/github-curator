@@ -1,6 +1,6 @@
 // Tests for skills/repo-review/scorecard-template.html: fill it as Step 5 says,
 // run its script against a minimal stand-in for the DOM, and check the markup
-// for each mode (single review, overview, triage, quick).
+// for each mode (single review, overview, triage, quick, profile).
 // Run: node --test tests/*.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -330,4 +330,45 @@ test('a Pinned item the review couldn\'t settle shows as Check and is counted ap
   assert.match(html, /class="fv yes">Yes <span>· pins not read<\/span>/);
   assert.match(html, /<span class="st check">Check<\/span><span class="it">Pinned<span>The pins couldn't be read<\/span>/);
   assert.match(html, /1 check · 1 done/);
+});
+
+const profile = {
+  profile: true, title: 'Profile review: owner', subject: 'bio, 4 pins, profile README at abc123', link: 'https://github.com/owner', linkText: 'owner',
+  date: '2026-11-24', rerun: '/github-curator:repo-review profile',
+  verdict: { question: '2', fix: 'Pin owner/a.', why: 'It is the strongest work.' },
+  questions: [{ short: 'Introduction', status: 'pass', question: 'Who?', finding: 'F.', quotes: [{ text: 'I build tools.', source: 'GitHub profile bio, read via the API' }], fix: 'No change' },
+              { short: 'Pins', status: 'fail', question: 'Pins?', finding: 'F.', quotes: [], fix: 'Pin owner/a.' },
+              { short: 'Facts', status: 'flagged', question: 'Facts?', finding: 'F.', quotes: [], fix: 'Fix a link.' }],
+  pins: { current: ['owner/b', 'owner/c'], source: 'pinned items, read via GraphQL', recommended: ['owner/a', 'owner/b'], why: 'Swap c for a.',
+          basis: 'Portfolio overview of 2026-11-21', changes: [{ name: 'owner/a', change: 'pin', why: 'Featured on its scorecard.' }, { name: 'owner/c', change: 'drop', why: 'Its scorecard says not to feature it.' }] },
+  draft: { readme: 'I build <tools>.\n\n- [a](https://github.com/owner/a)', readmeNote: 'Drops the stats card.', bio: 'I build data tools.', bioNote: '19 characters.', where: '`README.md` in `owner/owner`' },
+  contributions: { line: '3 merged pull requests', named: ['`other/lib` · fixed a parser'], note: 'Employers left out.' },
+  next: '/github-curator:repo-review portfolio https://github.com/owner/d', nextNote: '1 more',
+};
+
+test('profile review shows its three questions, the pins with a reason per change, and the drafts to copy', () => {
+  const { html } = render(profile);
+  assert.equal((html.match(/<article class="row /g) || []).length, 3);
+  assert.match(html, /1 pass<\/span>.*1 fail<\/span>.*1 flagged<\/span>/);
+  assert.match(html, /Most important fix · question 2</);
+  assert.match(html, /<h3>Pinned now<\/h3><ol><li>owner\/b<\/li><li>owner\/c<\/li><\/ol>/);
+  assert.match(html, /<span class="pc pin">Pin<\/span><span><code>owner\/a<\/code> Featured on its scorecard\.<\/span>/);
+  assert.match(html, /<span class="pc drop">Drop<\/span>/);
+  assert.match(html, /Portfolio overview of 2026-11-21/);
+  assert.match(html, /<code id="draft-bio">I build data tools\.<\/code><button type="button" class="copy" data-copy="draft-bio">/);
+  assert.match(html, /<textarea id="draft-readme" readonly aria-label="Draft profile README">I build &lt;tools&gt;\.\n\n- \[a\]/);
+  assert.match(html, /Review these to rank them/);
+  assert.match(html, /Contributions · context, not scored/);
+  assert.match(html, /<code>other\/lib<\/code> · fixed a parser/);
+  assert.doesNotMatch(html, /class="rec /);
+});
+
+test('a profile review without drafts, contributions or a next command leaves those sections out', () => {
+  const { html } = render({ ...profile, draft: undefined, contributions: undefined, next: undefined });
+  assert.doesNotMatch(html, /Drafts, for you to paste|Contributions ·|Review these to rank them/);
+  assert.match(html, /Profile pins · up to 6/);
+});
+
+test('a single review shows no profile sections, even with pins in its data', () => {
+  assert.doesNotMatch(render({ ...review, pins: profile.pins }).html, /Profile pins · up to 6/);
 });

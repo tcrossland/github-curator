@@ -179,6 +179,12 @@ footer { color: var(--muted); font-size: 12.5px; }
 .pins .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .pins h3 { font: 600 13px/1.2 var(--body); margin: 0 0 4px; }
 .pins ol { margin: 0; padding-left: 20px; font: 400 13px/1.5 var(--mono); }
+.pchg { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 13.5px; }
+.pchg li { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: baseline; }
+.pchg .pc { font: 500 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; padding: 5px 0; border-radius: 999px; text-align: center; background: var(--quote-bg); color: var(--muted); }
+.pchg .pc.pin { background: var(--pass-bg); color: var(--pass); }
+.pchg .pc.drop { background: var(--fail-bg); color: var(--fail); }
+.fixp .dh { font: 600 13px/1.2 var(--body); margin: 4px 0 0; }
 .timings { font-size: 13px; color: var(--muted); }
 .timings summary { cursor: pointer; color: var(--accent); }
 .timings .ov { margin-top: 8px; font-size: 13px; }
@@ -263,6 +269,36 @@ details.fold { display: block; }
   var nextBlock = function (label) {
     return d.next ? '<section class="fixp" aria-label="Next"><span class="label">' + label + '</span><div class="rerun"><code id="next-cmd">' + esc(d.next) + '</code><button type="button" class="copy" data-copy="next-cmd">Copy command</button></div>' + (d.nextNote ? '<p class="note">' + fmt(d.nextNote) + '</p>' : '') + '</section>' : '';
   };
+  // The pins now and the ones to pin, on the portfolio page and the profile review; the profile review adds a reason per change.
+  var pinsSection = function (p) {
+    if (!p) return '';
+    var nowLabel = partialPins(p.current, p.source) ? 'Pins read, may be incomplete' : 'Pinned now';
+    var pl = function (a) { return a && a.length ? '<ol>' + a.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>' : '<p class="note">None</p>'; };
+    var change = { pin: 'Pin', keep: 'Keep', drop: 'Drop' };
+    return '<section class="pins" aria-label="Pins"><span class="label">Profile pins · up to 6</span>' + (p.why ? '<p class="why">' + fmt(p.why) + '</p>' : '') +
+           '<div class="cols"><div><h3>' + nowLabel + '</h3>' + pl(p.current) + '</div><div><h3>Recommended</h3>' + pl(p.recommended) + '</div></div>' +
+           (p.changes && p.changes.length ? '<ul class="pchg">' + p.changes.map(function (c) {
+             return '<li><span class="pc ' + esc(c.change) + '">' + esc(change[c.change] || c.change) + '</span><span><code>' + esc(c.name) + '</code> ' + fmt(c.why) + '</span></li>';
+           }).join('') + '</ul>' : '') +
+           (p.source ? '<p class="note">' + fmt(p.source) + '</p>' : '') + (p.basis ? '<p class="note">' + fmt(p.basis) + '</p>' : '') + '</section>';
+  };
+  // The profile review's drafts, each with a copy button; the user pastes them into GitHub.
+  var draftSection = function (dr) {
+    if (!dr) return '';
+    var s = '<section class="fixp" aria-label="Drafts"><span class="label">Drafts, for you to paste</span>';
+    if (dr.bio) s += '<h3 class="dh">Bio</h3><div class="rerun"><code id="draft-bio">' + esc(dr.bio) + '</code><button type="button" class="copy" data-copy="draft-bio">Copy bio</button></div>' + (dr.bioNote ? '<p class="note">' + fmt(dr.bioNote) + '</p>' : '');
+    if (dr.readme) s += '<h3 class="dh">Profile README</h3>' + (dr.where ? '<p class="note">' + fmt(dr.where) + '</p>' : '') +
+                        '<div class="bar"><button type="button" class="copy" data-copy="draft-readme">Copy README</button></div><textarea id="draft-readme" readonly aria-label="Draft profile README">' + esc(dr.readme) + '</textarea>' +
+                        (dr.readmeNote ? '<p class="note">' + fmt(dr.readmeNote) + '</p>' : '');
+    return s + '</section>';
+  };
+  var contribSection = function (c) {
+    if (!c) return '';
+    var body = (c.line ? '<p class="note">' + fmt(c.line) + '</p>' : '') +
+               '<div class="olists"><div><h3>Named in the draft</h3><ul>' + (c.named && c.named.length ? c.named.map(function (e) { return '<li>' + fmt(e) + '</li>'; }).join('') : '<li class="none">None</li>') + '</ul></div></div>' +
+               (c.note ? '<p class="note">' + fmt(c.note) + '</p>' : '');
+    return fold('outcomes', '<span class="label">Contributions · context, not scored</span>', body);
+  };
   if (d.triage) {
     var rs = d.repos || [], rev = rs.filter(function (r) { return r.sure !== 'clear'; }), clr = rs.filter(function (r) { return r.sure === 'clear'; });
     var tally = {}; rev.forEach(function (r) { tally[r.action] = (tally[r.action] || 0) + 1; });
@@ -327,13 +363,7 @@ details.fold { display: block; }
   if (d.overview) {
     var h = '<header class="meta"><h1>' + esc(d.title) + '</h1><span>' + esc(d.subject) + '</span><span>Checked ' + esc(d.date) + '</span></header>';
     h += '<section class="verdict" aria-label="Verdict"><span class="label">Needs attention first</span><p class="fix">' + fmt(d.verdict.fix) + '</p><p class="why">' + fmt(d.verdict.why) + '</p></section>';
-    if (d.pins) {
-      var nowLabel = partialPins(d.pins.current, d.pins.source) ? 'Pins read, may be incomplete' : 'Pinned now';
-      var pl = function (a) { return a && a.length ? '<ol>' + a.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ol>' : '<p class="note">None</p>'; };
-      h += '<section class="pins" aria-label="Pins"><span class="label">Profile pins · up to 6</span>' + (d.pins.why ? '<p class="why">' + fmt(d.pins.why) + '</p>' : '') +
-           '<div class="cols"><div><h3>' + nowLabel + '</h3>' + pl(d.pins.current) + '</div><div><h3>Recommended</h3>' + pl(d.pins.recommended) + '</div></div>' +
-           (d.pins.source ? '<p class="note">' + fmt(d.pins.source) + '</p>' : '') + '</section>';
-    }
+    h += pinsSection(d.pins);
     var hasFp = function (r) { return r.fixPrompt && r.fixPrompt.items && r.fixPrompt.items.length; };
     h += '<div class="ovwrap"><table class="ov"><thead><tr><th>Repo</th><th>Recommendation</th><th>Q1 to Q7</th><th>Most important fix</th><th>Stars</th><th>Views (14 days)</th><th>Scorecard</th><th>Fix prompt</th></tr></thead><tbody>';
     d.repos.forEach(function (r, ri) {
@@ -415,6 +445,7 @@ details.fold { display: block; }
     html += '<a class="chip ' + q.status + '" href="#q' + (i + 1) + '"><span class="n">Q' + (i + 1) + '</span><span class="t">' + esc(q.short) + '</span><span class="s">' + label[q.status] + '</span></a>';
   });
   html += '</nav>';
+  if (d.profile) html += pinsSection(d.pins) + draftSection(d.draft) + nextBlock('Review these to rank them') + contribSection(d.contributions);
   var fp = d.fixPrompt;
   if (fp && fp.items && fp.items.length) {
     html += '<section class="fixp" aria-label="Fix prompt"><span class="label">Fix prompt for Claude Code</span><div class="bar"><span class="seg" role="group" aria-label="Which findings">' +
@@ -478,6 +509,7 @@ details.fold { display: block; }
   html += timings(d.timings);
   if (d.footer) html += '<footer>' + fmt(d.footer) + '</footer>';
   document.getElementById('app').innerHTML = html;
+  wireCopy();
   var btn = document.getElementById('rerun-btn');
   if (btn) btn.addEventListener('click', function () {
     var done = function (msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = 'Copy re-run command'; }, 2500); };

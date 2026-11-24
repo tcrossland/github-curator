@@ -1,7 +1,7 @@
 ---
 name: "repo-review"
-description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: quick, triage, portfolio."
-argument-hint: "[repo | folder | file] [for:employers|users|researchers] · quick [repos…]: a glance · triage [public|private|own|forks|archived|org:NAME]: sort by action · portfolio [repos…]: full review of each · no-publish"
+description: "Review the user's GitHub repo or a README draft: recommend keep, publish, archive, make private or delete, and whether to feature it; check it and publish a scorecard. Modes: quick, triage, portfolio, profile."
+argument-hint: "[repo | folder | file] [for:employers|users|researchers] · quick [repos…]: a glance · triage [public|private|own|forks|archived|org:NAME]: sort by action · portfolio [repos…]: full review of each · profile: your bio, pins and profile README · no-publish"
 ---
 
 # Repo review
@@ -10,11 +10,12 @@ The work product is a public GitHub repo. By default it's a portfolio piece, pub
 
 For a repo, the review also recommends what to do with it, whether to feature it on the user's profile, and the work worth doing before each. Not every repo should stay as it is: some are finished and should be archived with a proper account of what they were, some aren't worth showing, some private ones are ready to publish, and a few deserve one of the six pinned places on the user's profile. It also finds similar repos, so the review can say what this one adds and where readers who want a maintained tool should go.
 
-There are four ways to run it:
+There are five ways to run it:
 - **One draft**: the arguments are a repo, a local clone's folder, a file, a doc link or pasted text. Run Steps 1 to 6.
 - **Portfolio**: the arguments start with `portfolio`, or `overview`, its old name, optionally followed by repos. Run Steps 1 to 4 for each repo, one repo at a time (publishing each repo's scorecard as usual), then Step 7. Step 7 and how a portfolio run logs its time are in [portfolio.md](portfolio.md) beside this file: read it before starting, and only in this mode.
 - **Triage**: the arguments start with `triage`, optionally followed by filters (`public`, `private`, `own`, `forks`, `archived`, or `org:NAME` for an organisation's repos). Run Step 8 only, from [triage.md](triage.md) beside this file, read only in this mode: a quick pass over many repos from GitHub's API, without cloning or the seven questions, that sorts out the clear cases and names the repos worth a full review.
 - **Quick**: the arguments start with `quick`, optionally followed by repos. Run Step 9 only, from [quick.md](quick.md) beside this file, read only in this mode: an at-a-glance review of many repos from GitHub's search and each README, answering Hook, Findable and Getting started, on one page with a row per repo.
+- **Profile**: the arguments start with `profile`. Run Step 10 only, from [profile.md](profile.md) beside this file, read only in this mode: a check of the user's own profile (the bio, the pins and the profile README), which pins to change, ranked from the feature calls of their existing scorecards, and a draft profile README and bio.
 
 `for:employers`, `for:users` or `for:researchers`, as a separate word in the arguments, names the readers the review judges the draft for, in a one-draft review and in portfolio mode (The audience, below). Quick mode and triage don't run the questions it changes, so they ignore it. Any other `for:` value: ask which of the three was meant; when no one can answer, use employers and say why in the footer.
 
@@ -174,7 +175,7 @@ Leave the recommendation and the feature call out for pasted text, a file, or a 
 
 ## Timing
 
-Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `portfolio-timings.log`, `triage-timings.log` or `quick-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`, as soon as the step's work is done. The line is the last thing in its command: the step's own work may come before it, but nothing comes after it, whether joined by `&&`, `;` or a newline, so none of the next step's work, such as the comparison list or the run's JSON, is written into that command.
+Every run logs how long each step takes and how many GitHub API requests it makes, and the page shows them. Keep the log in the working folder where Step 5 fills the template, outside any clone, one per page: `REPO-NAME-timings.log`, `portfolio-timings.log`, `triage-timings.log`, `quick-timings.log` or `profile-timings.log`. Run every timing line in that folder's shell, never through `device_bash`, so the log has one file and one clock. Write its first line, named `start`, with `>` as the run begins, so a log left from an earlier run is replaced. Then, as each step below finishes, append a line named for that step with `>>`, as soon as the step's work is done. The line is the last thing in its command: the step's own work may come before it, but nothing comes after it, whether joined by `&&`, `;` or a newline, so none of the next step's work, such as the comparison list or the run's JSON, is written into that command.
 
 ```sh
 printf '%s\t%s\t%s\n' 'NAME' "$(date -u +%s)" "$(r=$(gh api rate_limit --jq '"\(.resources.core.used)\t\(.resources.core.reset)"' 2>/dev/null) && printf %s "$r")" >> "LOG"
@@ -187,7 +188,7 @@ Reading `rate_limit` costs no request, and `core.used` counts nearly every REST 
 
 The count is the GitHub account's, not the run's: requests made at the same time by anything else on the account (the user's own `gh`, another session) are counted too, and so are this run's requests through `device_bash`.
 
-Log a line only for a step that ran. The steps, in order (portfolio, triage and quick name theirs in their own files), with the work each holds, are, for **one draft**:
+Log a line only for a step that ran. The steps, in order (portfolio, triage, quick and profile name theirs in their own files), with the work each holds, are, for **one draft**:
 1. `Get the draft`: Step 1 up to Outcomes, House style and The previous run included, so look for the previous scorecard before this line.
 2. `Outcomes`: Outcomes.
 3. `Similar repos`: Similar repos.
@@ -409,18 +410,20 @@ Reply in exactly three lines (two when there is no recommendation), and nothing 
 0. On a re-run (Step 1 found a previous run), what changed since it, exactly as the script below prints it first when given the previous run's JSON too (`python3 counts.py RUN.json PREVIOUS.json`): `Since 2026-11-21: Hook fail → pass; action archive → keep`, with `audience employers → users` first when the audience changed. Leave it out on a first run.
 1. The recommendation: the action and whether to feature it, with the reason, in one sentence, and the number of `todo` items before them when there are any.
 2. The verdict: the most important fix, in one sentence.
-3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the portfolio page's JSON, and Step 9 on the quick review's.
+3. The counts, in the form `N pass · N fail · N flagged`, exactly as the script below prints them from the run's JSON (`python3 counts.py RUN.json`). Don't count by hand. If it prints `cannot count` instead, fix the JSON's `questions` and rebuild the page before replying. Step 7 runs the same script on the portfolio page's JSON, Step 9 on the quick review's and Step 10 on the profile review's.
 
 ```python
 import json, sys
 d = json.load(open(sys.argv[1], encoding='utf-8'))
 statuses = ('pass', 'fail', 'flagged')
 
+n = 3 if d.get('profile') else 7
+
 def counts(name, items):
     got = [s for _, s in items]
     odd = [str(label) for label, s in items if s not in statuses]
-    if len(items) != 7 or odd:
-        sys.exit(f"cannot count {name}: {len(items)} questions, expected 7; unknown status in: {', '.join(odd) or 'none'}")
+    if len(items) != n or odd:
+        sys.exit(f"cannot count {name}: {len(items)} questions, expected {n}; unknown status in: {', '.join(odd) or 'none'}")
     return f"{got.count('pass')} pass · {got.count('fail')} fail · {got.count('flagged')} flagged"
 
 if d.get('quick'):
@@ -443,10 +446,10 @@ else:
         p = json.load(open(sys.argv[2], encoding='utf-8'))
         since = f"Since {str(p.get('date') or 'the last run')[:10]}"
         old = [q.get('status') for q in p.get('questions') or []]
-        if len(old) != 7 or any(s not in statuses for s in old):
+        if len(old) != n or any(s not in statuses for s in old):
             print(f"{since}: the previous run's questions can't be compared")
         else:
-            # By order, not label: a run before 0.7 names questions 4 to 6 differently.
+            # By order, not label: a run before 0.7 names questions 4 to 6 differently, and a profile review's three keep their order.
             moved = [f"{q['short']} {o} → {q['status']}" for q, o in zip(d['questions'], old) if o != q['status']]
             u, v = p.get('audience') or 'employers', d.get('audience') or 'employers'
             if u != v:
