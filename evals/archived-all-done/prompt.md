@@ -62,7 +62,7 @@ license = "MIT"
 25
 26 ## Status and history
 27
-28 I wrote tidewatch between 2019 and 2023 as a way into harmonic analysis. It predicts well for ports with a strong semidiurnal tide and poorly for shallow-water ports, where higher harmonics matter; adding those was the next step, and I stopped before taking it. If I started again I would fit the constituents from a port's own records rather than take published ones, which would have let me test the predictions against data I hadn't used.
+28 I wrote tidewatch between 2019 and 2023 as a way into harmonic analysis. It predicts well for ports with a strong semidiurnal tide and poorly for shallow-water ports, where higher harmonics matter; adding those was the next step, and I stopped before taking it when the sailing club I wrote it for switched to the official tables. If I started again I would fit the constituents from a port's own records rather than take published ones, which would have let me test the predictions against data I hadn't used.
 29
 30 UTide, which came before tidewatch, does the fitting as well as the prediction and is maintained: use it if you need a working tool (https://github.com/wesleybowman/UTide).
 31
