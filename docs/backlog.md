@@ -6,7 +6,7 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [6. Profile review](#6-profile-review) | 0.9.0 | Mode | M | in progress |
+| [Profile review: rules from its first runs](#profile-review-rules-from-its-first-runs) | 0.9.0 | Rule | S | todo |
 | [Reviews side by side](#reviews-side-by-side) | 0.10.0 | Rule | M | todo |
 | [Author identities](#author-identities) | 0.10.0 | Feature | S | todo |
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
@@ -20,17 +20,16 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 
 The next two releases, in the order to do them. An item's Release is the version it's meant for.
 
-### 6. Profile review
+### Profile review: rules from its first runs
 
-The profile page is the first thing a visitor sees, and nothing checked the bio, the pins and the profile README together. `repo-review profile` now does, from `skills/repo-review/profile.md`: it answers Introduction, Pins and Facts, recommends which repos to pin and drop from the feature calls on the user's scorecards and portfolio page, and drafts a plain profile README and bio. `docs/design.md` says why it's a mode and why it ranks from reviews already run.
+`repo-review profile` ran on a real profile on 2026-11-24, in Claude Code and on claude.ai, and met its done-when in both. The runs raised five questions its rules don't settle:
+- **Employers from the bio.** Both runs counted an employer the bio names, which the `contributions` rules don't do. `user.json` already holds `company`, which could be passed as an employer and named in the footer, or the rule could forbid it.
+- **Pins quoted as one line.** The Claude Code run quoted six pin names as one line, labelled "summarised, not a verbatim line". `profile.md` could ask for one pin name per quote.
+- **A draft that puts back what the user removed.** The claude.ai run's draft named three contributions, though the previous review noted the user had removed that list, and left the call to the user. A re-run could keep out of the draft whatever the user took out of the README since the previous draft.
+- **Pins whose state is unknown.** On claude.ai, two recommended pins the page summary didn't name came out as "pin (check whether it's already pinned)". The changes have no `check` kind for that.
+- **The bio from the page summary.** By the claude.ai chat's account, the profile page summary gave the status message as the bio (**unverified**). `user` gave the bio there, so the fallback is rare, but it could say to take the bio only from a line the summary labels as the bio.
 
-A run in Claude Code on 2026-11-24, on a real profile, met both points below. Its pins all kept their places, each with a reason, so a recommendation to pin or drop hasn't been seen on a real profile yet. What's left is the same run on claude.ai, where it reads the bio from `user`, whose bio there is **unverified**, and the pins from the profile page summary, which can leave some out (`docs/github-facts.md`). No eval case guards it yet.
-
-The run raised two questions for the rules, not yet settled. It took an employer from the bio, which the `contributions` rules don't do: `user.json` already holds `company`, which could be passed as an employer and said in the footer. And it quoted the six pins as one line it labelled "summarised, not a verbatim line"; `profile.md` could ask for one pin name per quote.
-
-**Done when**, for a real profile, it produces:
-- a pins recommendation that names what to pin and what to drop, with a reason for each;
-- a draft profile README that links every recommended pin, and would read well to a visitor who has never heard of the user.
+Done when each is a rule in `profile.md`, with a test or an eval case where it can have one, or is recorded in `docs/design.md` as decided against.
 
 ### Reviews side by side
 
