@@ -9,9 +9,9 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [Reviews side by side](#reviews-side-by-side) | 0.10.0 | Rule | M | todo |
 | [Author identities](#author-identities) | 0.10.0 | Feature | S | todo |
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
-| [10. Launch drafts](#10-launch-drafts) | Later | New skill | M | todo |
-| [5. Benchmark against good practice](#5-benchmark-against-good-practice) | Later | Scorecard panel | L | todo |
-| [1. Traffic history](#1-traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
+| [Launch drafts](#launch-drafts) | Later | New skill | M | todo |
+| [Benchmark against good practice](#benchmark-against-good-practice) | Later | Scorecard panel | L | todo |
+| [Traffic history](#traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
 
@@ -35,13 +35,13 @@ Bigger features, in the order to do them.
 
 Each scorecard, the quick review, the triage page, the portfolio page and Traffic history are separate artifacts found by title, and only the portfolio page links to scorecards. Quick and triage rows could link to a repo's scorecard when one exists, and a scorecard's header to the latest quick review, triage and portfolio page, from one listing of the user's artifacts. In Claude Code that listing can stop at the 50 most recently updated artifacts (`docs/github-facts.md`), so a page that finds no link for a page it names says one may exist, as a review's footer does. Done when each page links to the others it names, and a template test covers each link.
 
-### 10. Launch drafts
+### Launch drafts
 
-When the review says publish or feature, draft the announcement: where it fits, and a post for each place, in the house style. It drafts only: posting is the user's call. It comes after Traffic history (item 1), which needs several weeks of referrers before it can show which places brought visitors.
+When the review says publish or feature, draft the announcement: where it fits, and a post for each place, in the house style. It drafts only: posting is the user's call. It comes after Traffic history, which needs several weeks of referrers before it can show which places brought visitors.
 
 **Done when**, for one repo recommended for featuring, it drafts posts for at least two places, each with the reason it fits (from the repo's referrers or where similar repos are discussed).
 
-### 5. Benchmark against good practice
+### Benchmark against good practice
 
 The review checks the page, not the engineering. A visitor who opens `pyproject.toml` or the CI workflow judges the craft too, and nothing checks it today: the manifest, CI workflow and licence are read only to confirm facts on the page.
 
@@ -67,7 +67,7 @@ Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/
 
 Started, and waiting on a date before it can close.
 
-### 1. Traffic history
+### Traffic history
 
 GitHub keeps traffic for 14 days only, so the scorecard's views, clones and referrers are lost after a fortnight. Nothing can show whether featuring or sharing a repo changed anything. This is the only item that loses something for every week it waits.
 
