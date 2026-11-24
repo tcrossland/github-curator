@@ -52,6 +52,7 @@ fi
 mkdir -p dist
 rm -f "$out"
 cd "$src"
-zip -r -X -q "$out" .claude-plugin skills README.md CHANGELOG.md LICENSE NOTICE -x '*.DS_Store'
+# The zip is the plugin alone: marketplace.json serves Claude Code's marketplace from GitHub.
+zip -r -X -q "$out" .claude-plugin skills README.md CHANGELOG.md LICENSE NOTICE -x '*.DS_Store' -x '.claude-plugin/marketplace.json'
 echo "Built $out"
 unzip -l "$out"

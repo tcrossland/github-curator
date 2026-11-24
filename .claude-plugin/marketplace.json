@@ -1,0 +1,19 @@
+{
+  "name": "github-curator",
+  "description": "github-curator, a Claude plugin that reviews the repos on a GitHub account and recommends what to do with each one.",
+  "owner": {
+    "name": "Tomas Crossland",
+    "url": "https://github.com/tcrossland"
+  },
+  "plugins": [
+    {
+      "name": "github-curator",
+      "source": {
+        "source": "github",
+        "repo": "tcrossland/github-curator",
+        "ref": "v0.9.0"
+      },
+      "description": "Recommends what to do with each repo on a GitHub account (keep, publish, archive, make private or delete) on a scorecard that quotes its evidence. It only recommends: it changes no repo and contacts no one."
+    }
+  ]
+}

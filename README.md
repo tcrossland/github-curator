@@ -61,7 +61,13 @@ In a claude.ai chat, GitHub answers only for the repos attached to the chat, so 
 
 It runs in a claude.ai chat or in Claude Code. In Claude Code it reads GitHub with your own `gh`, so sign in first with `gh auth login`. In a claude.ai chat it uses the chat's own access to GitHub, and asks before attaching the repos it needs.
 
-1. Download the zip from the [latest release](https://github.com/tcrossland/github-curator/releases/latest) and upload it to claude.ai: Plugins in the left sidebar > Add > Upload plugin.
+1. Download the zip from the [latest release](https://github.com/tcrossland/github-curator/releases/latest) and upload it to claude.ai: Plugins in the left sidebar > Add > Upload plugin. In Claude Code alone, you can install the latest release from this repo's marketplace instead:
+
+   ```sh
+   claude plugin marketplace add tcrossland/github-curator
+   claude plugin install github-curator@github-curator
+   ```
+
 2. In a new chat, or a new Claude Code session in the Claude desktop app, which picks up plugins uploaded to claude.ai, review one of your repos:
 
    ```
@@ -74,7 +80,7 @@ The skills are tested on Opus 5.5 and Sonnet 5.5. Sonnet uses about half as much
 
 ## Install and update
 
-To update, upload the new release's zip the same way; claude.ai asks you to confirm before it replaces the version you have. A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version.
+To update, upload the new release's zip the same way; claude.ai asks you to confirm before it replaces the version you have. Installed from the marketplace, update with `claude plugin marketplace update github-curator`, then `claude plugin update github-curator@github-curator`. A Claude Code session that was already open keeps the version it started with, even after the new one reaches its disk: a skill invoked again returns the text it loaded first. Start a new session to use the new version.
 
 The skills run as `/github-curator:repo-review`, `/github-curator:stargazers`, `/github-curator:forks`, `/github-curator:contributions` and `/github-curator:traffic`.
 

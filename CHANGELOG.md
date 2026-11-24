@@ -2,6 +2,10 @@
 
 What changed for someone using the plugin, newest first. A Claude Code session keeps the version it started with, so start a new session after installing an update.
 
+## Unreleased
+
+- In Claude Code you can install the plugin from this repo's own marketplace, with `claude plugin marketplace add tcrossland/github-curator` and `claude plugin install github-curator@github-curator`. It installs the latest release, not unreleased work.
+
 ## 0.9.0 (2026-11-24)
 
 - `repo-review profile` reviews your own GitHub profile: whether the bio and the profile README say who you are and what you work on, whether your pins are the repos your full reviews say to feature, and whether every repo and link the README names is still public and live. It recommends which repos to pin and which to drop, each with its reason, from your existing scorecards and portfolio page rather than new reviews, and drafts a plain profile README and a bio of at most 160 characters for you to paste. With no reviews to rank from, it gives the `portfolio` command for the repos it would need. A re-run leaves out of the draft anything you removed after an earlier draft suggested it, and an owner your bio or company names counts as an employer, so its work isn't put on your profile unless you say so with `orgs:`. On claude.ai, where the pins come from a summary of your profile page that can leave some out, a recommended repo it doesn't name shows Check rather than Pin. It pins nothing and changes neither the bio nor the README.
