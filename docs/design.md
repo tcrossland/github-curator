@@ -145,6 +145,13 @@ The profile is the first thing a visitor sees, and the scorecards judge repos on
 
 The links in the profile README are checked with one repository search, `repo:` per link: search answers for the rest when a `repo:` names a repo or owner that doesn't exist, so the repos it leaves out are the ones a visitor can't open. It runs on claude.ai with nothing attached, where reading each repo would need it attached first.
 
+The first runs on a real profile, on 2026-11-24 in Claude Code and on claude.ai, settled five rules:
+- **Employers from the profile.** With no `employers:` given, an owner the bio or `company` names counts as an employer. Whether to show an employer's work is the user's call, and getting it wrong in that direction only keeps work off the draft, while the other way puts it on the profile. `company` alone wasn't enough: on that profile it was empty and the bio named the employer.
+- **What the user declined stays out.** A re-run's draft put back a list of contributions the user had removed after an earlier draft suggested it. So the page carries `draft.declined` from run to run, and adds to it whatever the previous draft had that the README now lacks. A comparison with the previous draft alone would forget a removal after one more run.
+- **`check` for a pin the summary may have missed.** On claude.ai the pins come from a page summary that can leave some out, so a recommended repo it doesn't name may be pinned already. Telling the user to pin it would be wrong as often as right.
+- **One pin to a quote.** A list of pins joined into one line isn't a line from anywhere, so it can't be checked as a quote.
+- **The bio, not the status message.** The profile page shows both, and by one chat's account its summary gave the status as the bio. `user` gives the bio on claude.ai, so the summary is only a fallback.
+
 ## Steps for one mode live in their own file
 
 `SKILL.md` loads in full on every run, so a single review used to carry the portfolio and triage steps it never runs. Those steps are in `portfolio.md`, `triage.md`, `quick.md` and `profile.md` beside it, read only in their mode, so a single review loads the shared rules and Steps 1 to 6, and changes to triage don't grow every review. A portfolio run reads its file before starting, since it holds how a portfolio run logs its time, not only Step 7. Each mode file names the sections of `SKILL.md` it relies on.

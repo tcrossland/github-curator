@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Profile review: rules from its first runs](#profile-review-rules-from-its-first-runs) | 0.9.0 | Rule | S | todo |
 | [Reviews side by side](#reviews-side-by-side) | 0.10.0 | Rule | M | todo |
 | [Author identities](#author-identities) | 0.10.0 | Feature | S | todo |
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
@@ -19,17 +18,6 @@ Sizes: S is an hour or two, M is a session, L is several sessions. Change Status
 ## Next
 
 The next two releases, in the order to do them. An item's Release is the version it's meant for.
-
-### Profile review: rules from its first runs
-
-`repo-review profile` ran on a real profile on 2026-11-24, in Claude Code and on claude.ai, and met its done-when in both. The runs raised five questions its rules don't settle:
-- **Employers from the bio.** Both runs counted an employer the bio names, which the `contributions` rules don't do. `user.json` already holds `company`, which could be passed as an employer and named in the footer, or the rule could forbid it.
-- **Pins quoted as one line.** The Claude Code run quoted six pin names as one line, labelled "summarised, not a verbatim line". `profile.md` could ask for one pin name per quote.
-- **A draft that puts back what the user removed.** The claude.ai run's draft named three contributions, though the previous review noted the user had removed that list, and left the call to the user. A re-run could keep out of the draft whatever the user took out of the README since the previous draft.
-- **Pins whose state is unknown.** On claude.ai, two recommended pins the page summary didn't name came out as "pin (check whether it's already pinned)". The changes have no `check` kind for that.
-- **The bio from the page summary.** By the claude.ai chat's account, the profile page summary gave the status message as the bio (**unverified**). `user` gave the bio there, so the fallback is rare, but it could say to take the bio only from a line the summary labels as the bio.
-
-Done when each is a rule in `profile.md`, with a test or an eval case where it can have one, or is recorded in `docs/design.md` as decided against.
 
 ### Reviews side by side
 

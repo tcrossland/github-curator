@@ -184,6 +184,7 @@ footer { color: var(--muted); font-size: 12.5px; }
 .pchg .pc { font: 500 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; padding: 5px 0; border-radius: 999px; text-align: center; background: var(--quote-bg); color: var(--muted); }
 .pchg .pc.pin { background: var(--pass-bg); color: var(--pass); }
 .pchg .pc.drop { background: var(--fail-bg); color: var(--fail); }
+.pchg .pc.check { background: var(--flag-bg); color: var(--flag); }
 .fixp .dh { font: 600 13px/1.2 var(--body); margin: 4px 0 0; }
 .timings { font-size: 13px; color: var(--muted); }
 .timings summary { cursor: pointer; color: var(--accent); }
@@ -274,7 +275,7 @@ details.fold { display: block; }
     if (!p) return '';
     var nowLabel = partialPins(p.current, p.source) ? 'Pins read, may be incomplete' : 'Pinned now';
     var pl = function (a) { return a && a.length ? '<ol>' + a.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>' : '<p class="note">None</p>'; };
-    var change = { pin: 'Pin', keep: 'Keep', drop: 'Drop' };
+    var change = { pin: 'Pin', keep: 'Keep', drop: 'Drop', check: 'Check' };
     return '<section class="pins" aria-label="Pins"><span class="label">Profile pins · up to 6</span>' + (p.why ? '<p class="why">' + fmt(p.why) + '</p>' : '') +
            '<div class="cols"><div><h3>' + nowLabel + '</h3>' + pl(p.current) + '</div><div><h3>Recommended</h3>' + pl(p.recommended) + '</div></div>' +
            (p.changes && p.changes.length ? '<ul class="pchg">' + p.changes.map(function (c) {

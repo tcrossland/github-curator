@@ -369,6 +369,13 @@ test('a profile review without drafts, contributions or a next command leaves th
   assert.match(html, /Profile pins · up to 6/);
 });
 
+test('a pin the profile summary may have left out is marked check', () => {
+  const pins = { ...profile.pins, source: 'profile page summary, may not be complete', changes: [{ name: 'owner/a', change: 'check', why: 'The summary named 2 of 6 pins; check the profile.' }] };
+  const { html } = render({ ...profile, pins });
+  assert.match(html, /<span class="pc check">Check<\/span><span><code>owner\/a<\/code> The summary named 2 of 6 pins; check the profile\.<\/span>/);
+  assert.match(html, /<h3>Pins read, may be incomplete<\/h3>/);
+});
+
 test('a bio that needs no change is shown without a copy button', () => {
   const { html } = render({ ...profile, draft: { ...profile.draft, bio: 'No change', bioNote: 'The bio passes Introduction.' } });
   assert.match(html, /<h3 class="dh">Bio<\/h3><p>No change<\/p><p class="note">The bio passes Introduction\.<\/p>/);
