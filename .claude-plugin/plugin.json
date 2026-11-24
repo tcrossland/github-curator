@@ -1,6 +1,6 @@
 {
   "name": "github-curator",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Claude plugin that recommends what to do with each repo on a GitHub account (keep, publish, archive, make private or delete) on a scorecard that quotes its evidence. It also triages every repo at once, and lists stargazers, forks, your pull requests to other projects and traffic history. It only recommends: it changes no repo and contacts no one.",
   "author": {
     "name": "Tomas Crossland",
