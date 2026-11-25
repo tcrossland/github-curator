@@ -77,6 +77,29 @@ The behaviours of GitHub and of Claude's plugin system that the skills state or 
 
 ## GitHub from a claude.ai session
 
+In outline, from the rows below:
+
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+    subgraph vm["the claude.ai session's VM"]
+        gh["gh api"]
+        git["git"]
+        wf["WebFetch"]
+        curl["curl"]
+    end
+    tools["add_repo and list_repos<br>(each asks in Manual mode)"] -. "attach, list" .-> attached
+    gh --> attached["an attached repo's paths<br>repos/OWNER/REPO/..."]
+    gh --> searchok["search/repositories, search/issues, user"]
+    gh --x refused["HTTP 403: GraphQL; user/repos, users/LOGIN,<br>orgs/NAME/repos, user/memberships/orgs;<br>any unattached repo; compare across forks"]
+    git --> clones["any public repo;<br>a private repo once attached"]
+    wf --x gh403["URL_NOT_ON_ALLOWLIST for github.com,<br>unless a search in the chat found the URL"]
+    curl --> rel["betterleaks' release from github.com"]
+```
+
 Seen in the 0.2.4 test runs on claude.ai, recorded in the doc "github-curator 0.2.4: test report", and in a second session that probed attaching, compare, cloning and WebFetch. The session's `gh` goes through a proxy bound to the repos attached to the session, so much of what works in Claude Code's own shell doesn't work there.
 
 Rechecked on 2026-11-20 with one prompt run in two chats, one in claude.ai in a browser and one in the desktop app's Chat tab. Both ran in the same kind of cloud VM (hostname `vm`, kernel `6.18.44-fc-v726`, working directory `/home/claude`, `$HOME` `/root`) and got the same answers from the proxy, so this section holds for both. The desktop app's Chat tab also listed four artifact tools "on your computer" (`create_artifact`, `list_artifacts`, `list_legacy_live_artifacts`, `update_artifact`). Both chats had `add_repo` refused (below), so the rows that need an attached repo weren't rechecked and keep their earlier date. The desktop app's Code tab is Claude Code, on the user's computer, and none of this section applies to it.

@@ -11,6 +11,7 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
 | [Launch drafts](#launch-drafts) | Later | New skill | M | todo |
 | [Benchmark against good practice](#benchmark-against-good-practice) | Later | Scorecard panel | L | todo |
+| [The GitHub connector on claude.ai](#the-github-connector-on-claudeai) | Later | Route | S | todo |
 | [Traffic history](#traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
 
 Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
@@ -62,6 +63,14 @@ Add a **Practice** panel to the scorecard: a checklist of `done`, `todo` and `n/
 - Each profile carries the date it was last reviewed, since good practice moves quickly.
 
 **Done when** a review of a Python repo with a `pyproject.toml` and CI shows a Practice panel whose items match those files, with evidence for each, and `tests/` holds small fixture repos with known Practice results, one per profile, so a change to a profile can't silently break it.
+
+### The GitHub connector on claude.ai
+
+A claude.ai session's `gh` reads only the repos attached to it, so a first triage there attaches every fork to read its parent, one approval each past what Auto mode lets through. The claude.ai GitHub connector reads other owners' public repos without attaching them: by 2026-11-23 its repo tools answered on claude.ai (`docs/github-facts.md`, "The GitHub connector"). It can't see private repos, has none of stargazers, traffic, forks or pins, returns authors' email addresses and can write, so no skill uses it yet.
+
+Decide whether a skill should read through it on claude.ai, and for which reads: forks' parents first. A skill that uses it keeps the email addresses out of everything it writes and calls none of its write tools.
+
+**Done when** `docs/design.md` records the decision and its reason, and, if it's yes, a first triage on claude.ai reads its forks' parents through the connector, attaching fewer repos than it does today.
 
 ## Waiting on time
 
