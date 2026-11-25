@@ -5,6 +5,7 @@ What changed for someone using the plugin, newest first. A Claude Code session k
 ## Unreleased
 
 - In Claude Code you can install the plugin from this repo's own marketplace, with `claude plugin marketplace add tcrossland/github-curator` and `claude plugin install github-curator@github-curator`. It installs the latest release, not unreleased work.
+- A portfolio run doesn't hand its repos to subagents to review side by side, so each scorecard's time and request counts are its own.
 
 ## 0.9.0 (2026-11-24)
 

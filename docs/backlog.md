@@ -6,7 +6,6 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 
 | Item | Release | Kind | Size | Status |
 |---|---|---|---|---|
-| [Reviews side by side](#reviews-side-by-side) | 0.10.0 | Rule | M | todo |
 | [Author identities](#author-identities) | 0.10.0 | Feature | S | todo |
 | [Links between the pages](#links-between-the-pages) | Later | Pages | M | todo |
 | [Launch drafts](#launch-drafts) | Later | New skill | M | todo |
@@ -14,19 +13,17 @@ Ideas for the plugin, grouped by the release they're meant for and in order with
 | [The GitHub connector on claude.ai](#the-github-connector-on-claudeai) | Later | Route | S | todo |
 | [Traffic history](#traffic-history) | Waiting on time | New skill and scheduled task | M | in progress |
 
-Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. When an item is done, delete its section and its summary row: the changelog and the commit that closes it record it. Keep a short section under Done only when an open item depends on what it found, such as figures, and keep only that part. Move an item between groups by moving its section and changing its row's Release.
+Sizes: S is an hour or two, M is a session, L is several sessions. Change Status to `in progress` when work starts. How to close an item is in the working agreement in [CLAUDE.md](../CLAUDE.md#working-agreement).
 
 ## Next
 
-The next two releases, in the order to do them. An item's Release is the version it's meant for.
-
-### Reviews side by side
-
-`docs/design.md` has a portfolio run review its repos one at a time, since the request count is the account's and side-by-side reviews can't be told apart. Several repo URLs with no mode word now ask which mode to run, so they no longer start separate reviews at once, but a portfolio run whose reviews run in subagents still can. On 2026-11-21 one review ran alone, then seven ran in subagents four at a time: by their timing logs they took 2,312 s between them and the last finished 817 s after the first began. Three things came up that the skill doesn't cover. Each review's `calls` included the others' requests, and the page has no field to say so, so each footer said it in a sentence the subagents were given. The reviews share the search limit of 30 a minute (`gh api rate_limit`); none was refused, and the retry after a minute that the subagents were told to use isn't in the skill. And nothing says how many may run at once. Settle it before the next large portfolio run. If the skill rules them out, the change is a fix and can go in a patch release. Done when the skill either rules side-by-side reviews out, or says how to run them (how many at once, what to do when a search is refused) and the page shows when a review's counts include other runs'.
+The next release, in the order to do it. An item's Release is the version it's meant for.
 
 ### Author identities
 
-Let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. Triage's fork step now reads each commit's author name and email domain from git, so the list would let it mark those commits as the user's. Done when triage reads the list and marks matching commits as the user's.
+Let the user list their past commit email domains, kept outside the plugin (in their instructions or memory, as `contributions` takes their employers), so triage can tell their unlinked commits from other people's without asking. Triage's fork step reads each commit's author name and email domain from git, so the list would let it mark those commits as the user's.
+
+**Done when** triage reads the list and marks matching commits as the user's.
 
 ## Later
 
@@ -34,7 +31,9 @@ Bigger features, in the order to do them.
 
 ### Links between the pages
 
-Each scorecard, the quick review, the triage page, the portfolio page and Traffic history are separate artifacts found by title, and only the portfolio page links to scorecards. Quick and triage rows could link to a repo's scorecard when one exists, and a scorecard's header to the latest quick review, triage and portfolio page, from one listing of the user's artifacts. In Claude Code that listing can stop at the 50 most recently updated artifacts (`docs/github-facts.md`), so a page that finds no link for a page it names says one may exist, as a review's footer does. Done when each page links to the others it names, and a template test covers each link.
+Each scorecard, the quick review, the triage page, the portfolio page and Traffic history are separate artifacts found by title, and only the portfolio page links to scorecards. Quick and triage rows could link to a repo's scorecard when one exists, and a scorecard's header to the latest quick review, triage and portfolio page, from one listing of the user's artifacts. In Claude Code that listing can stop at the 50 most recently updated artifacts (`docs/github-facts.md`), so a page that finds no link for a page it names says one may exist, as a review's footer does.
+
+**Done when** each page links to the others it names, and a template test covers each link.
 
 ### Launch drafts
 
@@ -78,10 +77,6 @@ Started, and waiting on a date before it can close.
 
 ### Traffic history
 
-GitHub keeps traffic for 14 days only, so the scorecard's views, clones and referrers are lost after a fortnight. Nothing can show whether featuring or sharing a repo changed anything. This is the only item that loses something for every week it waits.
-
-The `traffic` skill saves a snapshot of every public repo's stars, forks, daily views and clones and top referrers as one document in the database of a page titled "Traffic history", which charts them across snapshots, and `schedule` sets up a weekly task that runs it, early on Mondays. The review's Outcomes panel links to the page.
-
-The task's first run on schedule saved a snapshot on its own at 06:26 UTC on 2026-11-23, of 15 of the 17 public repos the account has: `github-curator` and the profile README repo weren't attached to the chat that created the task, and a run can't attach them. A snapshot of all 17 was saved at 13:15 UTC the same day, outside the schedule. Whether the task itself now covers all 17 shows in its next run, early on 2026-11-30. If it doesn't, attach the two in a chat and run `traffic schedule` again.
+The `traffic` skill and its weekly task have shipped. The task's first run on schedule, at 06:26 UTC on 2026-11-23, saved 15 of the 17 public repos: `github-curator` and the profile README repo weren't attached to the chat that created the task, and a run can't attach them. A snapshot of all 17 was saved by hand the same day. Whether the task itself now covers all 17 shows in its next run, early on 2026-11-30. If it doesn't, attach the two in a chat and run `traffic schedule` again.
 
 **Done when** two weekly snapshots of every public repo are saved and charted on the page, the second by the weekly task on its schedule.
